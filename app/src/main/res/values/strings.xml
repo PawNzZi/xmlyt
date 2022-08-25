@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">soundbook</string>
+    <string name="title_home">首页</string>
+    <string name="title_dashboard">分类</string>
+    <string name="title_notifications">我的</string>
+    <string name="null_fragment">暂未开发</string>
+    <string name="null_fragment_tip">请到首页使用搜索功能，后续开发中，加群获得最新版本</string>
+    <string name="qq_gruop">一键复制：</string>
+    <string name="username">你好，游客</string>
+    <string name="collection_history">收藏列表</string>
+    <string name="play_histtory">播放历史</string>
+
+</resources>

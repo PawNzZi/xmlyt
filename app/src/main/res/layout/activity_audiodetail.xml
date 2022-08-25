@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        tools:ignore="MissingConstraints"
+        android:background="@color/colorPrimaryDark"
+        >
+        <ImageView
+            android:id="@+id/backIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="15dp"
+            android:src="@mipmap/back"
+            >
+
+        </ImageView>
+        <ImageView
+            android:id="@+id/collection"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="15dp"
+            android:src="@mipmap/unlike"
+            android:layout_alignParentRight="true"
+            >
+
+        </ImageView>
+        <ImageView
+            android:id="@+id/bookThumb"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+
+            >
+
+        </ImageView>
+        <TextView
+            android:id="@+id/bookName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bookThumb"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="庆余年"
+            android:textSize="20sp"
+            android:textColor="@color/cardview_light_background"
+            >
+
+        </TextView>
+        <TextView
+            android:id="@+id/bookAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bookName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:text="猫腻 著"
+            android:textSize="16sp"
+            android:textColor="@color/colorDivider"
+            >
+        </TextView>
+    </RelativeLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorBorder"
+        >
+    </TextView>
+    <LinearLayout
+        android:layout_height="30dp"
+        android:layout_width="match_parent"
+        android:gravity="center_vertical"
+        android:background="@color/cardview_light_background"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/listLen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="共 109 集"
+            android:layout_marginLeft="10dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            >
+        </TextView>
+
+    </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorBorder"
+        >
+    </TextView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </androidx.recyclerview.widget.RecyclerView>
+</LinearLayout>
