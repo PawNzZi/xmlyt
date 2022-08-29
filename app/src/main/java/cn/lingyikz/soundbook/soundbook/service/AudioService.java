@@ -112,14 +112,12 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
         player.onStop();
         player.reset();
         player.freeMediaPlayer();
-
     }
 
     @Override
     public void onCompletion(android.media.MediaPlayer mediaPlayer) {
 
-        player.onStop();
-        player.reset();
+
         Log.i("TAG","播放完毕");
 //        Log.i("TAG","albumId:"+bundle.getInt("albumId"));
 //        Log.i("TAG","播放完毕");
@@ -152,7 +150,9 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
                             reslutBundle.putLong("audioCreated",dataDTO.getCreated());
                             reslutBundle.putString("src",dataDTO.getUrl());
                             reslutBundle.putInt("audioId",dataDTO.getId());
-
+                            reslutBundle.putInt("totalCount",bundle.getInt("totalCount"));
+                            player.onStop();
+                            player.reset();
                             player.onRead(dataDTO.getUrl());
                             SharedPreferences.saveOldAudioInfo(getApplication(),bundle);
                             bundle = reslutBundle;
@@ -202,6 +202,8 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
         hashMap.put("src",bundle.getString("src"));
         hashMap.put("audioId",bundle.getInt("audioId"));
         hashMap.put("audioCreated",bundle.getLong("audioCreated"));
+        hashMap.put("totalCount",bundle.getInt("totalCount"));
+
 //        Log.i("TAG",bundle.getString("title"));
 //        Log.i("TAG",bundle.getLong("audioCreated")+"");
         dataBaseHelper = DataBaseHelper.getInstance(this);
@@ -219,6 +221,7 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
         hashMap.put("src",bundle.getString("src"));
         hashMap.put("audioId",bundle.getInt("audioId"));
         hashMap.put("audioCreated",bundle.getLong("audioCreated"));
+        hashMap.put("totalCount",bundle.getInt("totalCount"));
 //        Log.i("TAG",bundle.getString("title"));
 //        Log.i("TAG",bundle.getLong("audioCreated")+"");
 

@@ -11,16 +11,22 @@
     <ImageView
         android:id="@+id/bookThumb"
         android:layout_width="match_parent"
-        android:layout_height="450dp" />
+        android:layout_height="550dp" />
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/seekbar"
+        android:progressDrawable="@drawable/seekbar_brightness_selector"
         android:layout_width="match_parent"
-        android:layout_height="30dp">
+        android:layout_height="30dp"
+        android:splitTrack="false"
+        android:thumb="@mipmap/seekbar_qiu"
+        >
 
     </androidx.appcompat.widget.AppCompatSeekBar>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        >
 
         <ImageView
             android:layout_centerVertical="true"
@@ -28,7 +34,7 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginLeft="50dp"
-            android:src="@mipmap/like"
+            android:src="@mipmap/activity_preplay"
             >
 
         </ImageView>
@@ -38,7 +44,7 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_centerHorizontal="true"
-            android:src="@mipmap/like"
+            android:src="@mipmap/activity_pause"
             >
 
         </ImageView>
@@ -49,7 +55,7 @@
             android:layout_height="70dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="50dp"
-            android:src="@mipmap/like"
+            android:src="@mipmap/activity_nextplay"
             >
 
         </ImageView>

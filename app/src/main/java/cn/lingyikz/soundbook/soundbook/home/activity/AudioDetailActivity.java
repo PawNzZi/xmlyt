@@ -51,6 +51,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
 //    private int albumId = 0 ;
     private Album.DataDTO.ListDTO albumDetail ;
     private DataBaseHelper dataBaseHelper;
+    private int totalCount = 0 ;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -133,6 +134,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
 
                             if(isSpinner){
                                 int pages = reslut.getData().getPages();
+                                totalCount  = reslut.getData().getTotal();
                                 List<String> spinnerItemList = new ArrayList<>();
                                 if(pages == 1){
                                     for (int i = 0; i < pages + 1; i++) {
@@ -198,6 +200,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
 
     @Override
     public void onAudioPlay(Bundle bundle){
+        bundle.putInt("totalCount",totalCount);
         IntentAction.setValueActivity(this,PlayAudioActivity.class,bundle);
 //        Intent intent = new Intent(this, AudioService.class);
 //        long audioDuration = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
