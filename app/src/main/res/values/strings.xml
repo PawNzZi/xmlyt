@@ -9,5 +9,6 @@
     <string name="username">你好，游客</string>
     <string name="collection_history">收藏列表</string>
     <string name="play_histtory">播放历史</string>
+    <string name="spinner_text">第1-50集</string>
 
 </resources>

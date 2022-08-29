@@ -2,10 +2,17 @@ package cn.lingyikz.soundbook.soundbook.home.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
+import java.lang.reflect.TypeVariable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +23,7 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemAudiolistBinding;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 
@@ -27,12 +35,19 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     private Context context ;
     private AudioListen audioListen ;
     private SimpleDateFormat dateFormat ;
+    private int Tag ;
     @SuppressLint("SimpleDateFormat")
-    public AudioListAdapter(List<AlbumDetail.DataDTO.ListDTO> list, Context context, AudioListen audioListen ){
+    public AudioListAdapter(List<AlbumDetail.DataDTO.ListDTO> list, Context context, AudioListen audioListen ,int Tag){
         this.list = list ;
         this.context = context ;
         this.audioListen = audioListen;
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        this.Tag = Tag ;
+        if(Tag == 0){
+            dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        }else {
+            dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+
 
     }
     @NonNull
@@ -49,24 +64,41 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     @Override
     public void onBindViewHolder(@NonNull  AudioListAdapter.ViewHolder holder, int position) {
 //        LOnClickMe.init(this,holder.binding.getRoot());
+//        Log.i("TAG","onBindViewHolder");
+        String tip = "";
+        if(Tag == 1){
+            tip = "上一次播放 ";
+            holder.binding.listDate.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
+            holder.binding.donwloadAudio.setImageDrawable(context.getResources().getDrawable(R.mipmap.delete, context.getTheme()));
+        }
+        holder.binding.donwloadAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Tag == 1){
+                    audioListen.onDeleteItem(list.get(position).getAlbumId());
+                }else{
+                    Toast.makeText(context, "暂未开放", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         holder.binding.listIndex.setText(position+1+"");
         holder.binding.listName.setText(list.get(position).getName());
-
-        holder.binding.listDate.setText(dateFormat.format(new Date(list.get(position).getCreated())));
+//        Log.i("TAG","onBindViewHolder"+list.get(position).getName());
+        holder.binding.listDate.setText(tip + dateFormat.format(new Date(list.get(position).getCreated())));
         holder.binding.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Map<String,Object> map = new HashMap<>();
-                map.put("albumId",list.get(position).getAlbumId());
-                map.put("episodes",list.get(position).getEpisodes());
-                map.put("audioCreated",list.get(position).getCreated());
-                map.put("audioDes",list.get(position).getDescription());
-                map.put("audioDuration",0);
-                map.put("title",list.get(position).getName());
-                map.put("src",list.get(position).getUrl());
-                map.put("audioId",list.get(position).getId());
-//                map.put("currentPosition",0L);
-                audioListen.onAudioPlay(map);
+//                Map<String,Object> map = new HashMap<>();
+                Bundle bundle = new Bundle();
+                bundle.putInt("albumId",list.get(position).getAlbumId());
+                bundle.putInt("episodes",list.get(position).getEpisodes());
+                bundle.putLong("audioCreated",System.currentTimeMillis());
+                bundle.putString("audioDes", (String) list.get(position).getDescription());
+//                bundle.putString("audioDuration","0");
+                bundle.putString("title",list.get(position).getName());
+                bundle.putString("src",list.get(position).getUrl());
+                bundle.putInt("audioId",list.get(position).getId());
+                audioListen.onAudioPlay(bundle);
             }
         });
 
@@ -90,6 +122,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     }
 
     public interface AudioListen{
-        void onAudioPlay(Map<String,Object> map);
+        void onAudioPlay(Bundle bundle);
+        void onDeleteItem(int albumId);
     }
 }

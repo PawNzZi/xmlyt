@@ -2,13 +2,12 @@ package cn.lingyikz.soundbook.soundbook.home.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContentValues;
+
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -16,9 +15,12 @@ import com.bumptech.glide.request.RequestOptions;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 
+import org.angmarch.views.NiceSpinner;
+import org.angmarch.views.OnSpinnerItemSelectedListener;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -27,31 +29,28 @@ import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityAudiodetailBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
-import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
-import cn.lingyikz.soundbook.soundbook.pojo.ItemAudioDetail;
-import cn.lingyikz.soundbook.soundbook.pojo.ItemHome;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
+import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class AudioDetailActivity extends Activity implements AudioListAdapter.AudioListen {
+public class AudioDetailActivity extends Activity implements AudioListAdapter.AudioListen ,OnSpinnerItemSelectedListener{
 
     private ActivityAudiodetailBinding activityAudiodetailBinding;
-    private AudioListAdapter adapter ;
-    private List<AlbumDetail.DataDTO.ListDTO> mList ;
-    private static final int SIZE = 10;
+    private AudioListAdapter adapter = null;
+    private List<AlbumDetail.DataDTO.ListDTO> mList  = new ArrayList<>();
+
     private int nextPage = 1;
-    private int totalPage = 0 ;
-    private boolean hasNextPage = false;
+//    private int albumId = 0 ;
     private Album.DataDTO.ListDTO albumDetail ;
     private DataBaseHelper dataBaseHelper;
-    private boolean isCollection = false ;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,12 +68,10 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
         albumDetail = (Album.DataDTO.ListDTO) bundle.getSerializable("bookObject");
 //        database = new DataBaseHelper(this);
         dataBaseHelper = DataBaseHelper.getInstance(this);
-        dataBaseHelper.getReadLink();
-        int count = dataBaseHelper.queryCollectionCount(albumDetail.getId(),SharedPreferences.getUUID(this));
+        int count = dataBaseHelper.queryCollectionCount(albumDetail.getId());
         dataBaseHelper.close();
         if(count == 0 ){
 //            Log.i("TAG","结果为空");
-
         }else if(count > 0){
 
             Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
@@ -86,11 +83,12 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
         activityAudiodetailBinding.bookAuthor.setText(albumDetail.getDescription());
 
         //调接口查询列表
-        this.queryList(albumDetail.getId());
+        this.queryList(albumDetail.getId(),true);
+
     }
     @SuppressLint("SetTextI18n")
-    public void queryList(int id){
-        Observable<AlbumDetail> observable  = RequestService.getInstance().getApi().getAlbumDetail(nextPage,SIZE,id);
+    public void queryList(int id,boolean isSpinner){
+        Observable<AlbumDetail> observable  = RequestService.getInstance().getApi().getAlbumDetail(nextPage, Constans.PAGE_SIZE,id);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
                 .subscribe(new Observer<AlbumDetail>() { // 订阅
@@ -107,24 +105,70 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
 
                     @Override
                     public void onNext(AlbumDetail reslut) {
-                        Log.i("http返回：", reslut.toString() + "");
-                        mList = reslut.getData().getList();
-                        hasNextPage = reslut.getData().getHasNextPage();
-                        nextPage = reslut.getData().getNextPage();
+                        if(reslut.getCode() == 200 && reslut.getData().getList().size() > 0 ) {
+//                            Log.i("TAG：", reslut.toString() + "");
+//                        mList = null ;
+                            if(mList == null){
+                                mList = new ArrayList<>();
+                            }
+                            mList.clear();
+                            List<AlbumDetail.DataDTO.ListDTO> newList = reslut.getData().getList();
+                            mList.addAll(newList);
+//                        Log.i("TAG",mList+"");
+//                        Log.i("TAG：", mList.get(0).getName() + "");
+                            nextPage = reslut.getData().getNextPage();
+                            if(adapter == null){
+//                                Log.i("TAG","adapter == null");
+                                adapter = new AudioListAdapter(mList,AudioDetailActivity.this,AudioDetailActivity.this,0);
+                                activityAudiodetailBinding.recyclerView.setLayoutManager(new LinearLayoutManager(AudioDetailActivity.this));
+                                activityAudiodetailBinding.recyclerView.setAdapter(adapter);
+                                DividerItemDecoration divider = new DividerItemDecoration(AudioDetailActivity.this,DividerItemDecoration.VERTICAL);
+                                activityAudiodetailBinding.recyclerView.addItemDecoration(divider);
+                                activityAudiodetailBinding.listLen.setText("共"+ reslut.getData().getTotal() +"集");
+                            }else {
+//                                Log.i("TAG","adapter != null");
+                                adapter.notifyDataSetChanged();
+                                //数据没有刷新，是因为mList对象被指向新的地址，
+                            }
 
-                        adapter = new AudioListAdapter(mList,AudioDetailActivity.this,AudioDetailActivity.this);
-                        activityAudiodetailBinding.recyclerView.setLayoutManager(new LinearLayoutManager(AudioDetailActivity.this));
-                        activityAudiodetailBinding.recyclerView.setAdapter(adapter);
-                        DividerItemDecoration divider = new DividerItemDecoration(AudioDetailActivity.this,DividerItemDecoration.VERTICAL);
-                        activityAudiodetailBinding.recyclerView.addItemDecoration(divider);
-                        activityAudiodetailBinding.listLen.setText("共"+ reslut.getData().getTotal() +"集");
+                            if(isSpinner){
+                                int pages = reslut.getData().getPages();
+                                List<String> spinnerItemList = new ArrayList<>();
+                                if(pages == 1){
+                                    for (int i = 0; i < pages + 1; i++) {
+                                        String str = "" ;
+                                        str = "第1"+"—"+ reslut.getData().getTotal() +"集";
+//                                       str = "第" + (i*SIZE+1) +"—"+(reslut.getData().getTotal() - (i*SIZE)) +  +"集";
+//                                        Log.i("TAG","STR:"+str);
+                                        spinnerItemList.add(str);
+                                    }
+                                }else if(pages > 1){
+                                    for (int i = 0; i < pages; i++) {
+                                        String str = "" ;
+                                        if(i == pages - 1){
+                                            str = "第" + (i*Constans.PAGE_SIZE+1) +"—"+ reslut.getData().getTotal() +"集";
+//                                        str = "第" + (i*SIZE+1) +"—"+(reslut.getData().getTotal() - (i*SIZE)) +  +"集";
+//                                            Log.i("TAG","STR:"+str);
+                                        }else {
+                                            str = "第" + (i*Constans.PAGE_SIZE+1) +"—"+(i+1)*Constans.PAGE_SIZE+"集";
+//                                            Log.i("TAG","STR1:"+str);
+                                        }
+
+                                        spinnerItemList.add(str);
+                                    }
+                                }
+
+                                activityAudiodetailBinding.niceSpinner.attachDataSource(spinnerItemList);
+                                activityAudiodetailBinding.niceSpinner.setOnSpinnerItemSelectedListener(AudioDetailActivity.this);
+                            }
+                        }else {
+                            Toast.makeText(AudioDetailActivity.this, reslut.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+
 
                     }
                 });
-
-
     }
-
 
     @AClick({R.id.backIcon,R.id.collection})
     public void click(View view) {
@@ -134,18 +178,17 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
                 break;
             case R.id.collection:
                 //收藏
-                Log.i("TAG","collection");
+//                Log.i("TAG","collection");
                 String sql = "";
                 dataBaseHelper = DataBaseHelper.getInstance(this);
-                dataBaseHelper.getWriteLink();
-                int count = dataBaseHelper.queryCollectionCount(albumDetail.getId(),SharedPreferences.getUUID(this));
+                int count = dataBaseHelper.queryCollectionCount(albumDetail.getId());
                 if( count > 0 ){
                     //取消
-                    dataBaseHelper.cancleCollection(albumDetail.getId(),SharedPreferences.getUUID(this));
+                    dataBaseHelper.cancleCollection(albumDetail.getId());
                     Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.unlike).into(activityAudiodetailBinding.collection);
                 }else{
                     //关注
-                    dataBaseHelper.addCollection(albumDetail,SharedPreferences.getUUID(this));
+                    dataBaseHelper.addCollection(albumDetail);
                     Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
                 }
                 dataBaseHelper.close();
@@ -154,33 +197,42 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
     }
 
     @Override
-    public void onAudioPlay(Map<String,Object> map) {
-        Intent intent = new Intent(this, AudioService.class);
-        Map<String,Object> oldAudioInfo =  SharedPreferences.getOldAudioInfo(this);
+    public void onAudioPlay(Bundle bundle){
+        IntentAction.setValueActivity(this,PlayAudioActivity.class,bundle);
+//        Intent intent = new Intent(this, AudioService.class);
+//        long audioDuration = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
+//        dataBaseHelper.close();
+//        Bundle oldAudioInfo =  SharedPreferences.getOldAudioInfo(this);
+//        if(oldAudioInfo.getString("src" ) != null){
+//
+//            if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
+////                Log.i("TAG","暂停");
+//
+//                bundle.putBoolean("continuePlay",true);
+//
+//            }else{
+//                //stop并重新播放
+////                Log.i("TAG","stop并重新播放");
+//
+//                bundle.putBoolean("continuePlay",false);
+//            }
+//        }else {
+//
+//            bundle.putBoolean("continuePlay",false);
+//        }
+//        bundle.putLong("audioDuration", audioDuration);
+//        intent.putExtras(bundle);
+//        startService(intent);
+//        //播放时增加这条记录
+//        dataBaseHelper = DataBaseHelper.getInstance(this);
+//        dataBaseHelper.addPlayHistory(map);
+//        dataBaseHelper.close();
 
-        if(oldAudioInfo.get("src") != null){
-            if(oldAudioInfo.get("src").toString().equals(map.get("src").toString())){
-                //暂停
-//                Log.i("TAG","暂停");
-                intent.putExtra("continue",true);
-                map.put("currentPosition",oldAudioInfo.get("currentPosition"));
-            }else{
-                //stop并重新播放
-//                Log.i("TAG","stop并重新播放");
-                intent.putExtra("continue",false);
-                map.put("currentPosition",0L);
-            }
-        }else {
-            intent.putExtra("continue",false);
-            map.put("currentPosition",0L);
-        }
 
-        intent.putExtra("path",map.get("src").toString());
-        SharedPreferences.saveOldAudioInfo(this,map);
-        startService(intent);
-        dataBaseHelper = DataBaseHelper.getInstance(this);
-        dataBaseHelper.addPlayHistory(map);
+    }
 
+    @Override
+    public void onDeleteItem(int albumId) {
 
     }
 
@@ -188,5 +240,13 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
     protected void onDestroy() {
         super.onDestroy();
         activityAudiodetailBinding = null ;
+    }
+
+    @Override
+    public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+        if(albumDetail.getId() != 0){
+            nextPage = position + 1;
+            this.queryList(albumDetail.getId(),false);
+        }
     }
 }

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -74,12 +75,11 @@
         android:background="@color/colorBorder"
         >
     </TextView>
-    <LinearLayout
-        android:layout_height="30dp"
+    <RelativeLayout
+        android:layout_height="40dp"
         android:layout_width="match_parent"
-        android:gravity="center_vertical"
         android:background="@color/cardview_light_background"
-        android:orientation="vertical">
+        >
 
         <TextView
             android:id="@+id/listLen"
@@ -89,11 +89,27 @@
             android:layout_marginLeft="10dp"
             android:textSize="14sp"
             android:textStyle="bold"
+            android:layout_centerVertical="true"
             android:textColor="@color/colorPrimary"
             >
         </TextView>
+        <org.angmarch.views.NiceSpinner
+            android:id="@+id/nice_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:textSize="13sp"
+            />
+<!--        <com.androidbuts.multispinnerfilter.SingleSpinnerSearch-->
+<!--            android:id="@+id/singleItemSelectionSpinner"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_alignParentRight="true"-->
 
-    </LinearLayout>
+<!--            app:hintText="@string/spinner_text" />-->
+    </RelativeLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"

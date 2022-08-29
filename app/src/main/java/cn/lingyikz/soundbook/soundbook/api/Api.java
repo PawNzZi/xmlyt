@@ -2,6 +2,7 @@ package cn.lingyikz.soundbook.soundbook.api;
 
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
+import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
 import cn.lingyikz.soundbook.soundbook.pojo.PostInfo;
 import cn.lingyikz.soundbook.soundbook.pojo.Test;
 import retrofit2.Call;
@@ -15,13 +16,19 @@ import rx.Observable;
 public interface Api {
 
 
+      //专辑列表查询
       @FormUrlEncoded
       @POST("album/list")
       Observable<Album> getPostInfo(@Field("page") int page , @Field("size") int size, @Field("keyword") String keyword) ;
 
+      //专辑详情查询
       @FormUrlEncoded
       @POST("xmly/list")
       Observable<AlbumDetail> getAlbumDetail(@Field("page") int page , @Field("size") int size, @Field("albumId") int albumId) ;
 
+      //查询下一集
+      @FormUrlEncoded
+      @POST("xmly/nextPlay")
+      Observable<XmlyNextPaly> getNextPlay(@Field("albumId") int albumId , @Field("episodes") int episodes);
 
 }

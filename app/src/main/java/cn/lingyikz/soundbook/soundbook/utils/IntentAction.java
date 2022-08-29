@@ -40,23 +40,27 @@ public class IntentAction {
         context.startActivity(intent);
     }
 
-    public static void startService(Activity activity, Class service, ImageView view){
+    public static void startService(Activity activity, Class service, ImageView view,DataBaseHelper dataBaseHelper){
         Intent intent = new Intent(activity, service);
-        Map<String,Object> oldAudioInfo =  SharedPreferences.getOldAudioInfo(activity);
-        if(oldAudioInfo.get("src") != null){
-            intent.putExtra("continue",true);
+        Bundle oldAudioInfo =  SharedPreferences.getOldAudioInfo(activity);
+        long audioDuration = dataBaseHelper.queryPlayHistory(oldAudioInfo.getInt("albumId"),oldAudioInfo.getInt("audioId"));
+        dataBaseHelper.close();
+        if(oldAudioInfo.getString("src")!= null){
+            oldAudioInfo.putBoolean("continuePlay",true);
+            oldAudioInfo.putLong("audioDuration",audioDuration);
+            SharedPreferences.saveOldAudioInfo(activity,oldAudioInfo);
+            intent.putExtras(oldAudioInfo);
+            activity.startService(intent);
+            if(MediaPlayer.getInstance().isPlay()){
+                view.setImageDrawable(activity.getResources().getDrawable(R.mipmap.title_pause, activity.getResources().newTheme()));
+            }else {
+                view.setImageDrawable(activity.getResources().getDrawable(R.mipmap.title_play, activity.getResources().newTheme()));
+            }
         }else {
             //提示无播放历史
             Toast.makeText(activity, "当前无播放", Toast.LENGTH_SHORT).show();
         }
 
-        intent.putExtra("path",oldAudioInfo.get("src").toString());
-        SharedPreferences.saveOldAudioInfo(activity,oldAudioInfo);
-        activity.startService(intent);
-        if(MediaPlayer.getInstance().isPlay()){
-            view.setImageDrawable(activity.getResources().getDrawable(R.mipmap.title_pause, activity.getResources().newTheme()));
-        }else {
-            view.setImageDrawable(activity.getResources().getDrawable(R.mipmap.title_play, activity.getResources().newTheme()));
-        }
+
     }
 }

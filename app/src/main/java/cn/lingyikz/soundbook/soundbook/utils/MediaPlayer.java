@@ -1,24 +1,21 @@
 package cn.lingyikz.soundbook.soundbook.utils;
 
+
 import android.util.Log;
 
 import java.io.IOException;
 
+
 public class MediaPlayer {
     private volatile static MediaPlayer mediaPlayer ;
     private static android.media.MediaPlayer player ;
-    private AudioStateLinstener audioStateLinstener ;
+    public static int error = 0 ;
 
 
     private MediaPlayer(){
         if(player == null){
             player = new android.media.MediaPlayer();
-            player.setOnCompletionListener(new android.media.MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(android.media.MediaPlayer mediaPlayer) {
-                    audioStateLinstener.onCompleteLinstener();
-                }
-            });
+
         }
     }
 
@@ -35,11 +32,12 @@ public class MediaPlayer {
     }
 
     public void onRead(String src){
-        Log.i("TAG",src);
+//        Log.i("TAG",src);
         try {
 
             player.setDataSource(src);
             player.prepareAsync();
+
             player.setOnPreparedListener(new android.media.MediaPlayer.OnPreparedListener() {
 
                 @Override
@@ -47,14 +45,21 @@ public class MediaPlayer {
                     player.start();
                 }
             });
-
+            player.setOnErrorListener(new android.media.MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(android.media.MediaPlayer mediaPlayer, int i, int i1) {
+                    Log.i("TAG","cuowu");
+                    error = 1;
+                    return false;
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
     public void onRead(String src,long currentPosition){
-        Log.i("TAG",src);
+//        Log.i("TAG",src);
         try {
 
             player.setDataSource(src);
@@ -63,7 +68,7 @@ public class MediaPlayer {
             player.setOnSeekCompleteListener(new android.media.MediaPlayer.OnSeekCompleteListener() {
                 @Override
                 public void onSeekComplete(android.media.MediaPlayer mediaPlayer) {
-                    Log.i("TAG","onSeekComplete");
+//                    Log.i("TAG","onSeekComplete");
                     mediaPlayer.start();
                 }
             });
@@ -82,6 +87,9 @@ public class MediaPlayer {
         player.stop();
 
     }
+    public android.media.MediaPlayer getPlayer(){
+        return player;
+    }
     public boolean isPlay(){
         return player.isPlaying();
     }
@@ -92,16 +100,15 @@ public class MediaPlayer {
         player.release();
     }
     public long getCurrentPosition(){
+//        Log.i("TAG","getCurrentPosition:"+player.getCurrentPosition());
         return player.getCurrentPosition();
     }
     public void setCurrentPosition(int currentPosition){
         player.seekTo(currentPosition);
     }
 
-    public interface AudioStateLinstener{
-
-        void onStopLinstener();
-        void onPauserLinstener();
-        void onCompleteLinstener ();
+    public int getDuration(){
+        return player.getDuration();
     }
+
 }

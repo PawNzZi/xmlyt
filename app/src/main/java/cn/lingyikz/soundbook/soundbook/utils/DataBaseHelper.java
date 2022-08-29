@@ -24,7 +24,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     private DataBaseHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        Log.i("TAG","DataBaseHelper");
+//        Log.i("TAG","DataBaseHelper");
     }
     public static DataBaseHelper getInstance(Context context) {
         if(dataBaseHelper == null){
@@ -38,17 +38,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        Log.i("TAG","SQLonCreate");
+//        Log.i("TAG","SQLonCreate");
         sqLiteDatabase.execSQL("CREATE TABLE collection(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,albumDes TEXT,albumThumb TEXT," +
                 "uuid TEXT);");
-        sqLiteDatabase.execSQL("CREATE TABLE playhistory(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, episodes INTEGER,audioTitle TEXT,audioDes TEXT," +
+        sqLiteDatabase.execSQL("CREATE TABLE playhistory(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,episodes INTEGER,audioTitle TEXT,audioDes TEXT," +
                 "audioCreated TEXT,audioDuration TEXT,audioSrc TEXT ,audioId INTEGER,uuid TEXT);");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
-        Log.i("TAG","onUpgrade");
+//        Log.i("TAG","onUpgrade");
     }
 
     public SQLiteDatabase getReadLink(){
@@ -66,35 +66,56 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void close(){
         db.close();
     }
-    public int queryCollectionCount(int albumId,String uuid){
 
-        Cursor cursor = db.rawQuery("select * from collection where albumId = ? and uuid = ?",new String[]{String.valueOf(albumId),uuid});
+    /**
+     * 查询改专辑是否被收藏
+     * @param albumId
+     * @return
+     */
+    public int queryCollectionCount(int albumId){
+        db = getReadLink();
+        Cursor cursor = db.rawQuery("select * from collection where albumId = ? ",new String[]{String.valueOf(albumId)});
         int count = cursor.getCount();
         cursor.close();
-
         return count;
     }
 
-    public void cancleCollection(int albumId,String uuid){
-        String sql = "delete from collection where albumId = "+ albumId+ " and uuid = '"+uuid+"'";
+    /**
+     * 删除收藏历史
+     * @param albumId
+     */
+    public void cancleCollection(int albumId){
+        db = getWriteLink();
+        String sql = "delete from collection where albumId = "+ albumId;
         db.execSQL(sql);
 
     }
-    public void addCollection(Album.DataDTO.ListDTO albumDetail, String uuid){
+
+    /**
+     * 插入收藏历史
+     * @param albumDetail
+     */
+    public void addCollection(Album.DataDTO.ListDTO albumDetail){
+        db = getWriteLink();
         ContentValues contentValues = new ContentValues();
         contentValues.put("albumId",albumDetail.getId());
         contentValues.put("albumName",albumDetail.getName());
         contentValues.put("albumDes",albumDetail.getDescription());
-        contentValues.put("uuid",uuid);
         contentValues.put("albumThumb",albumDetail.getThumb().toString());
 
         db.insert("collection",null,contentValues);
 
     }
-    public List<Album.DataDTO.ListDTO> queryCollectionAll(String uuid ){
+
+    /**
+     * 查询收藏历史列表
+     * @return
+     */
+    public List<Album.DataDTO.ListDTO> queryCollectionAll(){
+        db = getReadLink();
         List<Album.DataDTO.ListDTO> mList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("select * from collection where  uuid = ?",new String[]{uuid});
-        Log.i("TAG","有:"+cursor.getCount());
+        Cursor cursor = db.rawQuery("select * from collection ",new String[]{});
+//        Log.i("TAG","有:"+cursor.getCount());
         if(cursor.moveToFirst()){
             for (int i = 0; i < cursor.getCount(); i++) {
                 Album.DataDTO.ListDTO listDTO = new Album.DataDTO.ListDTO();
@@ -103,17 +124,24 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 listDTO.setDescription(cursor.getString(cursor.getColumnIndex("albumDes")));
                 listDTO.setThumb(cursor.getString(cursor.getColumnIndex("albumThumb")));
                 mList.add(listDTO);
+                cursor.moveToNext();
             }
         }
         cursor.close();
         return mList ;
     }
+
+    /**
+     * 插入或修改播放历史
+     * @param map
+     */
     public void addPlayHistory(Map<String,Object> map){
-        db = getWritableDatabase();
-        String querySql = "select * from collection where albumId = ? and xmlyId = ?";
+//        Log.i("TAG","日期:"+map.get("audioCreated").toString());
+        db = getWriteLink();
+        String querySql = "select * from playhistory where albumId = ? ";
         Cursor cursor = db.rawQuery(querySql,new String[]{String.valueOf(map.get("albumId"))});
         int count = cursor.getCount();
-
+//        Log.i("TAG","COUNT:"+cursor.getCount());
         if(count == 0){
             //
             ContentValues contentValues = new ContentValues();
@@ -123,22 +151,102 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 //            contentValues.put("uuid",uuid);
             contentValues.put("audioDes",String.valueOf(map.get("audioDes")));
             contentValues.put("audioDuration",String.valueOf(map.get("audioDuration")));
-            contentValues.put("audioCreated",String.valueOf(map.get("albumId")));
+            contentValues.put("audioCreated",String.valueOf(map.get("audioCreated")));
             contentValues.put("audioSrc",String.valueOf(map.get("src")));
             contentValues.put("audioId",(Integer)map.get("audioId"));
 
             db.insert("playhistory",null,contentValues);
 
-        }else if(count == 1){
-            //
-            int _id = cursor.getInt(cursor.getColumnIndex("_id"));
-            String updateSql = "update playhistory set audioDuration = '"+ String.valueOf(map.get("audioDuration")) +"' where _id = "+_id;
-            db.execSQL(updateSql);
-        }else {
-            String deleteSql = "delete from playhistory where albumId = "+ map.get("albumId")+ " and audioId = "+map.get("audioId");
+        }
+//        else if(count == 1){
+//            //
+//
+//            if(cursor.moveToFirst()){
+//                int _id = cursor.getInt(cursor.getColumnIndex("_id"));
+//                String updateSql = "update playhistory set audioDuration = '"+ String.valueOf(map.get("audioDuration")) +"' where _id = "+_id;
+//                db.execSQL(updateSql);
+//            }
+//        }
+        else if(count > 0){
+            String deleteSql = "delete from playhistory where albumId = "+ map.get("albumId");
             db.execSQL(deleteSql);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("albumId",(Integer) map.get("albumId"));
+            contentValues.put("episodes",(Integer) map.get("episodes"));
+            contentValues.put("audioTitle",String.valueOf(map.get("title")));
+//            contentValues.put("uuid",uuid);
+            contentValues.put("audioDes",String.valueOf(map.get("audioDes")));
+            contentValues.put("audioDuration",String.valueOf(map.get("audioDuration")));
+            contentValues.put("audioCreated",String.valueOf(map.get("audioCreated")));
+            contentValues.put("audioSrc",String.valueOf(map.get("src")));
+            contentValues.put("audioId",(Integer)map.get("audioId"));
+
+            db.insert("playhistory",null,contentValues);
         }
         cursor.close();
 
     }
+    public void deletePlayHistory(int albumId){
+        db = getWriteLink();
+        String deleteSql = "delete from playhistory where albumId = "+ albumId;
+        db.execSQL(deleteSql);
+
+//        return queryPlayHistoryAll();
+    }
+    /**
+     * 查询播放历史列表
+     * @return
+     */
+    public List<AlbumDetail.DataDTO.ListDTO> queryPlayHistoryAll(){
+        db = getReadLink();
+        List<AlbumDetail.DataDTO.ListDTO> mList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("select * from playhistory order by audioCreated desc",new String[]{});
+//        Log.i("TAG","有:"+cursor.getCount());
+        if(cursor.moveToFirst()){
+            for (int i = 0; i < cursor.getCount(); i++) {
+
+//                Log.i("TAG",i+"");
+                AlbumDetail.DataDTO.ListDTO listDTO = new AlbumDetail.DataDTO.ListDTO();
+                listDTO.setId(cursor.getInt(cursor.getColumnIndex("audioId")));
+                listDTO.setName(cursor.getString(cursor.getColumnIndex("audioTitle")));
+                listDTO.setDescription(cursor.getString(cursor.getColumnIndex("audioDes")));
+                listDTO.setAlbumId(cursor.getInt(cursor.getColumnIndex("albumId")));
+                listDTO.setEpisodes(cursor.getInt(cursor.getColumnIndex("episodes")));
+                listDTO.setCreated(Long.parseLong(cursor.getString(cursor.getColumnIndex("audioCreated"))));
+//                Log.i("TAG","x:"+cursor.getString(cursor.getColumnIndex("audioCreated")));
+                listDTO.setUrl(cursor.getString(cursor.getColumnIndex("audioSrc")));
+                mList.add(listDTO);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return mList ;
+    }
+
+    /**
+     * 查询当前播放进度
+     * @param albumId
+     * @param audioId
+     * @return
+     */
+    public long queryPlayHistory(int albumId,int audioId){
+        db = getReadLink();
+        String querySql = "select audioDuration from playhistory where albumId = ? and audioId = ?";
+        Cursor cursor = db.rawQuery(querySql,new String[]{String.valueOf(albumId),String.valueOf(audioId)});
+
+//        Log.i("TAG","bofanglishi:"+cursor.getCount());
+        if(cursor.moveToFirst()){
+            Long result = Long.parseLong(cursor.getString(cursor.getColumnIndex("audioDuration")));
+            cursor.close();
+
+            return result;
+
+        }else{
+            cursor.close();
+            return 0;
+        }
+
+
+    }
+
 }

@@ -1,6 +1,12 @@
 package cn.lingyikz.soundbook.soundbook.user;
 
+
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,19 +24,17 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentUserBinding;
-import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
-import cn.lingyikz.soundbook.soundbook.pojo.ItemHome;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.user.fragment.CollectionFragment;
 import cn.lingyikz.soundbook.soundbook.user.fragment.PlayHistoryFragment;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 
@@ -40,13 +44,12 @@ import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 
 public class UserFragment extends Fragment {
 
-    private FragmentUserBinding binding ;
+    private static FragmentUserBinding binding ;
 
     private List<Fragment> fragmentList ;
     private List<String> titleList ;
 
-    private HomeAdapter adapter ;
-    private List<ItemHome> mList;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,16 +99,16 @@ public class UserFragment extends Fragment {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
 //                Log.i("TAG","position");
-
             }
         });
+
     }
 
     @AClick({R.id.go_play, R.id.userAvatar})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_play:
-                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view);
+                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
                 break;
             case R.id.userAvatar:
                 break;
@@ -126,7 +129,27 @@ public class UserFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         binding = null ;
+
+
     }
+//
+//    public class ChangePlayReceiver extends BroadcastReceiver {
+//
+//        @SuppressLint("UseCompatLoadingForDrawables")
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            if (intent.getAction().equals(Constans.CHANGE_PLAY_IMG)) {
+//                Log.i("TAG", "广播接受到了1。");
+//
+//                if(MediaPlayer.getInstance().isPlay()){
+//                    binding.titleBar.goPlay.setImageDrawable(UserFragment.this.getResources().getDrawable(R.mipmap.title_play, getResources().newTheme()));
+//                }else {
+//                    binding.titleBar.goPlay.setImageDrawable(getResources().getDrawable(R.mipmap.title_pause, getResources().newTheme()));
+//                }
+//            }
+//        }
+//    }
+
     public class ViewPageAdatper extends FragmentStateAdapter{
 
 

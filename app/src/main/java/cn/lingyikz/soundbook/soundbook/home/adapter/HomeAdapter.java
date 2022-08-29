@@ -11,14 +11,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.AudioDetailActivity;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Album.DataDTO.ListDTO> list ;
     private Context context ;
-    public HomeAdapter(List<Album.DataDTO.ListDTO> list,Context context){
+    private ItemOperaCallBack itemOperaCallBack;
+    private int Tag  ;
+    private DataBaseHelper dataBaseHelper ;
+    public HomeAdapter(List<Album.DataDTO.ListDTO> list,Context context,int Tag,ItemOperaCallBack itemOperaCallBack){
         this.list = list ;
         this.context = context ;
+        this.Tag = Tag ;
+        this.itemOperaCallBack = itemOperaCallBack;
 //        Log.i("tag",list.get(0).getBookName());
     }
     @Override
@@ -31,11 +38,25 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 //        Log.i("TAG","onBindViewHolder");
+        if(Tag == 1){
+            holder.itemHomeBinding.collectionIcon.setVisibility(View.VISIBLE);
+            holder.itemHomeBinding.collectionIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                      itemOperaCallBack.deleteItem(list.get(position).getId());
+//                    dataBaseHelper = DataBaseHelper.getInstance(context);
+//                    dataBaseHelper.cancleCollection(list.get(position).getId(), SharedPreferences.getUUID(context));
+//                    dataBaseHelper.close();
+
+                }
+            });
+        }
+
         holder.itemHomeBinding.itemBookName.setText(list.get(position).getName());
 //        Log.i("tag",list.get(position).getBookName());
         holder.itemHomeBinding.itemBookDescription.setText(list.get(position).getDescription());
         Glide.with(holder.itemHomeBinding.getRoot()).load(list.get(position).getThumb()).into(holder.itemHomeBinding.itemThumb);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemHomeBinding.contentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                Log.i("TAG",""+position);
@@ -45,12 +66,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 IntentAction.setValueContext(context, AudioDetailActivity.class,bundle);
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                return false;
-            }
-        });
+
     }
 
     @Override
@@ -67,6 +83,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             super(itemHomeBinding.getRoot());
             this.itemHomeBinding = itemHomeBinding ;
         }
+    }
 
+    public interface ItemOperaCallBack{
+        void deleteItem(int albumId);
     }
 }

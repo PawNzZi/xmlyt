@@ -3,50 +3,69 @@ package cn.lingyikz.soundbook.soundbook.utils;
 import android.app.Activity;
 import android.content.Context;
 
-import android.util.Log;
+import android.os.Bundle;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 
 public class SharedPreferences {
 
     private static String OLD_AUDIO_INFO = "oldAudioInfo";
     private static String UUID = "uuid" ;
-    public static void saveOldAudioInfo(Activity activity, Map<String,Object> map){
+    public static void saveOldAudioInfo(Activity activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
-        editor.putString("title", Objects.requireNonNull(map.get("title")).toString());
-        editor.putString("src", Objects.requireNonNull(map.get("src")).toString());
-        editor.putLong("currentPosition", (Long) map.get("currentPosition"));
+        editor.putInt("albumId",bundle.getInt("albumId"));
+        editor.putInt("episodes",bundle.getInt("episodes"));
+        editor.putInt("audioId",bundle.getInt("audioId"));
+        editor.putLong("audioCreated",bundle.getLong("audioCreated"));
+        editor.putString("audioDes",bundle.getString("audioDes"));
+        editor.putLong("audioDuration",bundle.getLong("audioDuration"));
+        editor.putString("title",bundle.getString("title"));
+        editor.putString("src",bundle.getString("src"));
         editor.commit();
     }
-    public static void saveOldAudioInfo(Context activity, Map<String,Object> map){
+    public static void saveOldAudioInfo(Context activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
-        editor.putString("title", Objects.requireNonNull(map.get("title")).toString());
-        editor.putString("src", Objects.requireNonNull(map.get("src")).toString());
-        editor.putLong("currentPosition", (Long) map.get("currentPosition"));
+        editor.putInt("albumId",bundle.getInt("albumId"));
+        editor.putInt("episodes",bundle.getInt("episodes"));
+        editor.putInt("audioId",bundle.getInt("audioId"));
+        editor.putLong("audioCreated",bundle.getLong("audioCreated"));
+        editor.putString("audioDes",bundle.getString("audioDes"));
+        editor.putLong("audioDuration",bundle.getLong("audioDuration"));
+        editor.putString("title",bundle.getString("title"));
+        editor.putString("src",bundle.getString("src"));
         editor.commit();
     }
-    public static Map<String,Object> getOldAudioInfo(Activity activity){
+    public static Bundle  getOldAudioInfo(Activity activity){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
-        Map<String,Object> map = new HashMap<>();
+        Bundle bundle = new Bundle() ;
 
-        map.put("title",oldAudioInfo.getString("title",null));
-        map.put("src",oldAudioInfo.getString("src",null));
-        map.put("currentPosition",oldAudioInfo.getLong("currentPosition",0L));
-        return map ;
+        bundle.putInt("albumId", oldAudioInfo.getInt("albumId",0));
+        bundle.putInt("episodes", oldAudioInfo.getInt("episodes",0));
+        bundle.putInt("audioId", oldAudioInfo.getInt("audioId",0));
+        bundle.putLong("audioCreated", oldAudioInfo.getLong("audioCreated",0));
+        bundle.putLong("audioDuration", oldAudioInfo.getLong("audioDuration",0));
+        bundle.putString("audioDes", oldAudioInfo.getString("audioDes",null));
+        bundle.putString("title", oldAudioInfo.getString("title",null));
+        bundle.putString("src", oldAudioInfo.getString("src",null));
+
+        return bundle ;
     }
-    public static Map<String,Object> getOldAudioInfo(Context activity){
+    public static Bundle  getOldAudioInfo(Context activity){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
-        Map<String,Object> map = new HashMap<>();
-        map.put("title",oldAudioInfo.getString("title",null));
-        map.put("src",oldAudioInfo.getString("src",null));
-        map.put("currentPosition",oldAudioInfo.getLong("currentPosition",0L));
-        return map ;
+        Bundle bundle = new Bundle() ;
+
+        bundle.putInt("albumId", oldAudioInfo.getInt("albumId",0));
+        bundle.putInt("episodes", oldAudioInfo.getInt("episodes",0));
+        bundle.putInt("audioId", oldAudioInfo.getInt("audioId",0));
+        bundle.putLong("audioCreated", oldAudioInfo.getLong("audioCreated",0));
+        bundle.putLong("audioDuration", oldAudioInfo.getLong("audioDuration",0));
+        bundle.putString("audioDes", oldAudioInfo.getString("audioDes",null));
+        bundle.putString("title", oldAudioInfo.getString("title",null));
+        bundle.putString("src", oldAudioInfo.getString("src",null));
+
+        return bundle ;
     }
 
     public static void saveUUid(Activity activity,String uuid){

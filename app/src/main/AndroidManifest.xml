@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".home.activity.AudioDetailActivity" />
+        <activity android:name=".home.activity.PlayAudioActivity" />
 
         <service
             android:name=".service.AudioService"

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
@@ -24,6 +25,8 @@ import cn.lingyikz.soundbook.soundbook.databinding.ActivitySearchlistBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 import rx.Observable;
@@ -31,15 +34,14 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class SearchActivity extends Activity {
+public class SearchActivity extends Activity implements HomeAdapter.ItemOperaCallBack {
 
     private ActivitySearchlistBinding binding ;
-    private HomeAdapter homeAdapter ;
-    private List<Album.DataDTO.ListDTO> mList ;
-    private static final int SIZE = 10;
+    private HomeAdapter homeAdapter = null;
+    private List<Album.DataDTO.ListDTO> mList = new ArrayList<>() ;
+//    private static final int SIZE = 50;
     private int nextPage = 1;
-    private int totalPage = 0 ;
-    private boolean hasNextPage = false;
+//    private int totalPage = 0 ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +63,7 @@ public class SearchActivity extends Activity {
     }
     public void searchList(String keyword){
 
-        Observable<Album> observable  = RequestService.getInstance().getApi().getPostInfo(nextPage,SIZE,keyword);
+        Observable<Album> observable  = RequestService.getInstance().getApi().getPostInfo(nextPage,Constans.PAGE_SIZE,keyword);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
                 .subscribe(new Observer<Album>() { // 订阅
@@ -78,17 +80,27 @@ public class SearchActivity extends Activity {
 
                     @Override
                     public void onNext(Album postInfo) {
-                        Log.i("http返回：", postInfo.toString() + "");
-                        hasNextPage = postInfo.getData().getHasNextPage();
-                        nextPage = postInfo.getData().getNextPage();
+                        if(postInfo.getCode() == 200 && postInfo.getData().getList().size() > 0){
+                            Log.i("http返回：", postInfo.toString() + "");
+                            if(mList == null) {
+                                mList = new ArrayList<>();
+                            }
+                            mList.clear();
+                            List<Album.DataDTO.ListDTO> newList = postInfo.getData().getList();
+                            nextPage = postInfo.getData().getNextPage();
+                            mList.addAll(newList);
+                            if(homeAdapter == null){
+                                homeAdapter = new HomeAdapter(mList,SearchActivity.this,0,SearchActivity.this);
+                                binding.recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
+                                binding.recyclerView.setAdapter(homeAdapter);
+                                DividerItemDecoration divider = new DividerItemDecoration(SearchActivity.this,DividerItemDecoration.VERTICAL);
+                                binding.recyclerView.addItemDecoration(divider);
+                            }
+                            homeAdapter.notifyDataSetChanged();
+                        }else{
+                            Toast.makeText(SearchActivity.this, Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+                        }
 
-                        mList = new ArrayList<>();
-                        mList = postInfo.getData().getList();
-                        homeAdapter = new HomeAdapter(mList,SearchActivity.this);
-                        binding.recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
-                        binding.recyclerView.setAdapter(homeAdapter);
-                        DividerItemDecoration divider = new DividerItemDecoration(SearchActivity.this,DividerItemDecoration.VERTICAL);
-                        binding.recyclerView.addItemDecoration(divider);
 
                     }
                 });
@@ -121,8 +133,13 @@ public class SearchActivity extends Activity {
                 finish();
                 break;
             case R.id.go_play:
-                IntentAction.startService(SearchActivity.this, AudioService.class, (ImageView) view);
+                IntentAction.startService(SearchActivity.this, AudioService.class, (ImageView) view,DataBaseHelper.getInstance(SearchActivity.this));
                 break;
         }
+    }
+
+    @Override
+    public void deleteItem(int albumId) {
+
     }
 }

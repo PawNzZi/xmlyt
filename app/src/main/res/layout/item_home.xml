@@ -14,19 +14,24 @@
         android:paddingLeft="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:gravity="center_vertical"
         >
 
         <ImageView
             android:id="@+id/item_thumb"
             android:layout_width="50dp"
-            android:layout_height="50dp">
+            android:layout_height="50dp"
+
+            >
 
         </ImageView>
         <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:orientation="vertical"
             android:layout_marginLeft="20dp"
+            android:layout_weight="8"
             >
             <TextView
                 android:id="@+id/item_bookName"
@@ -53,6 +58,15 @@
 
             </TextView>
         </LinearLayout>
+        <ImageView
+            android:id="@+id/collectionIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:visibility="gone"
+            android:src="@mipmap/like"
+            >
+
+        </ImageView>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

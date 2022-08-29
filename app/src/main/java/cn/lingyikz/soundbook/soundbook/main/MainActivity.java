@@ -1,5 +1,8 @@
 package cn.lingyikz.soundbook.soundbook.main;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -15,6 +18,7 @@ import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.category.CategoryFragment;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityMainBinding;
 import cn.lingyikz.soundbook.soundbook.home.HomeFragment;
+import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.user.UserFragment;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.UUIDUtils;
@@ -77,4 +81,11 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         }
         return false;
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(this, AudioService.class));
+    }
+
 }
