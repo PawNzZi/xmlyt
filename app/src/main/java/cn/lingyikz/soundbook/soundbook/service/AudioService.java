@@ -19,12 +19,12 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class AudioService extends Service   {
+public class AudioService extends Service  implements android.media.MediaPlayer.OnCompletionListener {
 
     private MediaPlayer player ;
     private DataBaseHelper dataBaseHelper ;
     private Bundle bundle ;
-    private AudioService.MyBinder myBinder = new MyBinder();
+    private AudioService.MyBinder myBinder;
 
     public AudioService() {
 
@@ -32,6 +32,9 @@ public class AudioService extends Service   {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.i("TAG","MyBinder");
+        myBinder = new MyBinder();
+
         // TODO: Return the communication channel to the service.
         return myBinder;
     }
@@ -41,7 +44,7 @@ public class AudioService extends Service   {
         super.onCreate();
 //        Log.i("TAG","onCreate");
         player = MediaPlayer.getInstance();
-        player.getPlayer().setOnCompletionListener(myBinder);
+        player.getPlayer().setOnCompletionListener(this);
 
     }
 
@@ -49,46 +52,37 @@ public class AudioService extends Service   {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-
         Log.i("TAG","onStartCommand");
-//        bundle = intent.getExtras();
-//        if(player.isPlay()){
-//            if(bundle.getBoolean("continuePlay")){
-//                 if(bundle.getInt("playModel") == Constans.PLAY_MODLE_INNER){
-//                     player.onPause();
-//                     addHistory1();
-//                     SharedPreferences.saveOldAudioInfo(this,bundle);
-//                 }
-//
-//            }else {
-//                player.onStop();
-//                //保存上一条信息 todo
-//                addHistory2(SharedPreferences.getOldAudioInfo(this));
-//                player.reset();
-////                player.onRead(bundle.getString("src"));
-//                if(bundle.getLong("audioDuration") > 0){
-//                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
-//                }else{
-//                    player.onRead(bundle.getString("src"));
-//                }
-//                SharedPreferences.saveOldAudioInfo(this,bundle);
-//            }
-//        }else{
-////            if(bundle.getBoolean("continuePlay")){
-////                Log.i("TAG","onPlay");
-////                player.onPlay();
-//                player.onStop();
-//                player.reset();
-//                if(bundle.getLong("audioDuration") > 0){
-//                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
-//                }else{
-//                    player.onRead(bundle.getString("src"));
-//                }
-//                SharedPreferences.saveOldAudioInfo(this,bundle);
-//        }
+        if(intent.getAction().equals(Constans.BIND_SERVICE)){
+            Log.i("TAG","BIND_SERVICE");
+            bundle = intent.getExtras();
+            if(player.isPlay()){
+                Bundle oldAudioInfo = SharedPreferences.getOldAudioInfo(this);
+                if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
 
-
-//        player.onPlay();
+                }else {
+                    player.onStop();
+                    //保存上一条信息 todo
+                    addHistory2(oldAudioInfo);
+                    player.reset();
+                    if(bundle.getLong("audioDuration") > 0){
+                        player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
+                    }else{
+                        player.onRead(bundle.getString("src"));
+                    }
+                    SharedPreferences.saveOldAudioInfo(this,bundle);
+                }
+            }else {
+                player.onStop();
+                player.reset();
+                if(bundle.getLong("audioDuration") > 0){
+                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
+                }else{
+                    player.onRead(bundle.getString("src"));
+                }
+                SharedPreferences.saveOldAudioInfo(this,bundle);
+            }
+        }
         return START_STICKY;
     }
 
@@ -96,18 +90,62 @@ public class AudioService extends Service   {
     public void onDestroy() {
         super.onDestroy();
         Log.i("TAG","onDestroy");
-        player.onPause();
 //        saveCurrentPosition();
-        closrService();
+//        closrService();
         player.onStop();
         player.reset();
         player.freeMediaPlayer();
     }
 
+    @Override
+    public void onCompletion(android.media.MediaPlayer mp) {
+        Log.i("TAG","播放完毕");
+        Observable<XmlyNextPaly> observable  = RequestService.getInstance().getApi().getNextPlay(bundle.getInt("albumId"),bundle.getInt("episodes") + 1);
+        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
+                .subscribe(new Observer<XmlyNextPaly>() { // 订阅
 
-    public class MyBinder extends Binder implements android.media.MediaPlayer.OnCompletionListener {
+                    @Override
+                    public void onCompleted() {
 
-        private Bundle bundle ;
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(XmlyNextPaly xmlyNextPaly) {
+                        Log.i("TAG", xmlyNextPaly.toString() + "");
+                        if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() > 0 && MediaPlayer.error == 0) {
+                            Log.i("TAG", xmlyNextPaly.toString() + "");
+                            XmlyNextPaly.DataDTO dataDTO = xmlyNextPaly.getData().get(0);
+                            Bundle reslutBundle = new Bundle();
+                            reslutBundle.putInt("albumId",dataDTO.getAlbumId());
+                            reslutBundle.putInt("episodes",dataDTO.getEpisodes());
+                            reslutBundle.putString("title",dataDTO.getName());
+                            reslutBundle.putString("audioDes","");
+                            reslutBundle.putLong("audioDuration",0);
+                            reslutBundle.putLong("audioCreated",dataDTO.getCreated());
+                            reslutBundle.putString("src",dataDTO.getUrl());
+                            reslutBundle.putInt("audioId",dataDTO.getId());
+                            player.onStop();
+                            player.reset();
+                            player.onRead(dataDTO.getUrl());
+                            SharedPreferences.saveOldAudioInfo(getApplication(),bundle);
+                            addHistory1();
+                            bundle = reslutBundle;
+                        }
+
+                    }
+                });
+    }
+
+    //
+    public class MyBinder extends Binder  {
+
+
         //判断是否处于播放状态
         public boolean isPlaying(){
             return player.isPlay();
@@ -145,56 +183,7 @@ public class AudioService extends Service   {
         public void seekTo(int mesc){
             player.setCurrentPosition(mesc);
         }
-        //设置bundle
-        public void setBundle(Bundle bundle){
-            this.bundle = bundle;
-        }
 
-        @Override
-        public void onCompletion(android.media.MediaPlayer mediaPlayer) {
-            Log.i("TAG","播放完毕");
-//        Log.i("TAG","albumId:"+bundle.getInt("albumId"));
-//        Log.i("TAG","播放完毕");
-            Observable<XmlyNextPaly> observable  = RequestService.getInstance().getApi().getNextPlay(bundle.getInt("albumId"),bundle.getInt("episodes") + 1);
-            observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
-                    .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                    .subscribe(new Observer<XmlyNextPaly>() { // 订阅
-
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onNext(XmlyNextPaly xmlyNextPaly) {
-                            if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() > 0 && MediaPlayer.error == 0) {
-                                Log.i("TAG", xmlyNextPaly.toString() + "");
-                                XmlyNextPaly.DataDTO dataDTO = xmlyNextPaly.getData().get(0);
-                                Bundle reslutBundle = new Bundle();
-                                reslutBundle.putInt("albumId",dataDTO.getAlbumId());
-                                reslutBundle.putInt("episodes",dataDTO.getEpisodes());
-                                reslutBundle.putString("title",dataDTO.getName());
-                                reslutBundle.putString("audioDes","");
-                                reslutBundle.putLong("audioDuration",0);
-                                reslutBundle.putLong("audioCreated",dataDTO.getCreated());
-                                reslutBundle.putString("src",dataDTO.getUrl());
-                                reslutBundle.putInt("audioId",dataDTO.getId());
-                                player.onStop();
-                                player.reset();
-                                player.onRead(dataDTO.getUrl());
-                                SharedPreferences.saveOldAudioInfo(getApplication(),bundle);
-                                addHistory1();
-                                bundle = reslutBundle;
-                            }
-
-                        }
-                    });
-        }
     }
 
 
@@ -210,18 +199,6 @@ public class AudioService extends Service   {
         dataBaseHelper.addPlayHistory(bundle);
         dataBaseHelper.close();
     }
-    public void closrService(){
-        if(player.isPlay()){
-            if(bundle.getBoolean("continuePlay")){
-                addHistory1();
-                SharedPreferences.saveOldAudioInfo(this,bundle);
-            }else {
-                addHistory2(SharedPreferences.getOldAudioInfo(this));
-                SharedPreferences.saveOldAudioInfo(this,bundle);
-            }
-        }else{
-            SharedPreferences.saveOldAudioInfo(this,bundle);
-        }
-    }
+
 
 }

@@ -9,4 +9,7 @@ public class Constans {
     public final static int PLAY_MODLE_ICON = 1;
     public final static int PLAY_MODLE_INNER = 3;
     public final static String NO_OLD_AUDIOINFO = "无播放数据";
+    public final static String START_SERVICE = "start_service";
+    public final static String BIND_SERVICE = "bind_service";
+
 }

@@ -61,22 +61,35 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         binding.titleBar.goPlay.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.VISIBLE);
         bundle = getIntent().getExtras();
-//        if(bundle.getInt("playModel") != Constans.PLAY_MODLE_ICON){
-//
-//        }
+        Log.i("TAG",bundle+"");
         binding.titleBar.title.setText(bundle.getString("title"));
         binding.seekbar.setOnSeekBarChangeListener(this);
         dataBaseHelper = DataBaseHelper.getInstance(this);
-        startService();
+        Intent intent = new Intent(this, AudioService.class);
+        conn = new MyConnection();
+        intent.setAction(Constans.BIND_SERVICE);
+        Bundle historyBundle = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
+        dataBaseHelper.close();
+        if(historyBundle.getString("audioDuration") == null){
+            Log.i("TAG","audioDuration == null");
+            bundle.putLong("audioDuration",0);
+        }else {
+            Log.i("TAG","audioDuration != null");
+            Log.i("TAG","audioDuration != null"+historyBundle.getString("audioDuration"));
+            bundle.putLong("audioDuration",Long.parseLong(historyBundle.getString("audioDuration")));
+        }
+        intent.putExtras(bundle);
+        startService(intent);
+        bindService(intent, conn, BIND_AUTO_CREATE);
+
     }
 
     /**
      * 启动服务播放
      */
     private void startService(){
-        Intent intent = new Intent(this, AudioService.class);
-        conn = new MyConnection();
-        bindService(intent, conn, BIND_AUTO_CREATE);
+
+
     }
     //使用handler定时更新进度条
     @SuppressLint("HandlerLeak")
@@ -96,21 +109,14 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
 //        Log.i("TAG","currenPostion:"+currenPostion);
         binding.seekbar.setProgress(currenPostion);
         //使用Handler每500毫秒更新一次进度条
-        handler.sendEmptyMessageDelayed(UPDATE_PROGRESS, 300);
+        handler.sendEmptyMessageDelayed(UPDATE_PROGRESS, 500);
     }
     @Override
     protected void onResume() {
         super.onResume();
         //进入到界面后开始更新进度条
-        Log.i("TAG","onResume");
-        if(myBinder!=null){
-            handler.sendEmptyMessage(UPDATE_PROGRESS);
-            if(myBinder.isPlaying()){
-                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
-            }else {
-                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
-            }
-        }
+//        Log.i("TAG","onResume");
+
     }
     @Override
     protected void onStop() {
@@ -164,56 +170,23 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                 break;
         }
     }
-    public void playAudio(){
-
-        Bundle historyBundle = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
-        dataBaseHelper.close();
-        Bundle oldAudioInfo = SharedPreferences.getOldAudioInfo(this);
-
-        if(myBinder.isPlaying()){
-                if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
-
-                }else{
-                    myBinder.onPause();
-                    oldAudioInfo.putLong("audioDuration",myBinder.getCurrenPostion());
-                    myBinder.onStop();
-                    dataBaseHelper.addPlayHistory(oldAudioInfo);
-                    dataBaseHelper.close();
-
-                    myBinder.onReset();
-                    if(historyBundle.getLong("audioDuration") > 0){
-                        myBinder.onRead(bundle.getString("src"),historyBundle.getLong("audioDuration"));
-                    }else{
-                        myBinder.onRead(bundle.getString("src"));
-                    }
-                    SharedPreferences.saveOldAudioInfo(this,bundle);
-                }
-        }else{
-            //没有播放，拿到刚刚bundle中的数据进行播放
-            myBinder.onStop();
-            myBinder.onReset();
-            if(historyBundle.getLong("audioDuration") > 0){
-                myBinder.onRead(bundle.getString("src"),historyBundle.getLong("audioDuration"));
-            }else{
-                myBinder.onRead(bundle.getString("src"));
-            }
-            SharedPreferences.saveOldAudioInfo(this,bundle);
-        }
-    }
 
     private class MyConnection  implements ServiceConnection {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myBinder = (AudioService.MyBinder) iBinder;
+            Log.i("TAG","onServiceConnected:"+myBinder.isPlaying());
             binding.seekbar.setMax(myBinder.getDuration());
+            Log.i("TAG","getDuration:"+myBinder.getDuration());
             //设置进度条的进度
             binding.seekbar.setProgress((int) myBinder.getCurrenPostion());
-            if(bundle.getInt("playModel") != Constans.PLAY_MODLE_ICON){
-                playAudio();
+            handler.sendEmptyMessage(UPDATE_PROGRESS);
+            if(myBinder.isPlaying()){
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+            }else {
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
             }
-            myBinder.setBundle(bundle);
-
         }
 
         @Override

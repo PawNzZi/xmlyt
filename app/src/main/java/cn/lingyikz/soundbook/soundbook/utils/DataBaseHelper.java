@@ -1,5 +1,6 @@
 package cn.lingyikz.soundbook.soundbook.utils;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -112,6 +113,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * 查询收藏历史列表
      * @return
      */
+    @SuppressLint("Range")
     public List<Album.DataDTO.ListDTO> queryCollectionAll(){
         db = getReadLink();
         List<Album.DataDTO.ListDTO> mList = new ArrayList<>();
@@ -196,6 +198,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * 查询播放历史列表
      * @return
      */
+    @SuppressLint("Range")
     public List<AlbumDetail.DataDTO.ListDTO> queryPlayHistoryAll(){
         db = getReadLink();
         List<AlbumDetail.DataDTO.ListDTO> mList = new ArrayList<>();
@@ -228,13 +231,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * @param audioId
      * @return
      */
-    public Bundle queryPlayHistory(int albumId,int audioId){
+    @SuppressLint("Range")
+    public Bundle queryPlayHistory(int albumId, int audioId){
         db = getReadLink();
         Bundle bundle = new Bundle();
         String querySql = "select audioDuration from playhistory where albumId = ? and audioId = ?";
         Cursor cursor = db.rawQuery(querySql,new String[]{String.valueOf(albumId),String.valueOf(audioId)});
-
-//        Log.i("TAG","bofanglishi:"+cursor.getCount());
+        Log.i("TAG","bofanglishi:"+cursor.getCount());
         if(cursor.moveToFirst()){
             for (int i = 0; i < cursor.getCount(); i++) {
                 bundle.putInt("albumId",cursor.getInt(cursor.getColumnIndex("albumId")));
@@ -242,32 +245,36 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 bundle.putInt("episodes",cursor.getInt(cursor.getColumnIndex("episodes")));
                 bundle.putString("title",cursor.getString(cursor.getColumnIndex("audioTitle")));
                 bundle.putString("audioDes",cursor.getString(cursor.getColumnIndex("audioDes")));
-                bundle.putString("src",cursor.getString(cursor.getColumnIndex("src")));
+                bundle.putString("src",cursor.getString(cursor.getColumnIndex("audioSrc")));
                 bundle.putLong("audioCreated",cursor.getInt(cursor.getColumnIndex("audioCreated")));
                 bundle.putString("audioDuration",cursor.getString(cursor.getColumnIndex("audioDuration")));
+                cursor.moveToNext();
             }
         }
         cursor.close();
         return bundle;
     }
+    @SuppressLint("Range")
     public Bundle queryPlayHistoryRecent(){
         Bundle bundle = new Bundle() ;
         db = getReadLink();
-        String querySql = "select max(audioCreated) from playhistory ";
+        String querySql = "select max(audioCreated),* from playhistory ";
         Cursor cursor = db.rawQuery(querySql,new String[]{});
         Log.i("TAG","COUNT:"+cursor.getCount());
         if(cursor.getCount() != 0){
             if(cursor.moveToFirst()){
-                bundle.putInt("albumId",cursor.getInt(cursor.getColumnIndex("albumId")));
-                bundle.putInt("audioId",cursor.getInt(cursor.getColumnIndex("audioId")));
-                bundle.putInt("episodes",cursor.getInt(cursor.getColumnIndex("episodes")));
-                bundle.putString("title",cursor.getString(cursor.getColumnIndex("audioTitle")));
-                bundle.putString("audioDes",cursor.getString(cursor.getColumnIndex("audioDes")));
-                bundle.putString("src",cursor.getString(cursor.getColumnIndex("src")));
-                bundle.putLong("audioCreated",cursor.getInt(cursor.getColumnIndex("audioCreated")));
-                bundle.putString("audioDuration",cursor.getString(cursor.getColumnIndex("audioDuration")));
-                bundle.putInt("playModel",Constans.PLAY_MODLE_INNER);
-
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    bundle.putInt("albumId",cursor.getInt(cursor.getColumnIndex("albumId")));
+                    bundle.putInt("audioId",cursor.getInt(cursor.getColumnIndex("audioId")));
+                    bundle.putInt("episodes",cursor.getInt(cursor.getColumnIndex("episodes")));
+                    bundle.putString("title",cursor.getString(cursor.getColumnIndex("audioTitle")));
+                    bundle.putString("audioDes",cursor.getString(cursor.getColumnIndex("audioDes")));
+                    bundle.putString("src",cursor.getString(cursor.getColumnIndex("audioSrc")));
+                    Log.i("TAG","COUNT:"+cursor.getString(cursor.getColumnIndex("audioSrc")));
+                    bundle.putLong("audioCreated",cursor.getInt(cursor.getColumnIndex("audioCreated")));
+                    bundle.putString("audioDuration",cursor.getString(cursor.getColumnIndex("audioDuration")));
+                    cursor.moveToNext();
+                }
             }
         }
          cursor.close();

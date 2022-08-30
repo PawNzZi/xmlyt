@@ -14,6 +14,7 @@ import cn.lingyikz.soundbook.soundbook.databinding.ActivityMainBinding;
 import cn.lingyikz.soundbook.soundbook.home.HomeFragment;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.user.UserFragment;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.UUIDUtils;
@@ -43,6 +44,7 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         this.deleteDatabase("audio");
         viewBinding.navigation.setOnNavigationItemSelectedListener(this);
         Intent intent = new Intent(this,AudioService.class);
+        intent.setAction(Constans.START_SERVICE);
         startService(intent);
 
     }

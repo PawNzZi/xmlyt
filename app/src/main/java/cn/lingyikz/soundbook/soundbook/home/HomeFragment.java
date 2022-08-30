@@ -5,6 +5,7 @@ package cn.lingyikz.soundbook.soundbook.home;
 import android.content.Intent;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -165,12 +166,11 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
                 break;
             case R.id.go_play:
 //                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
-                Bundle bundle = SharedPreferences.getOldAudioInfo(getActivity());
-
+                Bundle bundle = DataBaseHelper.getInstance(getActivity()).queryPlayHistoryRecent();
+//                Log.i("TAG",bundle.getString("src"));
                 if(bundle.getString("src") == null){
                     Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
                 }else {
-                    bundle.putInt("playModel",Constans.PLAY_MODLE_ICON);
                     IntentAction.setValueActivity(getActivity(),PlayAudioActivity.class,bundle);
                 }
                 break;
