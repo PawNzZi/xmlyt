@@ -212,6 +212,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
             if(bundle.getInt("playModel") != Constans.PLAY_MODLE_ICON){
                 playAudio();
             }
+            myBinder.setBundle(bundle);
 
         }
 
