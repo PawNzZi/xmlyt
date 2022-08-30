@@ -29,6 +29,7 @@ import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -133,7 +134,13 @@ public class SearchActivity extends Activity implements HomeAdapter.ItemOperaCal
                 finish();
                 break;
             case R.id.go_play:
-                IntentAction.startService(SearchActivity.this, AudioService.class, (ImageView) view,DataBaseHelper.getInstance(SearchActivity.this));
+                Bundle bundle = SharedPreferences.getOldAudioInfo(this);
+                if(bundle.getString("src") == null){
+                    Toast.makeText(this, Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+                }else {
+                    bundle.putInt("playModel",Constans.PLAY_MODLE_ICON);
+                    IntentAction.setValueActivity(this,PlayAudioActivity.class,bundle);
+                }
                 break;
         }
     }

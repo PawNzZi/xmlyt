@@ -23,8 +23,10 @@ import androidx.annotation.Nullable;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityPalyaduioBinding;
+import cn.lingyikz.soundbook.soundbook.modle.AlbumCount;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
@@ -59,97 +61,22 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         binding.titleBar.goPlay.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.VISIBLE);
         bundle = getIntent().getExtras();
+//        if(bundle.getInt("playModel") != Constans.PLAY_MODLE_ICON){
+//
+//        }
         binding.titleBar.title.setText(bundle.getString("title"));
-
         binding.seekbar.setOnSeekBarChangeListener(this);
-
         dataBaseHelper = DataBaseHelper.getInstance(this);
         startService();
-
     }
 
     /**
      * 启动服务播放
      */
     private void startService(){
-
         Intent intent = new Intent(this, AudioService.class);
-        long audioDuration = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
-        dataBaseHelper.close();
-        Log.i("TAG","episodes:"+bundle.getInt("episodes"));
-        Bundle oldAudioInfo =  SharedPreferences.getOldAudioInfo(this);
-        if(oldAudioInfo.getString("src" ) != null){
-            if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
-//                Log.i("TAG","暂停");
-                bundle.putBoolean("continuePlay",true);
-            }else{
-                //stop并重新播放
-//                Log.i("TAG","stop并重新播放");
-                bundle.putBoolean("continuePlay",false);
-            }
-        }else {
-            bundle.putBoolean("continuePlay",false);
-        }
-        bundle.putLong("audioDuration", audioDuration);
-        intent.putExtras(bundle);
         conn = new MyConnection();
-        startService(intent);
-//        bindService(intent, conn, BIND_ADJUST_WITH_ACTIVITY);
-
-        new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    bindService(intent, conn, BIND_AUTO_CREATE);
-                }
-            },1000);
-
-    }
-    public void getPlaySource(int episodes){
-
-
-        Observable<XmlyNextPaly> observable  = RequestService.getInstance().getApi().getNextPlay(bundle.getInt("albumId"),episodes);
-        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
-                .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                .subscribe(new Observer<XmlyNextPaly>() { // 订阅
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(XmlyNextPaly xmlyNextPaly) {
-                        if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() > 0 && MediaPlayer.error == 0) {
-                            Log.i("TAG", xmlyNextPaly.toString() + "");
-                            XmlyNextPaly.DataDTO dataDTO = xmlyNextPaly.getData().get(0);
-                            Bundle reslutBundle = new Bundle();
-                            reslutBundle.putInt("albumId",dataDTO.getAlbumId());
-                            reslutBundle.putInt("episodes",dataDTO.getEpisodes());
-                            reslutBundle.putString("title",dataDTO.getName());
-                            reslutBundle.putString("audioDes","");
-                            reslutBundle.putLong("audioDuration",0);
-                            reslutBundle.putLong("audioCreated",dataDTO.getCreated());
-                            reslutBundle.putString("src",dataDTO.getUrl());
-                            reslutBundle.putInt("audioId",dataDTO.getId());
-                            reslutBundle.putInt("totalCount",bundle.getInt("totalCount"));
-//                           dataDTO player.onStop();
-//                            player.reset();
-//                            player.onRead(dataDTO.getUrl());
-                            SharedPreferences.saveOldAudioInfo(getApplication(),bundle);
-                            bundle = reslutBundle;
-                            startService();
-                        }
-//                        else {
-//                            Toast.makeText(AudioService.this, "播放结束", Toast.LENGTH_SHORT).show();
-//                        }
-
-                    }
-                });
+        bindService(intent, conn, BIND_AUTO_CREATE);
     }
     //使用handler定时更新进度条
     @SuppressLint("HandlerLeak")
@@ -176,7 +103,14 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         super.onResume();
         //进入到界面后开始更新进度条
         Log.i("TAG","onResume");
-
+        if(myBinder!=null){
+            handler.sendEmptyMessage(UPDATE_PROGRESS);
+            if(myBinder.isPlaying()){
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+            }else {
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
+            }
+        }
     }
     @Override
     protected void onStop() {
@@ -192,10 +126,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-//        Log.i("TAG","onProgressChanged");
-//        Log.i("TAG","i:"+i);
         if (b){
-//            Log.i("TAG","i:"+i);
             myBinder.seekTo(i);
         }
     }
@@ -214,31 +145,59 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_bacK:
+                SharedPreferences.saveOldAudioInfo(this,bundle);
                 finish();
                 break;
-            case R.id.prePlay:
-                int episodes = bundle.getInt("episodes") - 1;
-                if(episodes > 0){
-                    getPlaySource(episodes);
-//                    startService();
-                }else {
-                    Toast.makeText(this, "已经是第一集了", Toast.LENGTH_SHORT).show();
-                }
-
-                break;
             case R.id.startPlay:
+                if(myBinder.isPlaying()){
+                    myBinder.onPause();
+                    bundle.putLong("",myBinder.getCurrenPostion());
+                    dataBaseHelper.addPlayHistory(bundle);
+                    dataBaseHelper.close();
+                    SharedPreferences.saveOldAudioInfo(this,bundle);
+                }else {
+                    myBinder.onStart();
+                }
                 startService();
                 break;
-            case R.id.nextPlay:
-                int totalCount = bundle.getInt("totalCount");
-                int episodes1 = bundle.getInt("episodes") + 1;
-                if(totalCount != 0 && episodes1 <= totalCount){
-                    getPlaySource(episodes1);
-
-                }else {
-                    Toast.makeText(this, "已经是最后一集了", Toast.LENGTH_SHORT).show();
-                }
+            default:
                 break;
+        }
+    }
+    public void playAudio(){
+
+        Bundle historyBundle = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
+        dataBaseHelper.close();
+        Bundle oldAudioInfo = SharedPreferences.getOldAudioInfo(this);
+
+        if(myBinder.isPlaying()){
+                if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
+
+                }else{
+                    myBinder.onPause();
+                    oldAudioInfo.putLong("audioDuration",myBinder.getCurrenPostion());
+                    myBinder.onStop();
+                    dataBaseHelper.addPlayHistory(oldAudioInfo);
+                    dataBaseHelper.close();
+
+                    myBinder.onReset();
+                    if(historyBundle.getLong("audioDuration") > 0){
+                        myBinder.onRead(bundle.getString("src"),historyBundle.getLong("audioDuration"));
+                    }else{
+                        myBinder.onRead(bundle.getString("src"));
+                    }
+                    SharedPreferences.saveOldAudioInfo(this,bundle);
+                }
+        }else{
+            //没有播放，拿到刚刚bundle中的数据进行播放
+            myBinder.onStop();
+            myBinder.onReset();
+            if(historyBundle.getLong("audioDuration") > 0){
+                myBinder.onRead(bundle.getString("src"),historyBundle.getLong("audioDuration"));
+            }else{
+                myBinder.onRead(bundle.getString("src"));
+            }
+            SharedPreferences.saveOldAudioInfo(this,bundle);
         }
     }
 
@@ -247,16 +206,13 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myBinder = (AudioService.MyBinder) iBinder;
-//            Log.i("TAG","getDuration:"+myBinder.getDuration());
             binding.seekbar.setMax(myBinder.getDuration());
             //设置进度条的进度
             binding.seekbar.setProgress((int) myBinder.getCurrenPostion());
-            handler.sendEmptyMessage(UPDATE_PROGRESS);
-            if(myBinder.isPlaying()){
-                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
-            }else {
-                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
+            if(bundle.getInt("playModel") != Constans.PLAY_MODLE_ICON){
+                playAudio();
             }
+
         }
 
         @Override

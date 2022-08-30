@@ -31,11 +31,9 @@ import cn.lingyikz.soundbook.soundbook.databinding.ActivityAudiodetailBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
-import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
-import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -200,7 +198,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
 
     @Override
     public void onAudioPlay(Bundle bundle){
-        bundle.putInt("totalCount",totalCount);
+
         IntentAction.setValueActivity(this,PlayAudioActivity.class,bundle);
 //        Intent intent = new Intent(this, AudioService.class);
 //        long audioDuration = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));

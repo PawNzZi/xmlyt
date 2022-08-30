@@ -6,12 +6,11 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
-
 import java.util.HashMap;
 import java.util.Map;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
@@ -25,7 +24,7 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
     private MediaPlayer player ;
     private DataBaseHelper dataBaseHelper ;
     private Bundle bundle ;
-
+    private AudioService.MyBinder myBinder = new MyBinder();
 
     public AudioService() {
 
@@ -34,7 +33,7 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
-        return new AudioService.MyBinder();
+        return myBinder;
     }
 
     @Override
@@ -52,50 +51,41 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
 
 
         Log.i("TAG","onStartCommand");
-        bundle = intent.getExtras();
-        if(player.isPlay()){
-            if(bundle.getBoolean("continuePlay")){
-                player.onPause();
-//                saveCurrentPosition();
-                addHistory1();
-                SharedPreferences.saveOldAudioInfo(this,bundle);
-            }else {
-                player.onStop();
-                //保存上一条信息 todo
-                addHistory2(SharedPreferences.getOldAudioInfo(this));
-                player.reset();
-//                player.onRead(bundle.getString("src"));
-                if(bundle.getLong("audioDuration") > 0){
-                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
-                }else{
-                    player.onRead(bundle.getString("src"));
-                }
-                SharedPreferences.saveOldAudioInfo(this,bundle);
-            }
-        }else{
-            if(bundle.getBoolean("continuePlay")){
-//                Log.i("TAG","onPlay");
-//                player.onPlay();
-                player.onStop();
-                player.reset();
-                if(bundle.getLong("audioDuration") > 0){
-                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
-                }else{
-                    player.onRead(bundle.getString("src"));
-                }
-                SharedPreferences.saveOldAudioInfo(this,bundle);
-            }else {
-                player.onStop();
-                player.reset();
-                if(bundle.getLong("audioDuration") > 0){
-                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
-                }else{
-                    player.onRead(bundle.getString("src"));
-
-                }
-                SharedPreferences.saveOldAudioInfo(this,bundle);
-            }
-        }
+//        bundle = intent.getExtras();
+//        if(player.isPlay()){
+//            if(bundle.getBoolean("continuePlay")){
+//                 if(bundle.getInt("playModel") == Constans.PLAY_MODLE_INNER){
+//                     player.onPause();
+//                     addHistory1();
+//                     SharedPreferences.saveOldAudioInfo(this,bundle);
+//                 }
+//
+//            }else {
+//                player.onStop();
+//                //保存上一条信息 todo
+//                addHistory2(SharedPreferences.getOldAudioInfo(this));
+//                player.reset();
+////                player.onRead(bundle.getString("src"));
+//                if(bundle.getLong("audioDuration") > 0){
+//                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
+//                }else{
+//                    player.onRead(bundle.getString("src"));
+//                }
+//                SharedPreferences.saveOldAudioInfo(this,bundle);
+//            }
+//        }else{
+////            if(bundle.getBoolean("continuePlay")){
+////                Log.i("TAG","onPlay");
+////                player.onPlay();
+//                player.onStop();
+//                player.reset();
+//                if(bundle.getLong("audioDuration") > 0){
+//                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
+//                }else{
+//                    player.onRead(bundle.getString("src"));
+//                }
+//                SharedPreferences.saveOldAudioInfo(this,bundle);
+//        }
 
 
 //        player.onPlay();
@@ -150,11 +140,12 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
                             reslutBundle.putLong("audioCreated",dataDTO.getCreated());
                             reslutBundle.putString("src",dataDTO.getUrl());
                             reslutBundle.putInt("audioId",dataDTO.getId());
-                            reslutBundle.putInt("totalCount",bundle.getInt("totalCount"));
+//                            reslutBundle.putInt("totalCount",bundle.getInt("totalCount"));
                             player.onStop();
                             player.reset();
                             player.onRead(dataDTO.getUrl());
                             SharedPreferences.saveOldAudioInfo(getApplication(),bundle);
+                            addHistory1();
                             bundle = reslutBundle;
                         }
 //                        else {
@@ -172,7 +163,24 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
             return player.isPlay();
         }
 
-
+        public void onStop(){
+            player.onStop();
+        }
+        public void onReset(){
+            player.reset();
+        }
+        public void onRead(String src){
+            player.onRead(src);
+        }
+        public void onRead(String src,long currentPostion){
+            player.onRead(src,currentPostion);
+        }
+        public void onPause(){
+            player.onPause();
+        }
+        public void onStart(){
+            player.onPlay();
+        }
         //返回歌曲的长度，单位为毫秒
         public int getDuration(){
             return player.getDuration();
@@ -191,42 +199,15 @@ public class AudioService extends Service  implements android.media.MediaPlayer.
 
 
     public void addHistory1(){
-//        Log.i("TAG","addHistory1");
-//        System.out.println("audioDuration"+player.getCurrentPosition());
-        Map<String,Object> hashMap = new HashMap<>();
-        hashMap.put("albumId",bundle.getInt("albumId"));
-        hashMap.put("episodes",bundle.getInt("episodes"));
-        hashMap.put("title",bundle.getString("title"));
-        hashMap.put("audioDes",bundle.getString("audioDes"));
-        hashMap.put("audioDuration",player.getCurrentPosition());
-        hashMap.put("src",bundle.getString("src"));
-        hashMap.put("audioId",bundle.getInt("audioId"));
-        hashMap.put("audioCreated",bundle.getLong("audioCreated"));
-        hashMap.put("totalCount",bundle.getInt("totalCount"));
 
-//        Log.i("TAG",bundle.getString("title"));
-//        Log.i("TAG",bundle.getLong("audioCreated")+"");
         dataBaseHelper = DataBaseHelper.getInstance(this);
-        dataBaseHelper.addPlayHistory(hashMap);
+        dataBaseHelper.addPlayHistory(bundle);
         dataBaseHelper.close();
     }
     public void addHistory2(Bundle bundle){
-//        Log.i("TAG","addHistory2");
-        Map<String,Object> hashMap = new HashMap<>();
-        hashMap.put("albumId",bundle.getInt("albumId"));
-        hashMap.put("episodes",bundle.getInt("episodes"));
-        hashMap.put("title",bundle.getString("title"));
-        hashMap.put("audioDes",bundle.getString("audioDes"));
-        hashMap.put("audioDuration",player.getCurrentPosition());
-        hashMap.put("src",bundle.getString("src"));
-        hashMap.put("audioId",bundle.getInt("audioId"));
-        hashMap.put("audioCreated",bundle.getLong("audioCreated"));
-        hashMap.put("totalCount",bundle.getInt("totalCount"));
-//        Log.i("TAG",bundle.getString("title"));
-//        Log.i("TAG",bundle.getLong("audioCreated")+"");
 
         dataBaseHelper = DataBaseHelper.getInstance(this);
-        dataBaseHelper.addPlayHistory(hashMap);
+        dataBaseHelper.addPlayHistory(bundle);
         dataBaseHelper.close();
     }
     public void closrService(){

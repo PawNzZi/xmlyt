@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -30,6 +31,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentUserBinding;
+import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.user.fragment.CollectionFragment;
 import cn.lingyikz.soundbook.soundbook.user.fragment.PlayHistoryFragment;
@@ -37,6 +39,7 @@ import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 /**
  * Created by 1085054 on 2022-8-17.
@@ -108,7 +111,14 @@ public class UserFragment extends Fragment {
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_play:
-                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
+//                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
+                Bundle bundle = SharedPreferences.getOldAudioInfo(getActivity());
+                if(bundle.getString("src") == null){
+                    Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+                }else {
+                    bundle.putInt("playModel",Constans.PLAY_MODLE_ICON);
+                    IntentAction.setValueActivity(getActivity(),PlayAudioActivity.class,bundle);
+                }
                 break;
             case R.id.userAvatar:
                 break;

@@ -1,6 +1,7 @@
 package cn.lingyikz.soundbook.soundbook.api;
 
 import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.AlbumCount;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
 import cn.lingyikz.soundbook.soundbook.pojo.PostInfo;
@@ -30,5 +31,10 @@ public interface Api {
       @FormUrlEncoded
       @POST("xmly/nextPlay")
       Observable<XmlyNextPaly> getNextPlay(@Field("albumId") int albumId , @Field("episodes") int episodes);
+
+      //查询下一集
+      @FormUrlEncoded
+      @POST("xmly/episodesCount")
+      Observable<AlbumCount> episodesCount(@Field("albumId") int albumId);
 
 }

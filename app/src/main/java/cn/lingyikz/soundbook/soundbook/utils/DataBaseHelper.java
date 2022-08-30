@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 //        Log.i("TAG","SQLonCreate");
         sqLiteDatabase.execSQL("CREATE TABLE collection(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,albumDes TEXT,albumThumb TEXT," +
                 "uuid TEXT);");
-        sqLiteDatabase.execSQL("CREATE TABLE playhistory(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,totalCount INTEGER,episodes INTEGER,audioTitle TEXT,audioDes TEXT," +
+        sqLiteDatabase.execSQL("CREATE TABLE playhistory(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,episodes INTEGER,audioTitle TEXT,audioDes TEXT," +
                 "audioCreated TEXT,audioDuration TEXT,audioSrc TEXT ,audioId INTEGER,uuid TEXT);");
     }
 
@@ -133,27 +134,26 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     /**
      * 插入或修改播放历史
-     * @param map
+     * @param bundle
      */
-    public void addPlayHistory(Map<String,Object> map){
+    public void addPlayHistory(Bundle bundle){
 //        Log.i("TAG","日期:"+map.get("audioCreated").toString());
         db = getWriteLink();
         String querySql = "select * from playhistory where albumId = ? ";
-        Cursor cursor = db.rawQuery(querySql,new String[]{String.valueOf(map.get("albumId"))});
+        Cursor cursor = db.rawQuery(querySql,new String[]{bundle.getString("albumId")});
         int count = cursor.getCount();
 //        Log.i("TAG","COUNT:"+cursor.getCount());
         if(count == 0){
             //
             ContentValues contentValues = new ContentValues();
-            contentValues.put("albumId",(Integer) map.get("albumId"));
-            contentValues.put("episodes",(Integer) map.get("episodes"));
-            contentValues.put("audioTitle",String.valueOf(map.get("title")));
-//            contentValues.put("uuid",uuid);
-            contentValues.put("audioDes",String.valueOf(map.get("audioDes")));
-            contentValues.put("audioDuration",String.valueOf(map.get("audioDuration")));
-            contentValues.put("audioCreated",String.valueOf(map.get("audioCreated")));
-            contentValues.put("audioSrc",String.valueOf(map.get("src")));
-            contentValues.put("audioId",(Integer)map.get("audioId"));
+            contentValues.put("albumId",bundle.getInt("albumId"));
+            contentValues.put("episodes",bundle.getInt("episodes"));
+            contentValues.put("audioTitle",bundle.getString("title"));
+            contentValues.put("audioDes",bundle.getString("audioDes"));
+            contentValues.put("audioDuration",String.valueOf(bundle.getLong("audioDuration")));
+            contentValues.put("audioCreated",bundle.getString("audioCreated"));
+            contentValues.put("audioSrc",bundle.getString("src"));
+            contentValues.put("audioId",bundle.getInt("audioId"));
 
             db.insert("playhistory",null,contentValues);
 
@@ -168,18 +168,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 //            }
 //        }
         else if(count > 0){
-            String deleteSql = "delete from playhistory where albumId = "+ map.get("albumId");
+            String deleteSql = "delete from playhistory where albumId = "+ bundle.getString("albumId");
             db.execSQL(deleteSql);
             ContentValues contentValues = new ContentValues();
-            contentValues.put("albumId",(Integer) map.get("albumId"));
-            contentValues.put("episodes",(Integer) map.get("episodes"));
-            contentValues.put("audioTitle",String.valueOf(map.get("title")));
-//            contentValues.put("uuid",uuid);
-            contentValues.put("audioDes",String.valueOf(map.get("audioDes")));
-            contentValues.put("audioDuration",String.valueOf(map.get("audioDuration")));
-            contentValues.put("audioCreated",String.valueOf(map.get("audioCreated")));
-            contentValues.put("audioSrc",String.valueOf(map.get("src")));
-            contentValues.put("audioId",(Integer)map.get("audioId"));
+            contentValues.put("albumId",bundle.getInt("albumId"));
+            contentValues.put("episodes",bundle.getInt("episodes"));
+            contentValues.put("audioTitle",bundle.getString("title"));
+            contentValues.put("audioDes",bundle.getString("audioDes"));
+            contentValues.put("audioDuration",String.valueOf(bundle.getLong("audioDuration")));
+            contentValues.put("audioCreated",bundle.getString("audioCreated"));
+            contentValues.put("audioSrc",bundle.getString("src"));
+            contentValues.put("audioId",bundle.getInt("audioId"));
 
             db.insert("playhistory",null,contentValues);
         }
@@ -213,8 +212,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 listDTO.setAlbumId(cursor.getInt(cursor.getColumnIndex("albumId")));
                 listDTO.setEpisodes(cursor.getInt(cursor.getColumnIndex("episodes")));
                 listDTO.setCreated(Long.parseLong(cursor.getString(cursor.getColumnIndex("audioCreated"))));
-//                Log.i("TAG","x:"+cursor.getString(cursor.getColumnIndex("audioCreated")));
                 listDTO.setUrl(cursor.getString(cursor.getColumnIndex("audioSrc")));
+//                listDTO.setUrl(cursor.getString(cursor.getColumnIndex("audioDuration")));
                 mList.add(listDTO);
                 cursor.moveToNext();
             }
@@ -229,24 +228,50 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * @param audioId
      * @return
      */
-    public long queryPlayHistory(int albumId,int audioId){
+    public Bundle queryPlayHistory(int albumId,int audioId){
         db = getReadLink();
+        Bundle bundle = new Bundle();
         String querySql = "select audioDuration from playhistory where albumId = ? and audioId = ?";
         Cursor cursor = db.rawQuery(querySql,new String[]{String.valueOf(albumId),String.valueOf(audioId)});
 
 //        Log.i("TAG","bofanglishi:"+cursor.getCount());
         if(cursor.moveToFirst()){
-            Long result = Long.parseLong(cursor.getString(cursor.getColumnIndex("audioDuration")));
-            cursor.close();
-
-            return result;
-
-        }else{
-            cursor.close();
-            return 0;
+            for (int i = 0; i < cursor.getCount(); i++) {
+                bundle.putInt("albumId",cursor.getInt(cursor.getColumnIndex("albumId")));
+                bundle.putInt("audioId",cursor.getInt(cursor.getColumnIndex("audioId")));
+                bundle.putInt("episodes",cursor.getInt(cursor.getColumnIndex("episodes")));
+                bundle.putString("title",cursor.getString(cursor.getColumnIndex("audioTitle")));
+                bundle.putString("audioDes",cursor.getString(cursor.getColumnIndex("audioDes")));
+                bundle.putString("src",cursor.getString(cursor.getColumnIndex("src")));
+                bundle.putLong("audioCreated",cursor.getInt(cursor.getColumnIndex("audioCreated")));
+                bundle.putString("audioDuration",cursor.getString(cursor.getColumnIndex("audioDuration")));
+            }
         }
+        cursor.close();
+        return bundle;
+    }
+    public Bundle queryPlayHistoryRecent(){
+        Bundle bundle = new Bundle() ;
+        db = getReadLink();
+        String querySql = "select max(audioCreated) from playhistory ";
+        Cursor cursor = db.rawQuery(querySql,new String[]{});
+        Log.i("TAG","COUNT:"+cursor.getCount());
+        if(cursor.getCount() != 0){
+            if(cursor.moveToFirst()){
+                bundle.putInt("albumId",cursor.getInt(cursor.getColumnIndex("albumId")));
+                bundle.putInt("audioId",cursor.getInt(cursor.getColumnIndex("audioId")));
+                bundle.putInt("episodes",cursor.getInt(cursor.getColumnIndex("episodes")));
+                bundle.putString("title",cursor.getString(cursor.getColumnIndex("audioTitle")));
+                bundle.putString("audioDes",cursor.getString(cursor.getColumnIndex("audioDes")));
+                bundle.putString("src",cursor.getString(cursor.getColumnIndex("src")));
+                bundle.putLong("audioCreated",cursor.getInt(cursor.getColumnIndex("audioCreated")));
+                bundle.putString("audioDuration",cursor.getString(cursor.getColumnIndex("audioDuration")));
+                bundle.putInt("playModel",Constans.PLAY_MODLE_INNER);
 
-
+            }
+        }
+         cursor.close();
+         return bundle;
     }
 
 }

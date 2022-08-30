@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemAudiolistBinding;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
-
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
 
 
 public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.ViewHolder>{
@@ -98,6 +98,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
                 bundle.putString("title",list.get(position).getName());
                 bundle.putString("src",list.get(position).getUrl());
                 bundle.putInt("audioId",list.get(position).getId());
+                bundle.putInt("playModel", Constans.PLAY_MODLE_LIST);
                 audioListen.onAudioPlay(bundle);
             }
         });

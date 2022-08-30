@@ -2,6 +2,7 @@ package cn.lingyikz.soundbook.soundbook.home;
 
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentHomeBinding;
+import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.activity.SearchActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
@@ -30,6 +32,7 @@ import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -161,7 +164,15 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
                 searchFragment.showFragment(getActivity().getSupportFragmentManager(),SearchFragment.TAG);
                 break;
             case R.id.go_play:
-                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
+//                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
+                Bundle bundle = SharedPreferences.getOldAudioInfo(getActivity());
+
+                if(bundle.getString("src") == null){
+                    Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+                }else {
+                    bundle.putInt("playModel",Constans.PLAY_MODLE_ICON);
+                    IntentAction.setValueActivity(getActivity(),PlayAudioActivity.class,bundle);
+                }
                 break;
         }
     }

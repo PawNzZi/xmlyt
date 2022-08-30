@@ -14,10 +14,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentPalyhistoryBinding;
+import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
+import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 public class PlayHistoryFragment extends Fragment implements AudioListAdapter.AudioListen {
@@ -100,26 +102,27 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
 
     @Override
     public void onAudioPlay(Bundle bundle) {
-        Intent intent = new Intent(getContext(), AudioService.class);
-        long audioDuration = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
-        dataBaseHelper.close();
-        Bundle oldAudioInfo =  SharedPreferences.getOldAudioInfo(getContext());
-        if(oldAudioInfo.getString("src" ) != null){
-            if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
-//                Log.i("TAG","暂停");
-                bundle.putBoolean("continuePlay",true);
-
-            }else{
-                //stop并重新播放
-//                Log.i("TAG","stop并重新播放");
-                bundle.putBoolean("continuePlay",false);
-            }
-        }else {
-            bundle.putBoolean("continuePlay",false);
-        }
-        bundle.putLong("audioDuration", audioDuration);
-        intent.putExtras(bundle);
-        getContext().startService(intent);
+        IntentAction.setValueActivity(getActivity(), PlayAudioActivity.class,bundle);
+//        Intent intent = new Intent(getContext(), AudioService.class);
+//        long audioDuration = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
+//        dataBaseHelper.close();
+//        Bundle oldAudioInfo =  SharedPreferences.getOldAudioInfo(getContext());
+//        if(oldAudioInfo.getString("src" ) != null){
+//            if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
+////                Log.i("TAG","暂停");
+//                bundle.putBoolean("continuePlay",true);
+//
+//            }else{
+//                //stop并重新播放
+////                Log.i("TAG","stop并重新播放");
+//                bundle.putBoolean("continuePlay",false);
+//            }
+//        }else {
+//            bundle.putBoolean("continuePlay",false);
+//        }
+//        bundle.putLong("audioDuration", audioDuration);
+//        intent.putExtras(bundle);
+//        getContext().startService(intent);
 //        this.sendBroadCast();
 
     }
