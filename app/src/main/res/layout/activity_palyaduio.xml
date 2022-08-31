@@ -51,7 +51,7 @@
             android:layout_height="40dp"
             android:src="@mipmap/kuaitui"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="100dp"
+            android:layout_marginLeft="90dp"
             >
 
         </ImageView>
@@ -72,7 +72,7 @@
             android:src="@mipmap/kuaijin"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="100dp"
+            android:layout_marginRight="90dp"
             >
 
         </ImageView>

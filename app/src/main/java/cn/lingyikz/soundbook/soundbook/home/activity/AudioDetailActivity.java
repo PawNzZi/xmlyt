@@ -166,8 +166,12 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
                             }
                         }else if(reslut.getCode() == 200 && reslut.getData().getList().size() == 0){
                             Toast.makeText(AudioDetailActivity.this, Constans.ALBUM_CONTENT_NULL, Toast.LENGTH_SHORT).show();
+                            activityAudiodetailBinding.niceSpinner.setVisibility(View.GONE);
+                            activityAudiodetailBinding.listLen.setText(Constans.ALBUM_CONTENT_NULL);
                         }else {
                             Toast.makeText(AudioDetailActivity.this, reslut.getMessage(), Toast.LENGTH_SHORT).show();
+                            activityAudiodetailBinding.niceSpinner.setVisibility(View.GONE);
+                            activityAudiodetailBinding.listLen.setText("共"+ 0 +"集");
                         }
 
                         new Handler().postDelayed(new Runnable() {

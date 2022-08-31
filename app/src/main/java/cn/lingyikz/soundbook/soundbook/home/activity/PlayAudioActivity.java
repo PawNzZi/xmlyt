@@ -145,16 +145,22 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
     private final SuperMediaPlayer.OnPreparedListener onPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mediaPlayer) {
-            binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
-            binding.spinKit.setVisibility(View.GONE);
+            if(binding != null){
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+                binding.spinKit.setVisibility(View.GONE);
+            }
+
             mediaPlayer.start();
         }
     };
     private final SuperMediaPlayer.OnSeekCompleteListener onSeekCompleteListener = new MediaPlayer.OnSeekCompleteListener() {
         @Override
         public void onSeekComplete(MediaPlayer mediaPlayer) {
-            binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
-            binding.spinKit.setVisibility(View.GONE);
+            if(binding != null){
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+                binding.spinKit.setVisibility(View.GONE);
+            }
+
             mediaPlayer.start();
         }
     };
@@ -196,7 +202,9 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                             if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() > 0 && SuperMediaPlayer.error == 0) {
                                 Log.i("TAG", xmlyNextPaly.toString() + "");
                                 XmlyNextPaly.DataDTO dataDTO = xmlyNextPaly.getData().get(0);
-                                binding.titleBar.title.setText(dataDTO.getName());
+                                if(binding != null){
+                                    binding.titleBar.title.setText(dataDTO.getName());
+                                }
                                 Bundle reslutBundle = new Bundle();
                                 reslutBundle.putInt("albumId",dataDTO.getAlbumId());
                                 reslutBundle.putInt("episodes",dataDTO.getEpisodes());
@@ -213,6 +221,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                                 dataBaseHelper.addPlayHistory(bundle);
                                 dataBaseHelper.close();
                                 bundle = reslutBundle;
+
                             }
 
                         }
