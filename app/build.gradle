@@ -69,5 +69,7 @@ dependencies {
     //spinner
 //    implementation 'com.github.pratikbutani:MultiSelectSpinner:1.0.1'
     implementation 'com.github.arcadefire:nice-spinner:1.4.4'
+    //加载loading
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
 }

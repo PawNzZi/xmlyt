@@ -4,14 +4,9 @@ import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumCount;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
-import cn.lingyikz.soundbook.soundbook.pojo.PostInfo;
-import cn.lingyikz.soundbook.soundbook.pojo.Test;
-import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Query;
 import rx.Observable;
 
 public interface Api {

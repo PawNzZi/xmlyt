@@ -40,6 +40,7 @@ import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
+import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
 
 /**
  * Created by 1085054 on 2022-8-17.
@@ -52,6 +53,9 @@ public class UserFragment extends Fragment {
     private List<Fragment> fragmentList ;
     private List<String> titleList ;
 
+    public static UserFragment newInstance() {
+        return new UserFragment();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,8 +79,8 @@ public class UserFragment extends Fragment {
 
 
         fragmentList = new ArrayList<>();
-        fragmentList.add(new PlayHistoryFragment());
-        fragmentList.add(new CollectionFragment());
+        fragmentList.add(PlayHistoryFragment.newInstance());
+        fragmentList.add(CollectionFragment.newInstance());
 
         titleList = new ArrayList<>();
         titleList.add("播放历史");
@@ -107,12 +111,14 @@ public class UserFragment extends Fragment {
 
     }
 
-    @AClick({R.id.go_play, R.id.userAvatar})
+    @AClick({R.id.go_play, R.id.userAvatar,R.id.titleSpinKit})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_play:
+            case R.id.titleSpinKit:
 //                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
-                Bundle bundle = DataBaseHelper.getInstance(getActivity()).queryPlayHistoryRecent();
+//                Bundle bundle = DataBaseHelper.getInstance(getActivity()).queryPlayHistoryRecent();
+                Bundle bundle = SharedPreferences.getOldAudioInfo(getActivity());
                 if(bundle.getString("src") == null){
                     Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
                 }else {
@@ -127,10 +133,12 @@ public class UserFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if(MediaPlayer.getInstance().isPlay()){
-            binding.titleBar.goPlay.setImageDrawable(getResources().getDrawable(R.mipmap.title_play, getResources().newTheme()));
+        if(SuperMediaPlayer.getInstance().isPlaying()){
+            binding.titleBar.goPlay.setVisibility(View.GONE);
+            binding.titleBar.titleSpinKit.setVisibility(View.VISIBLE);
         }else {
-            binding.titleBar.goPlay.setImageDrawable(getResources().getDrawable(R.mipmap.title_pause, getResources().newTheme()));
+            binding.titleBar.goPlay.setVisibility(View.VISIBLE);
+            binding.titleBar.titleSpinKit.setVisibility(View.GONE);
         }
     }
 
@@ -141,23 +149,6 @@ public class UserFragment extends Fragment {
 
 
     }
-//
-//    public class ChangePlayReceiver extends BroadcastReceiver {
-//
-//        @SuppressLint("UseCompatLoadingForDrawables")
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            if (intent.getAction().equals(Constans.CHANGE_PLAY_IMG)) {
-//                Log.i("TAG", "广播接受到了1。");
-//
-//                if(MediaPlayer.getInstance().isPlay()){
-//                    binding.titleBar.goPlay.setImageDrawable(UserFragment.this.getResources().getDrawable(R.mipmap.title_play, getResources().newTheme()));
-//                }else {
-//                    binding.titleBar.goPlay.setImageDrawable(getResources().getDrawable(R.mipmap.title_pause, getResources().newTheme()));
-//                }
-//            }
-//        }
-//    }
 
     public class ViewPageAdatper extends FragmentStateAdapter{
 

@@ -142,7 +142,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 //        Log.i("TAG","日期:"+map.get("audioCreated").toString());
         db = getWriteLink();
         String querySql = "select * from playhistory where albumId = ? ";
-        Cursor cursor = db.rawQuery(querySql,new String[]{bundle.getString("albumId")});
+        Cursor cursor = db.rawQuery(querySql,new String[]{String.valueOf(bundle.getInt("albumId"))});
         int count = cursor.getCount();
 //        Log.i("TAG","COUNT:"+cursor.getCount());
         if(count == 0){
@@ -170,7 +170,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 //            }
 //        }
         else if(count > 0){
-            String deleteSql = "delete from playhistory where albumId = "+ bundle.getString("albumId");
+            String deleteSql = "delete from playhistory where albumId = "+ bundle.getInt("albumId");
             db.execSQL(deleteSql);
             ContentValues contentValues = new ContentValues();
             contentValues.put("albumId",bundle.getInt("albumId"));
@@ -235,9 +235,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public Bundle queryPlayHistory(int albumId, int audioId){
         db = getReadLink();
         Bundle bundle = new Bundle();
-        String querySql = "select audioDuration from playhistory where albumId = ? and audioId = ?";
+        String querySql = "select * from playhistory where albumId = ? and audioId = ?";
         Cursor cursor = db.rawQuery(querySql,new String[]{String.valueOf(albumId),String.valueOf(audioId)});
-        Log.i("TAG","bofanglishi:"+cursor.getCount());
+//        Log.i("TAG","bofanglishi:"+cursor.getCount());
         if(cursor.moveToFirst()){
             for (int i = 0; i < cursor.getCount(); i++) {
                 bundle.putInt("albumId",cursor.getInt(cursor.getColumnIndex("albumId")));
@@ -246,7 +246,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 bundle.putString("title",cursor.getString(cursor.getColumnIndex("audioTitle")));
                 bundle.putString("audioDes",cursor.getString(cursor.getColumnIndex("audioDes")));
                 bundle.putString("src",cursor.getString(cursor.getColumnIndex("audioSrc")));
-                bundle.putLong("audioCreated",cursor.getInt(cursor.getColumnIndex("audioCreated")));
+                bundle.putString("audioCreated",cursor.getString(cursor.getColumnIndex("audioCreated")));
                 bundle.putString("audioDuration",cursor.getString(cursor.getColumnIndex("audioDuration")));
                 cursor.moveToNext();
             }
@@ -271,7 +271,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     bundle.putString("audioDes",cursor.getString(cursor.getColumnIndex("audioDes")));
                     bundle.putString("src",cursor.getString(cursor.getColumnIndex("audioSrc")));
                     Log.i("TAG","COUNT:"+cursor.getString(cursor.getColumnIndex("audioSrc")));
-                    bundle.putLong("audioCreated",cursor.getInt(cursor.getColumnIndex("audioCreated")));
+                    bundle.putString("audioCreated",cursor.getString(cursor.getColumnIndex("audioCreated")));
                     bundle.putString("audioDuration",cursor.getString(cursor.getColumnIndex("audioDuration")));
                     cursor.moveToNext();
                 }

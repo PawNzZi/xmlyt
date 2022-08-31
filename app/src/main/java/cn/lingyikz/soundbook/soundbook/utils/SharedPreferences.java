@@ -17,7 +17,7 @@ public class SharedPreferences {
         editor.putInt("albumId",bundle.getInt("albumId"));
         editor.putInt("episodes",bundle.getInt("episodes"));
         editor.putInt("audioId",bundle.getInt("audioId"));
-        editor.putLong("audioCreated",bundle.getLong("audioCreated"));
+        editor.putString("audioCreated",bundle.getString("audioCreated"));
         editor.putString("audioDes",bundle.getString("audioDes"));
         editor.putLong("audioDuration",bundle.getLong("audioDuration"));
         editor.putString("title",bundle.getString("title"));
@@ -30,7 +30,7 @@ public class SharedPreferences {
         editor.putInt("albumId",bundle.getInt("albumId"));
         editor.putInt("episodes",bundle.getInt("episodes"));
         editor.putInt("audioId",bundle.getInt("audioId"));
-        editor.putLong("audioCreated",bundle.getLong("audioCreated"));
+        editor.putString("audioCreated",bundle.getString("audioCreated"));
         editor.putString("audioDes",bundle.getString("audioDes"));
         editor.putLong("audioDuration",bundle.getLong("audioDuration"));
         editor.putString("title",bundle.getString("title"));
@@ -40,11 +40,10 @@ public class SharedPreferences {
     public static Bundle  getOldAudioInfo(Activity activity){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         Bundle bundle = new Bundle() ;
-
         bundle.putInt("albumId", oldAudioInfo.getInt("albumId",0));
         bundle.putInt("episodes", oldAudioInfo.getInt("episodes",0));
         bundle.putInt("audioId", oldAudioInfo.getInt("audioId",0));
-        bundle.putLong("audioCreated", oldAudioInfo.getLong("audioCreated",0));
+        bundle.putString("audioCreated", oldAudioInfo.getString("audioCreated","0"));
         bundle.putLong("audioDuration", oldAudioInfo.getLong("audioDuration",0));
         bundle.putString("audioDes", oldAudioInfo.getString("audioDes",null));
         bundle.putString("title", oldAudioInfo.getString("title",null));
@@ -59,7 +58,7 @@ public class SharedPreferences {
         bundle.putInt("albumId", oldAudioInfo.getInt("albumId",0));
         bundle.putInt("episodes", oldAudioInfo.getInt("episodes",0));
         bundle.putInt("audioId", oldAudioInfo.getInt("audioId",0));
-        bundle.putLong("audioCreated", oldAudioInfo.getLong("audioCreated",0));
+        bundle.putString("audioCreated", oldAudioInfo.getString("audioCreated","0"));
         bundle.putLong("audioDuration", oldAudioInfo.getLong("audioDuration",0));
         bundle.putString("audioDes", oldAudioInfo.getString("audioDes",null));
         bundle.putString("title", oldAudioInfo.getString("title",null));

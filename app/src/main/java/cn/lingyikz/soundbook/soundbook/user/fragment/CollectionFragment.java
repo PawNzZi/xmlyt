@@ -3,6 +3,7 @@ package cn.lingyikz.soundbook.soundbook.user.fragment;
 
 import android.os.Bundle;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCollectionBinding;
+import cn.lingyikz.soundbook.soundbook.home.HomeFragment;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
@@ -24,6 +26,10 @@ public class CollectionFragment extends Fragment implements HomeAdapter.ItemOper
     private HomeAdapter adapter = null;
     private List<Album.DataDTO.ListDTO> mList = new ArrayList<>();
     private DataBaseHelper dataBaseHelper ;
+
+    public static CollectionFragment newInstance() {
+        return new CollectionFragment();
+    }
     @Override
     public void onCreate(@Nullable  Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +64,7 @@ public class CollectionFragment extends Fragment implements HomeAdapter.ItemOper
 //        Log.i("TAG","mList.size:"+mList.size());
         if(adapter == null){
             binding.swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            adapter = new HomeAdapter(mList,getContext(),1,this);
+            adapter = new HomeAdapter(mList,getActivity(),1,this);
             binding.swipeRecyclerView.setAdapter(adapter);
             DividerItemDecoration divider = new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL);
             binding.swipeRecyclerView.addItemDecoration(divider);

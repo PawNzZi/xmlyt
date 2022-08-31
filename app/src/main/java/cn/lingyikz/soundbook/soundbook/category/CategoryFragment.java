@@ -15,10 +15,13 @@ import androidx.fragment.app.Fragment;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCategoryBinding;
 
-
 public class CategoryFragment extends Fragment {
 
     private FragmentCategoryBinding binding ;
+
+    public static CategoryFragment newInstance() {
+        return new CategoryFragment();
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

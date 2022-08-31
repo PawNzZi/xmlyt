@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 
@@ -46,13 +47,13 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
     private List<AlbumDetail.DataDTO.ListDTO> mList  = new ArrayList<>();
 
     private int nextPage = 1;
-//    private int albumId = 0 ;
     private Album.DataDTO.ListDTO albumDetail ;
     private DataBaseHelper dataBaseHelper;
-    private int totalCount = 0 ;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+//        overridePendingTransition(R.anim.translate_in,R.anim.translate_in);
         super.onCreate(savedInstanceState);
         activityAudiodetailBinding = ActivityAudiodetailBinding.inflate(getLayoutInflater());
         setContentView(activityAudiodetailBinding.getRoot());
@@ -65,7 +66,6 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
 
         Bundle bundle = getIntent().getExtras();
         albumDetail = (Album.DataDTO.ListDTO) bundle.getSerializable("bookObject");
-//        database = new DataBaseHelper(this);
         dataBaseHelper = DataBaseHelper.getInstance(this);
         int count = dataBaseHelper.queryCollectionCount(albumDetail.getId());
         dataBaseHelper.close();
@@ -80,13 +80,16 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
         Glide.with(activityAudiodetailBinding.getRoot()).applyDefaultRequestOptions(RequestOptions.bitmapTransform(new CircleCrop())).load(albumDetail.getThumb()).into(activityAudiodetailBinding.bookThumb);
         activityAudiodetailBinding.bookName.setText(albumDetail.getName());
         activityAudiodetailBinding.bookAuthor.setText(albumDetail.getDescription());
-
+        activityAudiodetailBinding.recyclerView.setVisibility(View.GONE);
+//        activityAudiodetailBinding.spinKit.setVisibility(View.VISIBLE);
         //调接口查询列表
         this.queryList(albumDetail.getId(),true);
 
     }
     @SuppressLint("SetTextI18n")
     public void queryList(int id,boolean isSpinner){
+        activityAudiodetailBinding.recyclerView.setVisibility(View.GONE);
+        activityAudiodetailBinding.spinKit.setVisibility(View.VISIBLE);
         Observable<AlbumDetail> observable  = RequestService.getInstance().getApi().getAlbumDetail(nextPage, Constans.PAGE_SIZE,id);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
@@ -132,7 +135,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
 
                             if(isSpinner){
                                 int pages = reslut.getData().getPages();
-                                totalCount  = reslut.getData().getTotal();
+//                                totalCount  = reslut.getData().getTotal();
                                 List<String> spinnerItemList = new ArrayList<>();
                                 if(pages == 1){
                                     for (int i = 0; i < pages + 1; i++) {
@@ -161,11 +164,19 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
                                 activityAudiodetailBinding.niceSpinner.attachDataSource(spinnerItemList);
                                 activityAudiodetailBinding.niceSpinner.setOnSpinnerItemSelectedListener(AudioDetailActivity.this);
                             }
+                        }else if(reslut.getCode() == 200 && reslut.getData().getList().size() == 0){
+                            Toast.makeText(AudioDetailActivity.this, Constans.ALBUM_CONTENT_NULL, Toast.LENGTH_SHORT).show();
                         }else {
                             Toast.makeText(AudioDetailActivity.this, reslut.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
-
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                activityAudiodetailBinding.recyclerView.setVisibility(View.VISIBLE);
+                                activityAudiodetailBinding.spinKit.setVisibility(View.GONE);
+                            }
+                        },500);
                     }
                 });
     }
@@ -175,6 +186,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
         switch (view.getId()) {
             case R.id.backIcon:
                 finish();
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 break;
             case R.id.collection:
                 //收藏
@@ -200,6 +212,8 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
     public void onAudioPlay(Bundle bundle){
 
         IntentAction.setValueActivity(this,PlayAudioActivity.class,bundle);
+        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+
 //        Intent intent = new Intent(this, AudioService.class);
 //        long audioDuration = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
 //        dataBaseHelper.close();

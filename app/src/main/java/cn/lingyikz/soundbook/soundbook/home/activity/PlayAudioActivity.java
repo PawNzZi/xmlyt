@@ -2,12 +2,10 @@ package cn.lingyikz.soundbook.soundbook.home.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
+
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
@@ -18,18 +16,18 @@ import android.widget.Toast;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 
+import java.io.IOException;
+
 import androidx.annotation.Nullable;
 
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityPalyaduioBinding;
-import cn.lingyikz.soundbook.soundbook.modle.AlbumCount;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
-import cn.lingyikz.soundbook.soundbook.service.AudioService;
-import cn.lingyikz.soundbook.soundbook.utils.Constans;
+
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
-import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
+import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -39,10 +37,12 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
 
     private ActivityPalyaduioBinding binding ;
     private DataBaseHelper dataBaseHelper;
-    private MyConnection conn ;
-    private AudioService.MyBinder myBinder ;
     private static final int UPDATE_PROGRESS = 0;
+    private static final int CHANGE_SECONDE = 15 ;
     private Bundle bundle ;
+    private SuperMediaPlayer superMediaPlayer = SuperMediaPlayer.getInstance();
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,40 +57,169 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
      * 初始化数据
      */
     private void initData() {
+        binding.spinKit.setVisibility(View.VISIBLE);
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goPlay.setVisibility(View.GONE);
+        binding.titleBar.titleSpinKit.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.VISIBLE);
         bundle = getIntent().getExtras();
-        Log.i("TAG",bundle+"");
+//        Log.i("TAG",bundle+"");
         binding.titleBar.title.setText(bundle.getString("title"));
         binding.seekbar.setOnSeekBarChangeListener(this);
         dataBaseHelper = DataBaseHelper.getInstance(this);
-        Intent intent = new Intent(this, AudioService.class);
-        conn = new MyConnection();
-        intent.setAction(Constans.BIND_SERVICE);
+        superMediaPlayer.setOnPreparedListener(onPreparedListener);
+        superMediaPlayer.setOnSeekCompleteListener(onSeekCompleteListener);
+        superMediaPlayer.setOnCompletionListener(onCompletionListener);
+        superMediaPlayer.setOnErrorListener(onErrorListener);
+
         Bundle historyBundle = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
         dataBaseHelper.close();
-        if(historyBundle.getString("audioDuration") == null){
-            Log.i("TAG","audioDuration == null");
-            bundle.putLong("audioDuration",0);
-        }else {
-            Log.i("TAG","audioDuration != null");
-            Log.i("TAG","audioDuration != null"+historyBundle.getString("audioDuration"));
-            bundle.putLong("audioDuration",Long.parseLong(historyBundle.getString("audioDuration")));
-        }
-        intent.putExtras(bundle);
-        startService(intent);
-        bindService(intent, conn, BIND_AUTO_CREATE);
 
+        if(historyBundle.getString("audioDuration") == null){
+//            Log.i("TAG","audioDuration == null");
+            bundle.putString("audioDuration","0");
+        }else {
+//            Log.i("TAG","audioDuration != null");
+//            Log.i("TAG","audioDuration != null"+historyBundle.getString("audioDuration"));
+            bundle.putString("audioDuration",historyBundle.getString("audioDuration"));
+        }
+        playAudio();
     }
 
     /**
      * 启动服务播放
      */
-    private void startService(){
+    private void playAudio(){
+        SuperMediaPlayer.error = 0 ;
+        if(superMediaPlayer.isPlaying()){
+
+            Bundle oldAudioInfo = SharedPreferences.getOldAudioInfo(this);
+            if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+                binding.spinKit.setVisibility(View.GONE);
+            }else {
+                superMediaPlayer.stop();
+                oldAudioInfo.putLong("audioDuration",superMediaPlayer.getCurrentPosition());
+                dataBaseHelper.addPlayHistory(oldAudioInfo);
+                dataBaseHelper.close();
+                superMediaPlayer.reset();
+                if(Long.parseLong(bundle.getString("audioDuration")) > 0){
+                    onSeekToRead(bundle.getString("src"),Long.parseLong(bundle.getString("audioDuration")));
+                }else {
+                    onRead(bundle.getString("src"));
+                }
+                SharedPreferences.saveOldAudioInfo(this,bundle);
+            }
+        }else{
+            superMediaPlayer.stop();
+            superMediaPlayer.reset();
+            if(Long.parseLong(bundle.getString("audioDuration")) > 0){
+                onSeekToRead(bundle.getString("src"),Long.parseLong(bundle.getString("audioDuration")));
+            }else {
+                onRead(bundle.getString("src"));
+            }
+            SharedPreferences.saveOldAudioInfo(this,bundle);
+        }
 
 
     }
+    private void onRead(String url){
+        try {
+            superMediaPlayer.setDataSource(url);
+            superMediaPlayer.prepareAsync();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void onSeekToRead(String url,long duration){
+
+        try {
+            superMediaPlayer.setDataSource(url);
+            superMediaPlayer.prepare();
+            superMediaPlayer.seekTo((int) duration);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private final SuperMediaPlayer.OnPreparedListener onPreparedListener = new MediaPlayer.OnPreparedListener() {
+        @Override
+        public void onPrepared(MediaPlayer mediaPlayer) {
+            binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+            binding.spinKit.setVisibility(View.GONE);
+            mediaPlayer.start();
+        }
+    };
+    private final SuperMediaPlayer.OnSeekCompleteListener onSeekCompleteListener = new MediaPlayer.OnSeekCompleteListener() {
+        @Override
+        public void onSeekComplete(MediaPlayer mediaPlayer) {
+            binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+            binding.spinKit.setVisibility(View.GONE);
+            mediaPlayer.start();
+        }
+    };
+    private final SuperMediaPlayer.OnErrorListener onErrorListener = new MediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            SuperMediaPlayer.error = 1;
+            Toast.makeText(PlayAudioActivity.this, "加载失败！", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    };
+    private final SuperMediaPlayer.OnCompletionListener onCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            if(binding != null){
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
+            }
+
+            Observable<XmlyNextPaly> observable  = RequestService.getInstance().getApi().getNextPlay(bundle.getInt("albumId"),bundle.getInt("episodes") + 1);
+            observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                    .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
+                    .subscribe(new Observer<XmlyNextPaly>() { // 订阅
+
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onNext(XmlyNextPaly xmlyNextPaly) {
+                            Log.i("TAG", xmlyNextPaly.toString() + "");
+                            if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() > 0 && SuperMediaPlayer.error == 0) {
+                                Log.i("TAG", xmlyNextPaly.toString() + "");
+                                XmlyNextPaly.DataDTO dataDTO = xmlyNextPaly.getData().get(0);
+                                binding.titleBar.title.setText(dataDTO.getName());
+                                Bundle reslutBundle = new Bundle();
+                                reslutBundle.putInt("albumId",dataDTO.getAlbumId());
+                                reslutBundle.putInt("episodes",dataDTO.getEpisodes());
+                                reslutBundle.putString("title",dataDTO.getName());
+                                reslutBundle.putString("audioDes","");
+                                reslutBundle.putLong("audioDuration",0);
+                                reslutBundle.putString("audioCreated", String.valueOf(dataDTO.getCreated()));
+                                reslutBundle.putString("src",dataDTO.getUrl());
+                                reslutBundle.putInt("audioId",dataDTO.getId());
+                                superMediaPlayer.stop();
+                                superMediaPlayer.reset();
+                                onRead(dataDTO.getUrl());
+                                SharedPreferences.saveOldAudioInfo(getApplication(),bundle);
+                                dataBaseHelper.addPlayHistory(bundle);
+                                dataBaseHelper.close();
+                                bundle = reslutBundle;
+                            }
+
+                        }
+                    });
+        }
+    };
+
     //使用handler定时更新进度条
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(Looper.myLooper()) {
@@ -105,9 +234,14 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
     };
     //更新进度条
     private void updateProgress() {
-        int currenPostion = (int) myBinder.getCurrenPostion();
-//        Log.i("TAG","currenPostion:"+currenPostion);
-        binding.seekbar.setProgress(currenPostion);
+        if(superMediaPlayer.isPlaying()){
+            binding.seekbar.setMax(superMediaPlayer.getDuration());
+//            Log.i("TAG","getDuration:"+superMediaPlayer.getDuration());
+            //设置进度条的进度
+            binding.seekbar.setProgress((int) superMediaPlayer.getCurrentPosition());
+        }
+//        Log.i("TAG","currenPostion:"+superMediaPlayer.getCurrentPosition());
+//        binding.seekbar.setProgress(superMediaPlayer.getCurrentPosition());
         //使用Handler每500毫秒更新一次进度条
         handler.sendEmptyMessageDelayed(UPDATE_PROGRESS, 500);
     }
@@ -116,6 +250,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         super.onResume();
         //进入到界面后开始更新进度条
 //        Log.i("TAG","onResume");
+        handler.sendEmptyMessage(UPDATE_PROGRESS);
 
     }
     @Override
@@ -127,13 +262,13 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(conn);
+        binding = null ;
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
         if (b){
-            myBinder.seekTo(i);
+            superMediaPlayer.seekTo(i);
         }
     }
 
@@ -147,51 +282,37 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
 
     }
 
-    @AClick({R.id.go_bacK, R.id.prePlay, R.id.startPlay, R.id.nextPlay})
+    @AClick({R.id.go_bacK,  R.id.startPlay,R.id.kuaituiClick,R.id.kuaijinClick})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_bacK:
-                SharedPreferences.saveOldAudioInfo(this,bundle);
                 finish();
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 break;
             case R.id.startPlay:
-                if(myBinder.isPlaying()){
-                    myBinder.onPause();
-                    bundle.putLong("",myBinder.getCurrenPostion());
+                if(superMediaPlayer.isPlaying()){
+                    superMediaPlayer.pause();
+                    bundle.putLong("audioDuration",superMediaPlayer.getCurrentPosition());
                     dataBaseHelper.addPlayHistory(bundle);
                     dataBaseHelper.close();
                     SharedPreferences.saveOldAudioInfo(this,bundle);
+                    binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
                 }else {
-                    myBinder.onStart();
+                    binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+                    superMediaPlayer.start();
                 }
-                startService();
+                break;
+            case R.id.kuaituiClick:
+                Log.i("TAG",superMediaPlayer.getCurrentPosition()+"");
+                superMediaPlayer.seekTo(superMediaPlayer.getCurrentPosition() - CHANGE_SECONDE * 1000);
+                break;
+            case R.id.kuaijinClick:
+                superMediaPlayer.seekTo(superMediaPlayer.getCurrentPosition() + CHANGE_SECONDE * 1000);
                 break;
             default:
                 break;
         }
     }
 
-    private class MyConnection  implements ServiceConnection {
 
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myBinder = (AudioService.MyBinder) iBinder;
-            Log.i("TAG","onServiceConnected:"+myBinder.isPlaying());
-            binding.seekbar.setMax(myBinder.getDuration());
-            Log.i("TAG","getDuration:"+myBinder.getDuration());
-            //设置进度条的进度
-            binding.seekbar.setProgress((int) myBinder.getCurrenPostion());
-            handler.sendEmptyMessage(UPDATE_PROGRESS);
-            if(myBinder.isPlaying()){
-                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
-            }else {
-                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    }
 }

@@ -92,7 +92,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
                 Bundle bundle = new Bundle();
                 bundle.putInt("albumId",list.get(position).getAlbumId());
                 bundle.putInt("episodes",list.get(position).getEpisodes());
-                bundle.putLong("audioCreated",System.currentTimeMillis());
+                bundle.putString("audioCreated", String.valueOf(System.currentTimeMillis()));
                 bundle.putString("audioDes", (String) list.get(position).getDescription());
 //                bundle.putString("audioDuration","0");
                 bundle.putString("title",list.get(position).getName());

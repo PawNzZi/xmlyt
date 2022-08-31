@@ -38,7 +38,6 @@
             android:layout_height="match_parent"
             android:textColor="@color/colorTitle"
             android:textSize="15sp"
-            android:text="庆余年庆余年庆余年庆余年庆余年庆余年庆余年庆余年庆余年庆余年庆余年庆余年庆余年庆余年"
             android:singleLine="true"
             android:ellipsize="end"
             android:layout_weight="1"
@@ -51,7 +50,6 @@
             android:layout_height="wrap_content"
             android:textColor="@color/colorContent"
             android:textSize="13sp"
-            android:text="2022-02-02"
             android:layout_marginTop="10dp"
             >
         </TextView>

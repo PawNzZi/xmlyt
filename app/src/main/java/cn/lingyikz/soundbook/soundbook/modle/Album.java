@@ -50,6 +50,7 @@ public class Album implements Serializable {
             private Object tag;
             private Object author;
             private Object thumb;
+            private Integer weight;
         }
     }
 }

@@ -64,6 +64,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 //                bundle.putString("audio_id",list.get(position).getId());
                 bundle.putSerializable("bookObject",list.get(position));
                 IntentAction.setValueContext(context, AudioDetailActivity.class,bundle);
+//                verridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 

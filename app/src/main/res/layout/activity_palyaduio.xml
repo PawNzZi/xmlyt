@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -11,30 +11,47 @@
     <ImageView
         android:id="@+id/bookThumb"
         android:layout_width="match_parent"
-        android:layout_height="550dp" />
+        android:layout_height="550dp"
+        android:layout_below="@id/title_bar"
+        />
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/seekbar"
         android:progressDrawable="@drawable/seekbar_brightness_selector"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:splitTrack="false"
+        android:maxHeight="5dp"
         android:thumb="@mipmap/seekbar_qiu"
+        android:layout_below="@id/bookThumb"
         >
 
     </androidx.appcompat.widget.AppCompatSeekBar>
+    <com.github.ybq.android.spinkit.SpinKitView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/spin_kit"
+        style="@style/SpinKitView.CubeGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_below="@id/title_bar"
+        app:SpinKit_Color="@color/colorPrimaryDark"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"
+        />
     <RelativeLayout
+        android:layout_below="@id/seekbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimaryDark"
         >
-
         <ImageView
+            android:id="@+id/kuaituiClick"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/kuaitui"
             android:layout_centerVertical="true"
-            android:id="@+id/prePlay"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginLeft="50dp"
-            android:src="@mipmap/activity_preplay"
+            android:layout_marginLeft="100dp"
             >
 
         </ImageView>
@@ -49,16 +66,16 @@
 
         </ImageView>
         <ImageView
+            android:id="@+id/kuaijinClick"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/kuaijin"
             android:layout_centerVertical="true"
-            android:id="@+id/nextPlay"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="50dp"
-            android:src="@mipmap/activity_nextplay"
+            android:layout_marginRight="100dp"
             >
 
         </ImageView>
     </RelativeLayout>
 
-</LinearLayout>
+</RelativeLayout>

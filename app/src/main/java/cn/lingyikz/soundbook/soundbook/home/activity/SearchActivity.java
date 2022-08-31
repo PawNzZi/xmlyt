@@ -1,48 +1,44 @@
 package cn.lingyikz.soundbook.soundbook.home.activity;
 
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
+import com.wyt.searchbox.SearchFragment;
+import com.wyt.searchbox.custom.IOnSearchClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.R;
-
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivitySearchlistBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
-import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
-import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
-import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
+import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class SearchActivity extends Activity implements HomeAdapter.ItemOperaCallBack {
+public class SearchActivity extends FragmentActivity implements HomeAdapter.ItemOperaCallBack {
 
     private ActivitySearchlistBinding binding ;
     private HomeAdapter homeAdapter = null;
     private List<Album.DataDTO.ListDTO> mList = new ArrayList<>() ;
-//    private static final int SIZE = 50;
     private int nextPage = 1;
-//    private int totalPage = 0 ;
+    private SearchFragment searchFragment ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,13 +51,22 @@ public class SearchActivity extends Activity implements HomeAdapter.ItemOperaCal
         this.searchList(keyword);
     }
     public void initView(String keyword){
+        searchFragment = SearchFragment.newInstance();
+        searchFragment.setOnSearchClickListener(iOnSearchClickListener);
         binding.titleBar.title.setText(keyword);
+        binding.titleBar.toSearch.setVisibility(View.VISIBLE);
         binding.titleBar.goBacK.setVisibility(View.VISIBLE);
         binding.titleBar.goSearch.setVisibility(View.GONE);
-
+        binding.spinKit.setVisibility(View.VISIBLE);
 
 
     }
+    private IOnSearchClickListener iOnSearchClickListener = new IOnSearchClickListener() {
+        @Override
+        public void OnSearchClick(String keyword) {
+            searchList(keyword);
+        }
+    };
     public void searchList(String keyword){
 
         Observable<Album> observable  = RequestService.getInstance().getApi().getPostInfo(nextPage,Constans.PAGE_SIZE,keyword);
@@ -101,7 +106,13 @@ public class SearchActivity extends Activity implements HomeAdapter.ItemOperaCal
                         }else{
                             Toast.makeText(SearchActivity.this, Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
                         }
-
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                binding.recyclerView.setVisibility(View.VISIBLE);
+                                binding.spinKit.setVisibility(View.GONE);
+                            }
+                        },700);
 
                     }
                 });
@@ -109,10 +120,12 @@ public class SearchActivity extends Activity implements HomeAdapter.ItemOperaCal
     @Override
     protected void onStart() {
         super.onStart();
-        if(MediaPlayer.getInstance().isPlay()){
-            binding.titleBar.goPlay.setImageDrawable(getResources().getDrawable(R.mipmap.title_play, getResources().newTheme()));
+        if(SuperMediaPlayer.getInstance().isPlaying()){
+            binding.titleBar.goPlay.setVisibility(View.GONE);
+            binding.titleBar.titleSpinKit.setVisibility(View.VISIBLE);
         }else {
-            binding.titleBar.goPlay.setImageDrawable(getResources().getDrawable(R.mipmap.title_pause, getResources().newTheme()));
+            binding.titleBar.goPlay.setVisibility(View.VISIBLE);
+            binding.titleBar.titleSpinKit.setVisibility(View.GONE);
         }
     }
 
@@ -127,20 +140,25 @@ public class SearchActivity extends Activity implements HomeAdapter.ItemOperaCal
         binding = null ;
     }
 
-    @AClick({R.id.go_bacK, R.id.go_play})
+    @AClick({R.id.go_bacK, R.id.go_play,R.id.titleSpinKit,R.id.to_search})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_bacK:
+            case R.id.titleSpinKit:
                 finish();
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 break;
             case R.id.go_play:
                 Bundle bundle = SharedPreferences.getOldAudioInfo(this);
                 if(bundle.getString("src") == null){
                     Toast.makeText(this, Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
                 }else {
-                    bundle.putInt("playModel",Constans.PLAY_MODLE_ICON);
                     IntentAction.setValueActivity(this,PlayAudioActivity.class,bundle);
+                    overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 }
+                break;
+            case R.id.to_search:
+                searchFragment.showFragment(getSupportFragmentManager(),SearchFragment.TAG);
                 break;
         }
     }

@@ -40,4 +40,17 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         />
+    <TextView
+        android:id="@+id/developer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/developer"
+        tools:ignore="MissingConstraints"
+        android:textColor="@color/colorContent"
+        android:textSize="20sp"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        />
 </LinearLayout>

@@ -1,15 +1,10 @@
 package cn.lingyikz.soundbook.soundbook.home;
 
-
-
-import android.content.Intent;
 import android.os.Bundle;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
@@ -28,12 +23,10 @@ import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.activity.SearchActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
-import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
-import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
-import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
+import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -47,6 +40,9 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
     private SearchFragment searchFragment ;
     private List<Album.DataDTO.ListDTO> mList  = new ArrayList<>();
 
+    public static HomeFragment newInstance() {
+        return new HomeFragment();
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +67,7 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
                 Bundle bundle = new Bundle();
                 bundle.putString("keyword",keyword);
                 IntentAction.setValueActivity(getActivity(), SearchActivity.class,bundle);
+                getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
             }
         });
         this.initData(view);
@@ -95,7 +92,7 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
 
                     @Override
                     public void onNext(Album postInfo) {
-//                        Log.i("http返回：", postInfo.toString() + "");
+                        Log.i("http返回：", postInfo.toString() + "");
                         if(postInfo.getCode() == 200 && postInfo.getData().getList().size() > 0){
                             if(mList == null){
                                 mList = new ArrayList<>();
@@ -103,6 +100,7 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
                             mList.clear();
                             List<Album.DataDTO.ListDTO> newList = postInfo.getData().getList();
                             mList.addAll(newList) ;
+
                             if(homeAdapter == null){
                                 homeAdapter = new HomeAdapter(mList,getContext(),0,HomeFragment.this);
                                 binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -111,12 +109,11 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
                                 binding.recyclerView.addItemDecoration(divider);
                             }
                             homeAdapter.notifyDataSetChanged();
-
                         }else{
                             Toast.makeText(getContext(), Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
                         }
-
-
+                        binding.recyclerView.setVisibility(View.VISIBLE);
+                        binding.spinKit1.setVisibility(View.GONE);
 
                     }
                 });
@@ -126,10 +123,12 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
         super.onStart();
 //        Log.i("Tag","onStart");
 //        Log.i("Tag","onStart:"+ MediaPlayer.getInstance().isPlay());
-        if(MediaPlayer.getInstance().isPlay()){
-            binding.titleBar.goPlay.setImageDrawable(getResources().getDrawable(R.mipmap.title_play, getResources().newTheme()));
+        if(SuperMediaPlayer.getInstance().isPlaying()){
+            binding.titleBar.goPlay.setVisibility(View.GONE);
+            binding.titleBar.titleSpinKit.setVisibility(View.VISIBLE);
         }else {
-            binding.titleBar.goPlay.setImageDrawable(getResources().getDrawable(R.mipmap.title_pause, getResources().newTheme()));
+            binding.titleBar.goPlay.setVisibility(View.VISIBLE);
+            binding.titleBar.titleSpinKit.setVisibility(View.GONE);
         }
 
     }
@@ -155,9 +154,10 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
     @Override
     public void onDestroy() {
         super.onDestroy();
+
     }
 
-    @AClick({R.id.go_search, R.id.go_play})
+    @AClick({R.id.go_search, R.id.go_play,R.id.titleSpinKit})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_search:
@@ -165,15 +165,22 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
                 searchFragment.showFragment(getActivity().getSupportFragmentManager(),SearchFragment.TAG);
                 break;
             case R.id.go_play:
-//                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
-                Bundle bundle = DataBaseHelper.getInstance(getActivity()).queryPlayHistoryRecent();
-//                Log.i("TAG",bundle.getString("src"));
-                if(bundle.getString("src") == null){
-                    Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
-                }else {
-                    IntentAction.setValueActivity(getActivity(),PlayAudioActivity.class,bundle);
-                }
+            case R.id.titleSpinKit:
+                //                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
+//                Bundle bundle = DataBaseHelper.getInstance(getActivity()).queryPlayHistoryRecent();
+                toNextActivity();
                 break;
+        }
+    }
+
+    private void toNextActivity(){
+        Bundle bundle = SharedPreferences.getOldAudioInfo(getActivity());
+//                Log.i("TAG",bundle.getString("src"));
+        if(bundle.getString("src") == null){
+            Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+        }else {
+            IntentAction.setValueActivity(getActivity(),PlayAudioActivity.class,bundle);
+            getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         }
     }
 

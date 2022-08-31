@@ -14,7 +14,6 @@
         android:src="@mipmap/back"
 
         >
-
     </ImageView>
     <ImageView
         android:id="@+id/go_search"
@@ -27,6 +26,17 @@
         >
     </ImageView>
 
+    <ImageView
+        android:id="@+id/to_search"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="55dp"
+        android:visibility="gone"
+        android:src="@mipmap/search"
+        >
+    </ImageView>
+
     <TextView
         android:id="@+id/title"
         android:layout_height="wrap_content"
@@ -34,7 +44,11 @@
         android:textSize="18sp"
         android:textColor="@color/cardview_light_background"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:singleLine="true"
+        android:ellipsize="end"
+        />
+
 
     <ImageView
         android:id="@+id/go_play"
@@ -46,4 +60,17 @@
         android:src="@mipmap/title_pause"
         >
     </ImageView>
+    <com.github.ybq.android.spinkit.SpinKitView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titleSpinKit"
+        style="@style/SpinKitView.Small.Wave"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        app:SpinKit_Color="@color/colorDivider"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:visibility="gone"
+        />
 </RelativeLayout>

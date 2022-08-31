@@ -31,7 +31,7 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
     private void setDefaultFragment(){
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content,new HomeFragment());
+        fragmentTransaction.replace(R.id.content,HomeFragment.newInstance());
         fragmentTransaction.commit();
     }
     @Override
@@ -65,16 +65,16 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         fragmentTransaction = fragmentManager.beginTransaction();
         switch (item.getItemId()) {
             case R.id.navigation_home:
-                fragmentTransaction.replace(R.id.content,new HomeFragment());  //对应的java class
+                fragmentTransaction.replace(R.id.content,HomeFragment.newInstance());  //对应的java class
                 fragmentTransaction.commit();  //一定不要忘记commit，否则不会显示
                 return true;
             case R.id.navigation_category:
-                fragmentTransaction.replace(R.id.content,new CategoryFragment());  //对应的java class
+                fragmentTransaction.replace(R.id.content,CategoryFragment.newInstance());  //对应的java class
                 fragmentTransaction.commit();  //一定不要忘记commit，否则不会显示
                 return true;
             case R.id.navigation_user:
 //                fragmentTransaction.replace(R.id.content,new UserFragment());  //对应的java class
-                fragmentTransaction.replace(R.id.content,new UserFragment());  //对应的java class
+                fragmentTransaction.replace(R.id.content,UserFragment.newInstance());  //对应的java class
                 fragmentTransaction.commit();  //一定不要忘记commit，否则不会显示
                 return true;
         }
@@ -85,6 +85,7 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(this, AudioService.class));
+        viewBinding = null ;
     }
 
 }

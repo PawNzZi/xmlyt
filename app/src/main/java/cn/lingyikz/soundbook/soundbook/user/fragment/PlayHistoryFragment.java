@@ -3,6 +3,7 @@ package cn.lingyikz.soundbook.soundbook.user.fragment;
 import android.content.Intent;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,12 +28,14 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
     private AudioListAdapter adapter = null;
     private List<AlbumDetail.DataDTO.ListDTO> mList = new ArrayList<>();
     private DataBaseHelper dataBaseHelper ;
-//    private UserFragment.ChangePlayReceiver changePlayReceiver ;
 
+
+    public static PlayHistoryFragment newInstance() {
+        return new PlayHistoryFragment();
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Log.i("TAG","onCreate");
     }
 
     @Nullable
@@ -55,7 +58,6 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
     private void initData() {
 //        Log.i("TAG","initData");
 //        dataBaseHelper = new DataBaseHelper(getActivity());
-
         dataBaseHelper = DataBaseHelper.getInstance(getActivity());
         if(mList == null){
             mList = new ArrayList<>();
@@ -72,7 +74,6 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
             binding.swipeRecyclerView.addItemDecoration(divider);
         }
         adapter.notifyDataSetChanged();
-
     }
     @Override
     public void onStart() {
