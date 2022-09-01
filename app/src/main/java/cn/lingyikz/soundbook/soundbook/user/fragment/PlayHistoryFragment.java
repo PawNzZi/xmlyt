@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        Log.i("TAG","PlayHistoryFragment:onCreate");
     }
 
     @Nullable
@@ -45,6 +47,7 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
         binding = FragmentPalyhistoryBinding.inflate(LayoutInflater.from(getContext()),container,false);
         View view = binding.getRoot();
 //        Log.i("TAG","onCreateView");
+//        Log.i("TAG","PlayHistoryFragment:onCreateView");
         return view ;
 
     }
@@ -52,7 +55,8 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
     @Override
     public void onViewCreated(@NonNull View view, @Nullable  Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initData();
+//        initData();
+//        Log.i("TAG","PlayHistoryFragment:onViewCreated");
     }
 
     private void initData() {
@@ -64,6 +68,7 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
         }
         mList.clear();
         List<AlbumDetail.DataDTO.ListDTO> newList = dataBaseHelper.queryPlayHistoryAll();
+//        Log.i("TAG","PlayHistoryFragment:initData = "+newList.size());
         mList.addAll(newList);
         dataBaseHelper.close();
         if(adapter == null){
@@ -79,18 +84,22 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
     public void onStart() {
         super.onStart();
 //        Log.i("TAG","onStart");
+//        Log.i("TAG","PlayHistoryFragment:onStart");
     }
 
     @Override
     public void onStop() {
         super.onStop();
 //        Log.i("TAG","onStop");
+//        Log.i("TAG","PlayHistoryFragment:onStop");
     }
 
     @Override
     public void onResume() {
         super.onResume();
 //        Log.i("TAG","onResume");
+        initData();
+//        Log.i("TAG","PlayHistoryFragment:onResume");
 
     }
 

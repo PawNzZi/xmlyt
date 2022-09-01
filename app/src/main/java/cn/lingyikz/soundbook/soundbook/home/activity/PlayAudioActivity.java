@@ -94,6 +94,8 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         if(superMediaPlayer.isPlaying()){
 
             Bundle oldAudioInfo = SharedPreferences.getOldAudioInfo(this);
+            Log.i("TAG",oldAudioInfo.getString("title" ));
+            Log.i("TAG",bundle.getString("title" ));
             if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
                 binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
                 binding.spinKit.setVisibility(View.GONE);
@@ -200,7 +202,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                         public void onNext(XmlyNextPaly xmlyNextPaly) {
                             Log.i("TAG", xmlyNextPaly.toString() + "");
                             if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() > 0 && SuperMediaPlayer.error == 0) {
-                                Log.i("TAG", xmlyNextPaly.toString() + "");
+//                                Log.i("TAG", xmlyNextPaly.toString() + "");
                                 XmlyNextPaly.DataDTO dataDTO = xmlyNextPaly.getData().get(0);
                                 if(binding != null){
                                     binding.titleBar.title.setText(dataDTO.getName());
@@ -217,13 +219,20 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                                 superMediaPlayer.stop();
                                 superMediaPlayer.reset();
                                 onRead(dataDTO.getUrl());
-                                SharedPreferences.saveOldAudioInfo(getApplication(),bundle);
+//                                SharedPreferences.saveOldAudioInfo(PlayAudioActivity.this,bundle);
                                 dataBaseHelper.addPlayHistory(bundle);
                                 dataBaseHelper.close();
                                 bundle = reslutBundle;
+                                SharedPreferences.saveOldAudioInfo(PlayAudioActivity.this,reslutBundle);
 
+                            }else if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() == 0){
+                                superMediaPlayer.stop();
+                                bundle.putLong("audioDuration",0);
+                                bundle.putString("audioCreated", String.valueOf(System.currentTimeMillis()));
+                                superMediaPlayer.reset();
+                                dataBaseHelper.addPlayHistory(bundle);
+                                dataBaseHelper.close();
                             }
-
                         }
                     });
         }

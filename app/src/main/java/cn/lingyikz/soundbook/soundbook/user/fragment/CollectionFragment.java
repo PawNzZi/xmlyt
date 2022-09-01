@@ -3,7 +3,7 @@ package cn.lingyikz.soundbook.soundbook.user.fragment;
 
 import android.os.Bundle;
 
-import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCollectionBinding;
-import cn.lingyikz.soundbook.soundbook.home.HomeFragment;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
@@ -33,6 +32,7 @@ public class CollectionFragment extends Fragment implements HomeAdapter.ItemOper
     @Override
     public void onCreate(@Nullable  Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        Log.i("TAG","CollectionFragment:onCreate");
     }
 
     @Nullable
@@ -40,15 +40,15 @@ public class CollectionFragment extends Fragment implements HomeAdapter.ItemOper
     public View onCreateView(@NonNull  LayoutInflater inflater, @Nullable ViewGroup container, @Nullable  Bundle savedInstanceState) {
         binding = FragmentCollectionBinding.inflate(LayoutInflater.from(getContext()),container,false);
         View view = binding.getRoot();
-
+//        Log.i("TAG","CollectionFragment:onCreateView");
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull  View view, @Nullable  Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initData();
-
+//        initData();
+//        Log.i("TAG","CollectionFragment:onViewCreated");
     }
 
     private void initData() {
@@ -59,6 +59,7 @@ public class CollectionFragment extends Fragment implements HomeAdapter.ItemOper
         }
         mList.clear();
         List<Album.DataDTO.ListDTO> newList = dataBaseHelper.queryCollectionAll();
+//        Log.i("TAG","CollectionFragment:initData = "+newList.size());
         mList.addAll(newList);
         dataBaseHelper.close();
 //        Log.i("TAG","mList.size:"+mList.size());
@@ -74,6 +75,18 @@ public class CollectionFragment extends Fragment implements HomeAdapter.ItemOper
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        initData();
+//        Log.i("TAG","CollectionFragment:onResume");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+//        Log.i("TAG","CollectionFragment:onStop");
+    }
 
     @Override
     public void onDestroy() {

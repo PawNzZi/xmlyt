@@ -14,18 +14,52 @@
         android:layout_height="550dp"
         android:layout_below="@id/title_bar"
         />
-    <androidx.appcompat.widget.AppCompatSeekBar
-        android:id="@+id/seekbar"
-        android:progressDrawable="@drawable/seekbar_brightness_selector"
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:splitTrack="false"
-        android:maxHeight="5dp"
-        android:thumb="@mipmap/seekbar_qiu"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_below="@id/bookThumb"
+        android:gravity="center_horizontal"
         >
+        <TextView
+            android:id="@+id/currentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="11:11"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
 
-    </androidx.appcompat.widget.AppCompatSeekBar>
+            >
+
+        </TextView>
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/seekbar"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginTop="-4dp"
+            android:maxHeight="5dp"
+            android:progressDrawable="@drawable/seekbar_brightness_selector"
+            android:splitTrack="false"
+            android:thumb="@mipmap/seekbar_qiu"
+            android:thumbOffset="0dp"
+            android:layout_weight="10"
+            >
+
+        </androidx.appcompat.widget.AppCompatSeekBar>
+
+        <TextView
+            android:id="@+id/totalTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="11:11"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            >
+        </TextView>
+
+    </LinearLayout>
+
     <com.github.ybq.android.spinkit.SpinKitView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/spin_kit"
@@ -40,7 +74,7 @@
         android:visibility="gone"
         />
     <RelativeLayout
-        android:layout_below="@id/seekbar"
+        android:layout_below="@id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimaryDark"

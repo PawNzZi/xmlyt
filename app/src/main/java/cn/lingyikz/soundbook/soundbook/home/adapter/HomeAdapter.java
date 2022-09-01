@@ -2,6 +2,7 @@ package cn.lingyikz.soundbook.soundbook.home.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +21,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private Context context ;
     private ItemOperaCallBack itemOperaCallBack;
     private int Tag  ;
-    private DataBaseHelper dataBaseHelper ;
     public HomeAdapter(List<Album.DataDTO.ListDTO> list,Context context,int Tag,ItemOperaCallBack itemOperaCallBack){
         this.list = list ;
         this.context = context ;
         this.Tag = Tag ;
         this.itemOperaCallBack = itemOperaCallBack;
-//        Log.i("tag",list.get(0).getBookName());
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

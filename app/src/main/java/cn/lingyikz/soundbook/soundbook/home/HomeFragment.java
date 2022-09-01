@@ -1,6 +1,10 @@
 package cn.lingyikz.soundbook.soundbook.home;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +43,7 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
     private HomeAdapter homeAdapter = null;
     private SearchFragment searchFragment ;
     private List<Album.DataDTO.ListDTO> mList  = new ArrayList<>();
+
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -123,14 +128,33 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
         super.onStart();
 //        Log.i("Tag","onStart");
 //        Log.i("Tag","onStart:"+ MediaPlayer.getInstance().isPlay());
-        if(SuperMediaPlayer.getInstance().isPlaying()){
-            binding.titleBar.goPlay.setVisibility(View.GONE);
-            binding.titleBar.titleSpinKit.setVisibility(View.VISIBLE);
-        }else {
-            binding.titleBar.goPlay.setVisibility(View.VISIBLE);
-            binding.titleBar.titleSpinKit.setVisibility(View.GONE);
-        }
 
+
+    }
+    //使用handler定时更新进度条
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler(Looper.myLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case Constans.UPDATE_AUDIO:
+                    updateAudioImg();
+                    break;
+            }
+        }
+    };
+
+    private void updateAudioImg() {
+        if(binding != null){
+            if(SuperMediaPlayer.getInstance().isPlaying()){
+                binding.titleBar.goPlay.setVisibility(View.GONE);
+                binding.titleBar.titleSpinKit.setVisibility(View.VISIBLE);
+            }else {
+                binding.titleBar.goPlay.setVisibility(View.VISIBLE);
+                binding.titleBar.titleSpinKit.setVisibility(View.GONE);
+            }
+            handler.sendEmptyMessageDelayed(Constans.UPDATE_AUDIO,500);
+        }
     }
 
     @Override
@@ -143,6 +167,7 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
     public void onResume() {
         super.onResume();
 //        Log.i("Tag","onResume");
+        handler.sendEmptyMessage(Constans.UPDATE_AUDIO);
     }
 
     @Override
