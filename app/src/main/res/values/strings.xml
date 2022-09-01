@@ -11,4 +11,6 @@
     <string name="play_histtory">播放历史</string>
     <string name="spinner_text">第1-50集</string>
     <string name="developer">by:阿威湿了</string>
+    <string name="current_position">00:00</string>
+    <string name="total_duration">00:00</string>
 </resources>

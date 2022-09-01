@@ -10,6 +10,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -39,7 +42,10 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
     private DataBaseHelper dataBaseHelper;
     private static final int UPDATE_PROGRESS = 0;
     private static final int CHANGE_SECONDE = 15 ;
+    private static final int UPDATE_CURRENT_POSITION = 1;
+
     private Bundle bundle ;
+    private Animation animation ;
     private SuperMediaPlayer superMediaPlayer = SuperMediaPlayer.getInstance();
 
 
@@ -49,6 +55,11 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         super.onCreate(savedInstanceState);
         binding = ActivityPalyaduioBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        animation = AnimationUtils.loadAnimation(this,R.anim.cover_roate);
+        animation.setRepeatMode(Animation.RESTART);
+        animation.setInterpolator(new LinearInterpolator());
+        animation.setRepeatCount(-1);
+
         LOnClickMe.init(this,binding.getRoot());
         initData();
     }
@@ -94,11 +105,12 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         if(superMediaPlayer.isPlaying()){
 
             Bundle oldAudioInfo = SharedPreferences.getOldAudioInfo(this);
-            Log.i("TAG",oldAudioInfo.getString("title" ));
-            Log.i("TAG",bundle.getString("title" ));
+//            Log.i("TAG",oldAudioInfo.getString("title" ));
+//            Log.i("TAG",bundle.getString("title" ));
             if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
                 binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
                 binding.spinKit.setVisibility(View.GONE);
+                binding.bookThumb.startAnimation(animation);
             }else {
                 superMediaPlayer.stop();
                 oldAudioInfo.putLong("audioDuration",superMediaPlayer.getCurrentPosition());
@@ -111,6 +123,8 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                     onRead(bundle.getString("src"));
                 }
                 SharedPreferences.saveOldAudioInfo(this,bundle);
+
+
             }
         }else{
             superMediaPlayer.stop();
@@ -121,6 +135,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                 onRead(bundle.getString("src"));
             }
             SharedPreferences.saveOldAudioInfo(this,bundle);
+
         }
 
 
@@ -150,6 +165,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
             if(binding != null){
                 binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
                 binding.spinKit.setVisibility(View.GONE);
+                binding.bookThumb.startAnimation(animation);
             }
 
             mediaPlayer.start();
@@ -161,6 +177,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
             if(binding != null){
                 binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
                 binding.spinKit.setVisibility(View.GONE);
+                binding.bookThumb.startAnimation(animation);
             }
 
             mediaPlayer.start();
@@ -181,6 +198,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         public void onCompletion(MediaPlayer mediaPlayer) {
             if(binding != null){
                 binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
+                binding.bookThumb.clearAnimation();
             }
 
             Observable<XmlyNextPaly> observable  = RequestService.getInstance().getApi().getNextPlay(bundle.getInt("albumId"),bundle.getInt("episodes") + 1);
@@ -253,15 +271,52 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
     //更新进度条
     private void updateProgress() {
         if(superMediaPlayer.isPlaying()){
-            binding.seekbar.setMax(superMediaPlayer.getDuration());
-//            Log.i("TAG","getDuration:"+superMediaPlayer.getDuration());
             //设置进度条的进度
             binding.seekbar.setProgress((int) superMediaPlayer.getCurrentPosition());
+            binding.seekbar.setMax(superMediaPlayer.getDuration());
+            binding.totalTime.setText(get(superMediaPlayer.getDuration() / 1000));
         }
 //        Log.i("TAG","currenPostion:"+superMediaPlayer.getCurrentPosition());
 //        binding.seekbar.setProgress(superMediaPlayer.getCurrentPosition());
         //使用Handler每500毫秒更新一次进度条
+
         handler.sendEmptyMessageDelayed(UPDATE_PROGRESS, 500);
+    }
+    @SuppressLint("HandlerLeak")
+    private Handler updateCurrentPositionHandler = new Handler(Looper.myLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_CURRENT_POSITION:
+                    updateCurrentPosition();
+                    break;
+            }
+        }
+    };
+    private void updateCurrentPosition(){
+        int bock = superMediaPlayer.getCurrentPosition();
+
+        binding.currentTime.setText( get(bock / 1000));
+        updateCurrentPositionHandler.sendEmptyMessageDelayed(UPDATE_CURRENT_POSITION,1000);
+
+    }
+    public String get(int bock){
+        String mm ;
+        String ss ;
+        int s = bock % 60 ;
+        int m = bock / 60 ;
+        if(s < 10){
+            ss = "0"+String.valueOf(s);
+        }else{
+            ss = String.valueOf(s);
+        }
+        if(m < 10){
+            mm = "0"+String.valueOf(m);
+        }else {
+            mm = String.valueOf(m);
+        }
+        return mm+":"+ss;
+
     }
     @Override
     protected void onResume() {
@@ -269,6 +324,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         //进入到界面后开始更新进度条
 //        Log.i("TAG","onResume");
         handler.sendEmptyMessage(UPDATE_PROGRESS);
+        updateCurrentPositionHandler.sendEmptyMessage(UPDATE_CURRENT_POSITION);
 
     }
     @Override
@@ -276,6 +332,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         super.onStop();
         //停止更新进度条的进度
         handler.removeCallbacksAndMessages(null);
+        updateCurrentPositionHandler.removeCallbacksAndMessages(null);
     }
     @Override
     protected void onDestroy() {
@@ -315,9 +372,11 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                     dataBaseHelper.close();
                     SharedPreferences.saveOldAudioInfo(this,bundle);
                     binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
+                    binding.bookThumb.clearAnimation();
                 }else {
                     binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
                     superMediaPlayer.start();
+                    binding.bookThumb.startAnimation(animation);
                 }
                 break;
             case R.id.kuaituiClick:
