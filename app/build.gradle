@@ -3,11 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 32
     defaultConfig {
-        applicationId "cn.lingyikz.soundbook.soundbook"
+        applicationId "cn.lingyikz.soundbook"
         minSdkVersion 26
         targetSdkVersion 32
         versionCode 1
-        versionName "1.0"
+        versionName "0.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary= true
 //添加如下配置 开启annotation processor
