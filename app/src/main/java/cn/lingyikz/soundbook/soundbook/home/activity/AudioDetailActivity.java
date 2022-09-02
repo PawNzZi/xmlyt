@@ -7,6 +7,7 @@ import android.content.Intent;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -47,6 +48,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
     private List<AlbumDetail.DataDTO.ListDTO> mList  = new ArrayList<>();
 
     private int nextPage = 1;
+    private int basePostion = 0 ;
     private Album.DataDTO.ListDTO albumDetail ;
     private DataBaseHelper dataBaseHelper;
 
@@ -90,6 +92,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
     public void queryList(int id,boolean isSpinner){
         activityAudiodetailBinding.recyclerView.setVisibility(View.GONE);
         activityAudiodetailBinding.spinKit.setVisibility(View.VISIBLE);
+        basePostion = nextPage ;
         Observable<AlbumDetail> observable  = RequestService.getInstance().getApi().getAlbumDetail(nextPage, Constans.PAGE_SIZE,id);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
@@ -128,9 +131,9 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
                                 activityAudiodetailBinding.recyclerView.addItemDecoration(divider);
                                 activityAudiodetailBinding.listLen.setText("共"+ reslut.getData().getTotal() +"集");
                             }else {
-//                                Log.i("TAG","adapter != null");
-                                adapter.notifyDataSetChanged();
-                                //数据没有刷新，是因为mList对象被指向新的地址，
+//                                Log.i("TAG","adapter != null" + nextPage);
+                                adapter.notifyDataSetChange(basePostion - 1);      //数据没有刷新，是因为mList对象被指向新的地址，
+
                             }
 
                             if(isSpinner){
@@ -265,6 +268,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
     public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
         if(albumDetail.getId() != 0){
             nextPage = position + 1;
+//            Log.i("TAG","onItemSelected"+nextPage);
             this.queryList(albumDetail.getId(),false);
         }
     }

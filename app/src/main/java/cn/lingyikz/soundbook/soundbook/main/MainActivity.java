@@ -39,9 +39,9 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         super.onCreate(savedInstanceState);
         viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
-        this.checkUUID();
+//        this.checkUUID();
         this.setDefaultFragment();
-        this.deleteDatabase("audio");
+//        this.deleteDatabase("audio");
         viewBinding.navigation.setOnNavigationItemSelectedListener(this);
         Intent intent = new Intent(this,AudioService.class);
         intent.setAction(Constans.START_SERVICE);

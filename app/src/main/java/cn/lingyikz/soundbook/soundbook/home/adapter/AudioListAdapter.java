@@ -35,6 +35,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     private Context context ;
     private AudioListen audioListen ;
     private SimpleDateFormat dateFormat ;
+    private int nextPage = 0 ;
     private int Tag ;
     @SuppressLint("SimpleDateFormat")
     public AudioListAdapter(List<AlbumDetail.DataDTO.ListDTO> list, Context context, AudioListen audioListen ,int Tag){
@@ -64,7 +65,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     @Override
     public void onBindViewHolder(@NonNull  AudioListAdapter.ViewHolder holder, int position) {
 //        LOnClickMe.init(this,holder.binding.getRoot());
-//        Log.i("TAG","onBindViewHolder");
+//        Log.i("TAG","onBindViewHolder" + this.nextPage);
         String tip = "";
         if(Tag == 1){
             tip = "上一次播放 ";
@@ -81,7 +82,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
                 }
             }
         });
-        holder.binding.listIndex.setText(position+1+"");
+        holder.binding.listIndex.setText(nextPage * 50 + position +1 +"");
         holder.binding.listName.setText(list.get(position).getName());
 //        Log.i("TAG","onBindViewHolder"+list.get(position).getName());
         holder.binding.listDate.setText(tip + dateFormat.format(new Date(list.get(position).getCreated())));
@@ -104,7 +105,10 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
         });
 
     }
-
+    public void notifyDataSetChange(int nextPage){
+        this.nextPage = nextPage ;
+        notifyDataSetChanged();
+    }
     @Override
     public int getItemCount() {
         return list.size();
