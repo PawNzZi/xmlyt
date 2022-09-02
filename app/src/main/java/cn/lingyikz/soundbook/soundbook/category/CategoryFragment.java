@@ -40,7 +40,7 @@ public class CategoryFragment extends Fragment {
     public void click(View view) {
         switch (view.getId()) {
             case R.id.copyQQGruop:
-                Toast.makeText(getActivity(), "复制成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), "复制成功", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
