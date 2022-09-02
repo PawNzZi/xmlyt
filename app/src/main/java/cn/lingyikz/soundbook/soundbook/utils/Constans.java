@@ -12,6 +12,8 @@ public class Constans {
     public final static String START_SERVICE = "start_service";
     public final static String BIND_SERVICE = "bind_service";
     public final static String ALBUM_CONTENT_NULL = "该内容正在上传中";
+    public final static String DO_NOT_COLLECT = "无资源，不能收藏";
+
     public final static int UPDATE_AUDIO = 0 ;
 
 }

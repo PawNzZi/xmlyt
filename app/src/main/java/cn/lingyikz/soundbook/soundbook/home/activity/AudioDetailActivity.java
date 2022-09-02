@@ -198,19 +198,23 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
             case R.id.collection:
                 //收藏
 //                Log.i("TAG","collection");
-                String sql = "";
-                dataBaseHelper = DataBaseHelper.getInstance(this);
-                int count = dataBaseHelper.queryCollectionCount(albumDetail.getId());
-                if( count > 0 ){
-                    //取消
-                    dataBaseHelper.cancleCollection(albumDetail.getId());
-                    Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.unlike).into(activityAudiodetailBinding.collection);
-                }else{
-                    //关注
-                    dataBaseHelper.addCollection(albumDetail);
-                    Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
+                if(mList.size() == 0){
+                    Toast.makeText(this, Constans.DO_NOT_COLLECT, Toast.LENGTH_SHORT).show();
+                }else {
+                    dataBaseHelper = DataBaseHelper.getInstance(this);
+                    int count = dataBaseHelper.queryCollectionCount(albumDetail.getId());
+                    if( count > 0 ){
+                        //取消
+                        dataBaseHelper.cancleCollection(albumDetail.getId());
+                        Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.unlike).into(activityAudiodetailBinding.collection);
+                    }else{
+                        //关注
+                        dataBaseHelper.addCollection(albumDetail);
+                        Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
+                    }
+                    dataBaseHelper.close();
                 }
-                dataBaseHelper.close();
+             
                 break;
         }
     }
