@@ -71,7 +71,7 @@ public class AudioService extends Service  {
             hadler.removeCallbacksAndMessages(null);
             switch (index){
                 case 0 :
-                    count = 10 * 1000;
+                    count = 30 * 60 * 1000;
                     hadler.sendEmptyMessage(Constans.UPDATE_BLOCK);
                     break;
                 case 1 :
