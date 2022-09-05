@@ -1,8 +1,10 @@
 package cn.lingyikz.soundbook.soundbook.home.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,7 +17,8 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.SeekBar;
 import android.widget.Toast;
-
+import com.kongzue.dialogx.dialogs.BottomMenu;
+import com.kongzue.dialogx.interfaces.OnMenuItemClickListener;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 
@@ -26,8 +29,11 @@ import androidx.annotation.Nullable;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityPalyaduioBinding;
+import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
 
+import cn.lingyikz.soundbook.soundbook.service.AudioService;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
@@ -36,9 +42,9 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
+public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener {
 
-    private ActivityPalyaduioBinding binding ;
+    private static ActivityPalyaduioBinding binding ;
     private DataBaseHelper dataBaseHelper;
     private static final int UPDATE_PROGRESS = 0;
     private static final int CHANGE_SECONDE = 15 ;
@@ -55,6 +61,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         super.onCreate(savedInstanceState);
         binding = ActivityPalyaduioBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         animation = AnimationUtils.loadAnimation(this,R.anim.cover_roate);
         animation.setRepeatMode(Animation.RESTART);
         animation.setInterpolator(new LinearInterpolator());
@@ -67,12 +74,14 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
     /**
      * 初始化数据
      */
+    @SuppressLint("SetTextI18n")
     private void initData() {
         binding.spinKit.setVisibility(View.VISIBLE);
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goPlay.setVisibility(View.GONE);
         binding.titleBar.titleSpinKit.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.VISIBLE);
+        binding.titleBar.setBlock.setVisibility(View.VISIBLE);
         bundle = getIntent().getExtras();
 //        Log.i("TAG",bundle+"");
         binding.titleBar.title.setText(bundle.getString("title"));
@@ -83,6 +92,13 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
         superMediaPlayer.setOnCompletionListener(onCompletionListener);
         superMediaPlayer.setOnErrorListener(onErrorListener);
 
+        Bundle blockBundle = SharedPreferences.getBolckClose(this);
+        if(blockBundle.getInt("index") == -1){
+            binding.bolckIime.setVisibility(View.GONE);
+        }else {
+            binding.bolckIime.setVisibility(View.VISIBLE);
+            binding.bolckIime.setText(blockBundle.getString("lable")+" 后关闭");
+        }
         Bundle historyBundle = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
         dataBaseHelper.close();
 
@@ -95,6 +111,8 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
             bundle.putString("audioDuration",historyBundle.getString("audioDuration"));
         }
         playAudio();
+
+
     }
 
     /**
@@ -167,7 +185,6 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
                 binding.spinKit.setVisibility(View.GONE);
                 binding.bookThumb.startAnimation(animation);
             }
-
             mediaPlayer.start();
         }
     };
@@ -357,7 +374,7 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
 
     }
 
-    @AClick({R.id.go_bacK,  R.id.startPlay,R.id.kuaituiClick,R.id.kuaijinClick})
+    @AClick({R.id.go_bacK,  R.id.startPlay,R.id.kuaituiClick,R.id.kuaijinClick,R.id.set_block})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_bacK:
@@ -386,10 +403,49 @@ public class PlayAudioActivity extends Activity implements SeekBar.OnSeekBarChan
             case R.id.kuaijinClick:
                 superMediaPlayer.seekTo(superMediaPlayer.getCurrentPosition() + CHANGE_SECONDE * 1000);
                 break;
+            case R.id.set_block:
+                BottomMenu.show(new String[]{"30分钟", "60分钟", "90分钟","120分钟","150分钟"})
+                        .setMessage("定时关闭")
+                        .setOnMenuItemClickListener(new OnMenuItemClickListener<BottomMenu>() {
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public boolean onClick(BottomMenu dialog, CharSequence text, int index) {
+//                                Toast.makeText(PlayAudioActivity.this, text.toString()+index, Toast.LENGTH_SHORT).show();
+                                binding.bolckIime.setVisibility(View.VISIBLE);
+                                binding.bolckIime.setText(text.toString()+" 后关闭");
+                                Bundle spbundle = new Bundle();
+                                spbundle.putString("lable",text.toString());
+                                spbundle.putInt("index",index);
+                                SharedPreferences.saveBolckClose(PlayAudioActivity.this,spbundle);
+                                Intent intent = new Intent(PlayAudioActivity.this, AudioService.class);
+                                intent.setAction(Constans.SET_BLOCK);
+                                intent.putExtra("index",index);
+                                intent.putExtras(bundle);
+                                PlayAudioActivity.this.startService(intent);
+
+                                return false;
+                            }
+                        });
+                break;
             default:
                 break;
         }
     }
 
+    public static class PlaystateReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(Constans.CHANGE_PLAY_IMG)){
+//                Log.i("TAG","onReceive");
+                if(binding != null){
+                    binding.startPlay.setImageDrawable(context.getResources().getDrawable(R.mipmap.activity_pause, null));
+                    binding.bookThumb.clearAnimation();
+                    binding.bolckIime.setText("");
+                    binding.bolckIime.setVisibility(View.GONE);
+                }
+            }
+        }
+    }
 
 }

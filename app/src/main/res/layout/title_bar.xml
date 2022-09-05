@@ -51,6 +51,7 @@
 
 
     <ImageView
+
         android:id="@+id/go_play"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -58,6 +59,18 @@
         android:layout_marginRight="15dp"
         android:layout_alignParentRight="true"
         android:src="@mipmap/title_pause"
+        >
+    </ImageView>
+    <ImageView
+
+        android:id="@+id/set_block"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="15dp"
+        android:layout_alignParentRight="true"
+        android:src="@mipmap/block"
+        android:visibility="gone"
         >
     </ImageView>
     <com.github.ybq.android.spinkit.SpinKitView

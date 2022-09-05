@@ -4,6 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.microsoft.appcenter.AppCenter;
+import com.microsoft.appcenter.analytics.Analytics;
+import com.microsoft.appcenter.crashes.Crashes;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -41,6 +45,8 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         setContentView(viewBinding.getRoot());
 //        this.checkUUID();
         this.setDefaultFragment();
+        AppCenter.start(getApplication(), Constans.APP_CENTER_SECRET,
+                Analytics.class, Crashes.class);
 //        this.deleteDatabase("audio");
         viewBinding.navigation.setOnNavigationItemSelectedListener(this);
         Intent intent = new Intent(this,AudioService.class);

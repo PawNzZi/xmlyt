@@ -71,5 +71,14 @@ dependencies {
     implementation 'com.github.arcadefire:nice-spinner:1.4.4'
     //加载loading
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+    //appcenter
+    def appCenterSdkVersion = '4.3.1'
+    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+    //dialogX
+    def dialogx_version = "0.0.45"
+    implementation "com.github.kongzue.DialogX:DialogX:${dialogx_version}"
+    implementation "com.github.kongzue.DialogX:DialogXKongzueStyle:${dialogx_version}"
+
 
 }

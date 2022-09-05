@@ -8,6 +8,7 @@ public class Constans {
     public final static int PLAY_MODLE_LIST = 0;
     public final static int PLAY_MODLE_ICON = 1;
     public final static int PLAY_MODLE_INNER = 3;
+    public final static String SET_BLOCK = "SET_BLOCK";
     public final static String NO_OLD_AUDIOINFO = "无播放数据";
     public final static String START_SERVICE = "start_service";
     public final static String BIND_SERVICE = "bind_service";
@@ -15,5 +16,8 @@ public class Constans {
     public final static String DO_NOT_COLLECT = "无资源，不能收藏";
 
     public final static int UPDATE_AUDIO = 0 ;
+    public final static int UPDATE_BLOCK = 1 ;
+    public final static int PLAY_PAUSE = 0 ;
+    public final static String APP_CENTER_SECRET= "462377c6-9210-44ce-8eff-05033ca3ee4f" ;
 
 }

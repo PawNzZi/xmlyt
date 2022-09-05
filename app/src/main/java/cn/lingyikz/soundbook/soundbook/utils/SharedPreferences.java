@@ -9,8 +9,9 @@ import android.os.Bundle;
 
 public class SharedPreferences {
 
-    private static String OLD_AUDIO_INFO = "oldAudioInfo";
-    private static String UUID = "uuid" ;
+    private static final String OLD_AUDIO_INFO = "oldAudioInfo";
+    private static final String UUID = "uuid" ;
+    private static final String BLOCK_CLOSE = "BLOCK_CLOSE";
     public static void saveOldAudioInfo(Activity activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
@@ -92,5 +93,29 @@ public class SharedPreferences {
         android.content.SharedPreferences UUIDInfo = activity.getSharedPreferences(UUID, Context.MODE_PRIVATE);
 
         return  UUIDInfo.getString("UUID",null);
+    }
+
+    public static void saveBolckClose(Activity activity,Bundle bundle){
+        android.content.SharedPreferences bolckClose = activity.getSharedPreferences(BLOCK_CLOSE, Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = bolckClose.edit();
+        editor.putString("lable",bundle.getString("lable"));
+        editor.putInt("index",bundle.getInt("index"));
+        editor.commit();
+
+    }
+    public static void saveBolckClose(Context activity,Bundle bundle){
+        android.content.SharedPreferences bolckClose = activity.getSharedPreferences(BLOCK_CLOSE, Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = bolckClose.edit();
+        editor.putString("lable",bundle.getString("lable"));
+        editor.putInt("index",bundle.getInt("index"));
+        editor.commit();
+
+    }
+    public static Bundle getBolckClose(Activity activity){
+        android.content.SharedPreferences bolckClose = activity.getSharedPreferences(BLOCK_CLOSE, Context.MODE_PRIVATE);
+        Bundle bundle = new Bundle();
+        bundle.putString("lable",bolckClose.getString("lable",""));
+        bundle.putInt("index",bolckClose.getInt("index",-1));
+        return bundle;
     }
 }
