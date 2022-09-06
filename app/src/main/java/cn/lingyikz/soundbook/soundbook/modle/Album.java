@@ -15,6 +15,7 @@ public class Album implements Serializable {
     private String message;
     private DataDTO data;
 
+
     @NoArgsConstructor
     @Data
     public static class DataDTO implements Serializable{

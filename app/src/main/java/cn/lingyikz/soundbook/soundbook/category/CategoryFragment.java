@@ -1,39 +1,39 @@
 package cn.lingyikz.soundbook.soundbook.category;
 
-import android.os.Bundle;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCategoryBinding;
+import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 
-public class CategoryFragment extends Fragment {
+public class CategoryFragment extends BaseFragment {
 
     private FragmentCategoryBinding binding ;
 
     public static CategoryFragment newInstance() {
         return new CategoryFragment();
     }
+
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected View setLayout(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentCategoryBinding.inflate(LayoutInflater.from(getActivity()),container,false);
+        LOnClickMe.init(this,binding.getRoot());
+        return binding.getRoot();
     }
 
+    @Override
+    protected void setView() {
+
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
-        binding = FragmentCategoryBinding.inflate(LayoutInflater.from(getActivity()),container,false);
-        View view = binding.getRoot();
-        LOnClickMe.init(this,binding.getRoot());
-        return view;
+    protected void setData() {
+
     }
 
     @AClick({R.id.copyQQGruop})

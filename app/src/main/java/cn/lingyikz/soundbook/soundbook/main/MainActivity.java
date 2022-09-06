@@ -3,6 +3,8 @@ package cn.lingyikz.soundbook.soundbook.main;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.analytics.Analytics;
@@ -23,7 +25,7 @@ import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.UUIDUtils;
 
-public class MainActivity extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends BaseFragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
 
 
     private FragmentManager fragmentManager ;
@@ -38,21 +40,27 @@ public class MainActivity extends FragmentActivity implements BottomNavigationVi
         fragmentTransaction.replace(R.id.content,HomeFragment.newInstance());
         fragmentTransaction.commit();
     }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(viewBinding.getRoot());
-//        this.checkUUID();
+    protected void setData() {
         this.setDefaultFragment();
-        AppCenter.start(getApplication(), Constans.APP_CENTER_SECRET,
-                Analytics.class, Crashes.class);
-//        this.deleteDatabase("audio");
         viewBinding.navigation.setOnNavigationItemSelectedListener(this);
         Intent intent = new Intent(this,AudioService.class);
         intent.setAction(Constans.START_SERVICE);
         startService(intent);
+    }
 
+    @Override
+    protected void setView() {
+
+    }
+
+    @Override
+    protected View setLayout() {
+        viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        AppCenter.start(getApplication(), Constans.APP_CENTER_SECRET,
+                Analytics.class, Crashes.class);
+        return viewBinding.getRoot();
     }
 
     private void checkUUID() {

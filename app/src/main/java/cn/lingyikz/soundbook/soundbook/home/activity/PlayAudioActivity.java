@@ -28,6 +28,7 @@ import androidx.annotation.Nullable;
 
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
+import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityPalyaduioBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
@@ -55,27 +56,18 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
     private SuperMediaPlayer superMediaPlayer = SuperMediaPlayer.getInstance();
 
 
+    @Override
+    protected void setData() {
+        initData();
+    }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityPalyaduioBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
+    protected void setView() {
         animation = AnimationUtils.loadAnimation(this,R.anim.cover_roate);
         animation.setRepeatMode(Animation.RESTART);
         animation.setInterpolator(new LinearInterpolator());
         animation.setRepeatCount(-1);
 
-        LOnClickMe.init(this,binding.getRoot());
-        initData();
-    }
-
-    /**
-     * 初始化数据
-     */
-    @SuppressLint("SetTextI18n")
-    private void initData() {
         binding.spinKit.setVisibility(View.VISIBLE);
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goPlay.setVisibility(View.GONE);
@@ -86,6 +78,21 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
 //        Log.i("TAG",bundle+"");
         binding.titleBar.title.setText(bundle.getString("title"));
         binding.seekbar.setOnSeekBarChangeListener(this);
+    }
+
+    @Override
+    protected View setLayout() {
+        binding = ActivityPalyaduioBinding.inflate(getLayoutInflater());
+        LOnClickMe.init(this,binding.getRoot());
+        return binding.getRoot();
+    }
+
+    /**
+     * 初始化数据
+     */
+    @SuppressLint("SetTextI18n")
+    private void initData() {
+
         dataBaseHelper = DataBaseHelper.getInstance(this);
         superMediaPlayer.setOnPreparedListener(onPreparedListener);
         superMediaPlayer.setOnSeekCompleteListener(onSeekCompleteListener);
@@ -221,21 +228,10 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
             Observable<XmlyNextPaly> observable  = RequestService.getInstance().getApi().getNextPlay(bundle.getInt("albumId"),bundle.getInt("episodes") + 1);
             observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                     .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                    .subscribe(new Observer<XmlyNextPaly>() { // 订阅
-
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
+                    .subscribe(new BaseObsever<XmlyNextPaly>() { // 订阅
                         @Override
                         public void onNext(XmlyNextPaly xmlyNextPaly) {
-                            Log.i("TAG", xmlyNextPaly.toString() + "");
+//                            Log.i("TAG", xmlyNextPaly.toString() + "");
                             if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() > 0 && SuperMediaPlayer.error == 0) {
 //                                Log.i("TAG", xmlyNextPaly.toString() + "");
                                 XmlyNextPaly.DataDTO dataDTO = xmlyNextPaly.getData().get(0);

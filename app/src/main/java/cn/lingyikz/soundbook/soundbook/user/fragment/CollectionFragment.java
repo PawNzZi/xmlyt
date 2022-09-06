@@ -16,10 +16,11 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCollectionBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
+import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 
-public class CollectionFragment extends Fragment implements HomeAdapter.ItemOperaCallBack {
+public class CollectionFragment extends BaseFragment implements HomeAdapter.ItemOperaCallBack {
 
     private FragmentCollectionBinding binding ;
     private HomeAdapter adapter = null;
@@ -29,26 +30,23 @@ public class CollectionFragment extends Fragment implements HomeAdapter.ItemOper
     public static CollectionFragment newInstance() {
         return new CollectionFragment();
     }
-    @Override
-    public void onCreate(@Nullable  Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-//        Log.i("TAG","CollectionFragment:onCreate");
-    }
 
-    @Nullable
+
     @Override
-    public View onCreateView(@NonNull  LayoutInflater inflater, @Nullable ViewGroup container, @Nullable  Bundle savedInstanceState) {
+    protected View setLayout(LayoutInflater inflater, ViewGroup container) {
         binding = FragmentCollectionBinding.inflate(LayoutInflater.from(getContext()),container,false);
-        View view = binding.getRoot();
-//        Log.i("TAG","CollectionFragment:onCreateView");
-        return view;
+        return binding.getRoot();
+    }
+
+
+    @Override
+    protected void setView() {
+
     }
 
     @Override
-    public void onViewCreated(@NonNull  View view, @Nullable  Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-//        initData();
-//        Log.i("TAG","CollectionFragment:onViewCreated");
+    protected void setData() {
+
     }
 
     private void initData() {

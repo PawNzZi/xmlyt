@@ -135,7 +135,10 @@ public class AudioService extends Service  {
         SuperMediaPlayer.getInstance().stop();
         SuperMediaPlayer.getInstance().reset();
         SuperMediaPlayer.getInstance().release();
-        unregisterReceiver(myBroadcastReceiver);
+        if(myBroadcastReceiver != null){
+            unregisterReceiver(myBroadcastReceiver);
+        }
+
     }
 
     @SuppressLint("HandlerLeak")

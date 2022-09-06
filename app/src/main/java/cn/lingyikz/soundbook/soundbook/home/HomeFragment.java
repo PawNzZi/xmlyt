@@ -22,10 +22,12 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
+import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.activity.SearchActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
+import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
@@ -37,7 +39,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 
-public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallBack {
+public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaCallBack {
 
     private FragmentHomeBinding binding;
     private HomeAdapter homeAdapter = null;
@@ -48,56 +50,46 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
+
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected View setLayout(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentHomeBinding.inflate(inflater,container,false);
+        LOnClickMe.init(this,binding.getRoot());
+        return binding.getRoot();
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        binding = FragmentHomeBinding.inflate(inflater,container,false);
-        View view = binding.getRoot();
-        LOnClickMe.init(this,binding.getRoot());
+    protected void setView() {
         binding.titleBar.title.setText("首页");
         binding.titleBar.goBacK.setVisibility(View.GONE);
         binding.titleBar.goSearch.setVisibility(View.VISIBLE);
-        searchFragment = SearchFragment.newInstance();
-        searchFragment.setOnSearchClickListener(new IOnSearchClickListener() {
-            @Override
-            public void OnSearchClick(String keyword) {
-                //这里处理逻辑
-//                Toast.makeText(getActivity(), keyword, Toast.LENGTH_SHORT).show();
-                Bundle bundle = new Bundle();
-                bundle.putString("keyword",keyword);
-                IntentAction.setValueActivity(getActivity(), SearchActivity.class,bundle);
-                getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-            }
-        });
-        this.initData(view);
-        return view ;
     }
+
+    @Override
+    protected void setData() {
+        searchFragment = SearchFragment.newInstance();
+        searchFragment.setOnSearchClickListener(iOnSearchClickListener);
+        this.initData(binding.getRoot());
+    }
+    private IOnSearchClickListener iOnSearchClickListener = new IOnSearchClickListener() {
+        @Override
+        public void OnSearchClick(String keyword) {
+            Bundle bundle = new Bundle();
+            bundle.putString("keyword",keyword);
+            IntentAction.setValueActivity(getActivity(), SearchActivity.class,bundle);
+            getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        }
+    };
     public void initData(View view){
 
         Observable<Album> observable  = RequestService.getInstance().getApi().getPostInfo(1,Constans.PAGE_SIZE,"");
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                .subscribe(new Observer<Album>() { // 订阅
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
+                .subscribe(new BaseObsever<Album>() { // 订阅
 
                     @Override
                     public void onNext(Album postInfo) {
-                        Log.i("http返回：", postInfo.toString() + "");
+//                        Log.i("http返回：", postInfo.toString() + "");
                         if(postInfo.getCode() == 200 && postInfo.getData().getList().size() > 0){
                             if(mList == null){
                                 mList = new ArrayList<>();
@@ -122,6 +114,7 @@ public class HomeFragment extends Fragment implements HomeAdapter.ItemOperaCallB
 
                     }
                 });
+        observable.unsubscribeOn(Schedulers.io());
     }
     @Override
     public void onStart() {

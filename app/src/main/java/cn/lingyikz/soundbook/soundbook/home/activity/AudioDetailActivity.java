@@ -1,16 +1,12 @@
 package cn.lingyikz.soundbook.soundbook.home.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 
-import android.content.Intent;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
@@ -29,8 +25,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
+import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityAudiodetailBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
+import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
@@ -41,7 +39,7 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class AudioDetailActivity extends Activity implements AudioListAdapter.AudioListen ,OnSpinnerItemSelectedListener{
+public class AudioDetailActivity extends BaseActivity implements AudioListAdapter.AudioListen ,OnSpinnerItemSelectedListener{
 
     private ActivityAudiodetailBinding activityAudiodetailBinding;
     private AudioListAdapter adapter = null;
@@ -52,20 +50,13 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
     private Album.DataDTO.ListDTO albumDetail ;
     private DataBaseHelper dataBaseHelper;
 
-
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-//        overridePendingTransition(R.anim.translate_in,R.anim.translate_in);
-        super.onCreate(savedInstanceState);
-        activityAudiodetailBinding = ActivityAudiodetailBinding.inflate(getLayoutInflater());
-        setContentView(activityAudiodetailBinding.getRoot());
-        LOnClickMe.init(this,activityAudiodetailBinding.getRoot());
+    protected void setData() {
         this.initData();
     }
 
-
-    public void initData(){
-
+    @Override
+    protected void setView() {
         Bundle bundle = getIntent().getExtras();
         albumDetail = (Album.DataDTO.ListDTO) bundle.getSerializable("bookObject");
         dataBaseHelper = DataBaseHelper.getInstance(this);
@@ -83,6 +74,18 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
         activityAudiodetailBinding.bookName.setText(albumDetail.getName());
         activityAudiodetailBinding.bookAuthor.setText(albumDetail.getDescription());
         activityAudiodetailBinding.recyclerView.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected View setLayout() {
+        activityAudiodetailBinding = ActivityAudiodetailBinding.inflate(getLayoutInflater());
+        LOnClickMe.init(this,activityAudiodetailBinding.getRoot());
+        return activityAudiodetailBinding.getRoot();
+    }
+
+
+    public void initData(){
+
 //        activityAudiodetailBinding.spinKit.setVisibility(View.VISIBLE);
         //调接口查询列表
         this.queryList(albumDetail.getId(),true);
@@ -96,18 +99,7 @@ public class AudioDetailActivity extends Activity implements AudioListAdapter.Au
         Observable<AlbumDetail> observable  = RequestService.getInstance().getApi().getAlbumDetail(nextPage, Constans.PAGE_SIZE,id);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                .subscribe(new Observer<AlbumDetail>() { // 订阅
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
+                .subscribe(new BaseObsever<AlbumDetail>() { // 订阅
                     @Override
                     public void onNext(AlbumDetail reslut) {
                         if(reslut.getCode() == 200 && reslut.getData().getList().size() > 0 ) {

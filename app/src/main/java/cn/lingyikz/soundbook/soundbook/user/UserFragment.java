@@ -35,6 +35,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentUserBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
+import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.user.fragment.CollectionFragment;
 import cn.lingyikz.soundbook.soundbook.user.fragment.PlayHistoryFragment;
@@ -49,7 +50,7 @@ import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
  * Created by 1085054 on 2022-8-17.
  */
 
-public class UserFragment extends Fragment {
+public class UserFragment extends BaseFragment {
 
     private static FragmentUserBinding binding ;
 
@@ -61,26 +62,25 @@ public class UserFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    protected View setLayout(LayoutInflater inflater, ViewGroup container) {
         binding = FragmentUserBinding.inflate(LayoutInflater.from(getActivity()),container,false);
-        View view = binding.getRoot();
         LOnClickMe.init(this,binding.getRoot());
-        initData();
-        return view;
+        return binding.getRoot();
     }
 
-    private void initData() {
+    @Override
+    protected void setView() {
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.GONE);
         binding.titleBar.title.setText("我的");
+    }
 
+    @Override
+    protected void setData() {
+        initData();
+    }
 
+    private void initData() {
         fragmentList = new ArrayList<>();
         fragmentList.add(PlayHistoryFragment.newInstance());
         fragmentList.add(CollectionFragment.newInstance());

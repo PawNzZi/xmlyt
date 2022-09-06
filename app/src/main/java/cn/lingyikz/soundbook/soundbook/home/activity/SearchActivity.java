@@ -22,8 +22,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
+import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivitySearchlistBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
+import cn.lingyikz.soundbook.soundbook.main.BaseFragmentActivity;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
@@ -34,7 +36,7 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class SearchActivity extends FragmentActivity implements HomeAdapter.ItemOperaCallBack {
+public class SearchActivity extends BaseFragmentActivity implements HomeAdapter.ItemOperaCallBack {
 
     private ActivitySearchlistBinding binding ;
     private HomeAdapter homeAdapter = null;
@@ -45,14 +47,30 @@ public class SearchActivity extends FragmentActivity implements HomeAdapter.Item
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    protected void setData() {
+
+    }
+
+    @Override
+    protected void setView() {
+
+    }
+
+    @Override
+    protected View setLayout() {
         binding = ActivitySearchlistBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
         LOnClickMe.init(this,binding.getRoot());
         Bundle bundle = getIntent().getExtras();
         String keyword = bundle.getString("keyword");
         this.initView(keyword);
         this.searchList(keyword);
+        return binding.getRoot();
     }
+
     public void initView(String keyword){
         searchFragment = SearchFragment.newInstance();
         searchFragment.setOnSearchClickListener(iOnSearchClickListener);
@@ -75,22 +93,12 @@ public class SearchActivity extends FragmentActivity implements HomeAdapter.Item
         Observable<Album> observable  = RequestService.getInstance().getApi().getPostInfo(nextPage,Constans.PAGE_SIZE,keyword);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                .subscribe(new Observer<Album>() { // 订阅
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
+                .subscribe(new BaseObsever<Album>() { // 订阅
 
                     @Override
                     public void onNext(Album postInfo) {
                         if(postInfo.getCode() == 200 && postInfo.getData().getList().size() > 0){
-                            Log.i("http返回：", postInfo.toString() + "");
+//                            Log.i("http返回：", postInfo.toString() + "");
                             if(mList == null) {
                                 mList = new ArrayList<>();
                             }

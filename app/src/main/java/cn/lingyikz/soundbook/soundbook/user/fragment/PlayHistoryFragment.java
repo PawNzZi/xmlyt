@@ -18,13 +18,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentPalyhistoryBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
+import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
-public class PlayHistoryFragment extends Fragment implements AudioListAdapter.AudioListen {
+public class PlayHistoryFragment extends BaseFragment implements AudioListAdapter.AudioListen {
     private FragmentPalyhistoryBinding binding ;
     private AudioListAdapter adapter = null;
     private List<AlbumDetail.DataDTO.ListDTO> mList = new ArrayList<>();
@@ -34,29 +35,22 @@ public class PlayHistoryFragment extends Fragment implements AudioListAdapter.Au
     public static PlayHistoryFragment newInstance() {
         return new PlayHistoryFragment();
     }
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-//        Log.i("TAG","PlayHistoryFragment:onCreate");
-    }
-
-    @Nullable
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable  Bundle savedInstanceState) {
+    protected View setLayout(LayoutInflater inflater, ViewGroup container) {
         binding = FragmentPalyhistoryBinding.inflate(LayoutInflater.from(getContext()),container,false);
-        View view = binding.getRoot();
-//        Log.i("TAG","onCreateView");
-//        Log.i("TAG","PlayHistoryFragment:onCreateView");
-        return view ;
+        return binding.getRoot();
+    }
+
+
+    @Override
+    protected void setView() {
 
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable  Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-//        initData();
-//        Log.i("TAG","PlayHistoryFragment:onViewCreated");
+    protected void setData() {
+
     }
 
     private void initData() {
