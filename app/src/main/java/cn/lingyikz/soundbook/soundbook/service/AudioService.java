@@ -125,7 +125,7 @@ public class AudioService extends Service  {
 //                SharedPreferences.saveOldAudioInfo(this,bundle);
 //            }
 //        }
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -151,8 +151,6 @@ public class AudioService extends Service  {
                     break;
             }
         }
-
-
     };
     private void updateBlock() {
 //        Log.i("TAG","updateBlock:"+count);
@@ -180,6 +178,7 @@ public class AudioService extends Service  {
             count = count - 1000;
             hadler.sendEmptyMessageDelayed(Constans.UPDATE_BLOCK,1000);
         }
+        bundle = null ;
 
     }
 }

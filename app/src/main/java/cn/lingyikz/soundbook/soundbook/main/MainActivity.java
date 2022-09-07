@@ -98,7 +98,7 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(this, AudioService.class));
+//        stopService(new Intent(this, AudioService.class));
         viewBinding = null ;
     }
 
