@@ -45,6 +45,8 @@ public class AudioService extends Service  {
     private SuperMediaPlayer superMediaPlayer ;
     private IntentFilter intentFilter;
     private PlayAudioActivity.PlaystateReceiver myBroadcastReceiver;
+    private Notification.Builder builder ;
+    private NotificationManager manager ;
     private static final String CHANNEL_ID = "NFCService";
     public AudioService() {
 
@@ -68,29 +70,7 @@ public class AudioService extends Service  {
         intentFilter.addAction(Constans.CHANGE_PLAY_IMG);
         myBroadcastReceiver = new PlayAudioActivity.PlaystateReceiver();
         registerReceiver(myBroadcastReceiver, intentFilter);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            Notification notification = new Notification.Builder(this,CHANNEL_ID)
-                    .setChannelId(CHANNEL_ID)
-                    .setContentTitle("主服务")//标题
-                    .setContentText("运行中...")//内容
-                    .setWhen(System.currentTimeMillis())
-                    .setSmallIcon(R.mipmap.logo_round)//小图标一定需要设置,否则会报错(如果不设置它启动服务前台化不会报错,但是你会发现这个通知不会启动),如果是普通通知,不设置必然报错
-                    .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.logo_round))
-                    .build();
-
-            NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-            NotificationChannel Channel = new NotificationChannel(CHANNEL_ID,"主服务",NotificationManager.IMPORTANCE_HIGH);
-            Channel.enableLights(true);//设置提示灯
-            Channel.setLightColor(Color.RED);//设置提示灯颜色
-            Channel.setShowBadge(true);//显示logo
-            Channel.setDescription("ytzn");//设置描述
-            Channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC); //设置锁屏可见 VISIBILITY_PUBLIC=可见
-            assert manager != null;
-            manager.createNotificationChannel(Channel);
-            startForeground(0,notification);
-        }
+        startForeground(0,getNotificationBuilder().build());
     }
 
 
@@ -129,36 +109,6 @@ public class AudioService extends Service  {
 
             }
         }
-//        if(intent.getAction().equals(Constans.BIND_SERVICE)){
-//            Log.i("TAG","BIND_SERVICE");
-//            bundle = intent.getExtras();
-//            if(player.isPlay()){
-//                Bundle oldAudioInfo = SharedPreferences.getOldAudioInfo(this);
-//                if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
-//
-//                }else {
-//                    player.onStop();
-//                    //保存上一条信息 todo
-//                    addHistory2(oldAudioInfo);
-//                    player.reset();
-//                    if(bundle.getLong("audioDuration") > 0){
-//                        player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
-//                    }else{
-//                        player.onRead(bundle.getString("src"));
-//                    }
-//                    SharedPreferences.saveOldAudioInfo(this,bundle);
-//                }
-//            }else {
-//                player.onStop();
-//                player.reset();
-//                if(bundle.getLong("audioDuration") > 0){
-//                    player.onRead(bundle.getString("src"),bundle.getLong("audioDuration"));
-//                }else{
-//                    player.onRead(bundle.getString("src"));
-//                }
-//                SharedPreferences.saveOldAudioInfo(this,bundle);
-//            }
-//        }
         return START_STICKY;
     }
 
@@ -215,5 +165,31 @@ public class AudioService extends Service  {
         }
         bundle = null ;
 
+    }
+    private Notification.Builder getNotificationBuilder(){
+        Notification.Builder builder = new Notification.Builder(this,CHANNEL_ID);
+        builder.setContentTitle("主服务");//标题
+        builder.setContentText("运行中...");//内容
+        builder.setWhen(System.currentTimeMillis());
+        builder.setSmallIcon(R.mipmap.logo_round);//小图标一定需要设置,否则会报错(如果不设置它启动服务前台化不会报错,但是你会发现这个通知不会启动),如果是普通通知,不设置必然报错
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.logo_round));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(CHANNEL_ID);
+            NotificationChannel Channel = new NotificationChannel(CHANNEL_ID,"主服务",NotificationManager.IMPORTANCE_HIGH);
+            Channel.enableLights(true);//设置提示灯
+            Channel.setLightColor(Color.RED);//设置提示灯颜色
+            Channel.setShowBadge(true);//显示logo
+            Channel.setDescription("ytzn");//设置描述
+            Channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC); //设置锁屏可见 VISIBILITY_PUBLIC=可见
+            getNotificationManager().createNotificationChannel(Channel);
+        }
+        return builder;
+    }
+
+    private NotificationManager getNotificationManager(){
+        if(manager == null){
+            manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        }
+        return manager;
     }
 }
