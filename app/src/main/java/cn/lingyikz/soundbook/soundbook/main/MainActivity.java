@@ -98,8 +98,13 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        stopService(new Intent(this, AudioService.class));
+        stopService(new Intent(this, AudioService.class));
         viewBinding = null ;
+        Bundle spBundle = new Bundle();
+        spBundle.putString("lable","");
+        spBundle.putInt("index",-1);
+        SharedPreferences.saveBolckClose(this,spBundle);
     }
+
 
 }

@@ -47,7 +47,7 @@ public class AudioService extends Service  {
     private PlayAudioActivity.PlaystateReceiver myBroadcastReceiver;
     private Notification.Builder builder ;
     private NotificationManager manager ;
-    private static final String CHANNEL_ID = "NFCService";
+    private static final String CHANNEL_ID = "AudioService";
     public AudioService() {
 
     }
@@ -70,14 +70,15 @@ public class AudioService extends Service  {
         intentFilter.addAction(Constans.CHANGE_PLAY_IMG);
         myBroadcastReceiver = new PlayAudioActivity.PlaystateReceiver();
         registerReceiver(myBroadcastReceiver, intentFilter);
-        startForeground(0,getNotificationBuilder().build());
+        startForeground(1,getNotificationBuilder().build());
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-//        Log.i("TAG","onStartCommand");
+        Log.i("TAG","onStartCommand");
+
         if(intent.getAction().equals(Constans.SET_BLOCK)){
             int index = intent.getIntExtra("index",-1);
             bundle = intent.getExtras();
@@ -112,11 +113,12 @@ public class AudioService extends Service  {
         return START_STICKY;
     }
 
+    @SuppressLint("WrongConstant")
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i("TAG","onDestroy");
-        stopForeground(0);
+        stopForeground(1);
         SuperMediaPlayer.getInstance().stop();
         SuperMediaPlayer.getInstance().reset();
         SuperMediaPlayer.getInstance().release();
@@ -167,19 +169,21 @@ public class AudioService extends Service  {
 
     }
     private Notification.Builder getNotificationBuilder(){
-        Notification.Builder builder = new Notification.Builder(this,CHANNEL_ID);
-        builder.setContentTitle("主服务");//标题
+        builder = new Notification.Builder(this,CHANNEL_ID);
+        builder.setContentTitle("后台播放服务");//标题
         builder.setContentText("运行中...");//内容
         builder.setWhen(System.currentTimeMillis());
         builder.setSmallIcon(R.mipmap.logo_round);//小图标一定需要设置,否则会报错(如果不设置它启动服务前台化不会报错,但是你会发现这个通知不会启动),如果是普通通知,不设置必然报错
         builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.logo_round));
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId(CHANNEL_ID);
-            NotificationChannel Channel = new NotificationChannel(CHANNEL_ID,"主服务",NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel Channel = new NotificationChannel(CHANNEL_ID,"后台播放服务",NotificationManager.IMPORTANCE_LOW);
             Channel.enableLights(true);//设置提示灯
             Channel.setLightColor(Color.RED);//设置提示灯颜色
             Channel.setShowBadge(true);//显示logo
-            Channel.setDescription("ytzn");//设置描述
+            Channel.setDescription("后台播放服务");//设置描述
+            Channel.setSound(null, null);
             Channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC); //设置锁屏可见 VISIBILITY_PUBLIC=可见
             getNotificationManager().createNotificationChannel(Channel);
         }

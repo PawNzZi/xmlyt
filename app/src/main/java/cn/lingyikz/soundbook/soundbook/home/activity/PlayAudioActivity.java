@@ -398,24 +398,34 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
                 superMediaPlayer.seekTo(superMediaPlayer.getCurrentPosition() + CHANGE_SECONDE * 1000);
                 break;
             case R.id.set_block:
-                BottomMenu.show(new String[]{"30分钟", "60分钟", "90分钟","120分钟","150分钟"})
+                BottomMenu.show(new String[]{"30分钟", "60分钟", "90分钟","120分钟","150分钟","取消定时"})
                         .setMessage("定时关闭")
                         .setOnMenuItemClickListener(new OnMenuItemClickListener<BottomMenu>() {
                             @SuppressLint("SetTextI18n")
                             @Override
                             public boolean onClick(BottomMenu dialog, CharSequence text, int index) {
 //                                Toast.makeText(PlayAudioActivity.this, text.toString()+index, Toast.LENGTH_SHORT).show();
-                                binding.bolckIime.setVisibility(View.VISIBLE);
-                                binding.bolckIime.setText(text.toString()+" 后关闭");
-                                Bundle spbundle = new Bundle();
-                                spbundle.putString("lable",text.toString());
-                                spbundle.putInt("index",index);
-                                SharedPreferences.saveBolckClose(PlayAudioActivity.this,spbundle);
-                                Intent intent = new Intent(PlayAudioActivity.this, AudioService.class);
-                                intent.setAction(Constans.SET_BLOCK);
-                                intent.putExtra("index",index);
-                                intent.putExtras(bundle);
-                                PlayAudioActivity.this.startForegroundService(intent);
+                                if(index == 5 ){
+                                    Bundle spBundle = new Bundle();
+                                    spBundle.putString("lable","");
+                                    spBundle.putInt("index",-1);
+                                    SharedPreferences.saveBolckClose(PlayAudioActivity.this,spBundle);
+                                    binding.bolckIime.setVisibility(View.GONE);
+                                    binding.bolckIime.setText("");
+                                }else{
+                                    binding.bolckIime.setVisibility(View.VISIBLE);
+                                    binding.bolckIime.setText(text.toString()+" 后关闭");
+                                    Bundle spbundle = new Bundle();
+                                    spbundle.putString("lable",text.toString());
+                                    spbundle.putInt("index",index);
+                                    SharedPreferences.saveBolckClose(PlayAudioActivity.this,spbundle);
+                                    Intent intent = new Intent(PlayAudioActivity.this, AudioService.class);
+                                    intent.setAction(Constans.SET_BLOCK);
+                                    intent.putExtra("index",index);
+                                    intent.putExtras(bundle);
+                                    PlayAudioActivity.this.startService(intent);
+                                }
+
 
                                 return false;
                             }
