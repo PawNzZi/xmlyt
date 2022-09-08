@@ -7,7 +7,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 33
         versionCode 1
-        versionName "0.5.3"
+        versionName "0.5.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary= true
 //添加如下配置 开启annotation processor
