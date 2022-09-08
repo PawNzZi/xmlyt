@@ -47,7 +47,7 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
         viewBinding.navigation.setOnNavigationItemSelectedListener(this);
         Intent intent = new Intent(this,AudioService.class);
         intent.setAction(Constans.START_SERVICE);
-        startService(intent);
+        startForegroundService(intent);
     }
 
     @Override

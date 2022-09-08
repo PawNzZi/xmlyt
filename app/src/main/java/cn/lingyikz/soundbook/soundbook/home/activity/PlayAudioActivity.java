@@ -118,8 +118,6 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
             bundle.putString("audioDuration",historyBundle.getString("audioDuration"));
         }
         playAudio();
-
-
     }
 
     /**
@@ -417,7 +415,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
                                 intent.setAction(Constans.SET_BLOCK);
                                 intent.putExtra("index",index);
                                 intent.putExtras(bundle);
-                                PlayAudioActivity.this.startService(intent);
+                                PlayAudioActivity.this.startForegroundService(intent);
 
                                 return false;
                             }
