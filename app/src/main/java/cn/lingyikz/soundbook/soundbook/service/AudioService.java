@@ -54,13 +54,11 @@ public class AudioService extends Service  {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i("TAG","MyBinder");
-
+//        Log.i("TAG","MyBinder");
         // TODO: Return the communication channel to the service.
         return null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -70,7 +68,7 @@ public class AudioService extends Service  {
         intentFilter.addAction(Constans.CHANGE_PLAY_IMG);
         myBroadcastReceiver = new PlayAudioActivity.PlaystateReceiver();
         registerReceiver(myBroadcastReceiver, intentFilter);
-        startForeground(1,getNotificationBuilder().build());
+
     }
 
 
@@ -78,7 +76,7 @@ public class AudioService extends Service  {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Log.i("TAG","onStartCommand");
-
+        startForeground(1,getNotificationBuilder().build());
         if(intent.getAction().equals(Constans.SET_BLOCK)){
             int index = intent.getIntExtra("index",-1);
             bundle = intent.getExtras();
@@ -169,13 +167,15 @@ public class AudioService extends Service  {
 
     }
     private Notification.Builder getNotificationBuilder(){
-        builder = new Notification.Builder(this,CHANNEL_ID);
-        builder.setContentTitle("后台播放服务");//标题
-        builder.setContentText("运行中...");//内容
-        builder.setWhen(System.currentTimeMillis());
-        builder.setSmallIcon(R.mipmap.logo_round);//小图标一定需要设置,否则会报错(如果不设置它启动服务前台化不会报错,但是你会发现这个通知不会启动),如果是普通通知,不设置必然报错
-        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.logo_round));
 
+        if(builder == null){
+            builder = new Notification.Builder(this,CHANNEL_ID);
+            builder.setContentTitle("后台播放服务");//标题
+            builder.setContentText("运行中...");//内容
+            builder.setWhen(System.currentTimeMillis());
+            builder.setSmallIcon(R.mipmap.logo_round);//小图标一定需要设置,否则会报错(如果不设置它启动服务前台化不会报错,但是你会发现这个通知不会启动),如果是普通通知,不设置必然报错
+            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.logo_round));
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId(CHANNEL_ID);
             NotificationChannel Channel = new NotificationChannel(CHANNEL_ID,"后台播放服务",NotificationManager.IMPORTANCE_LOW);
