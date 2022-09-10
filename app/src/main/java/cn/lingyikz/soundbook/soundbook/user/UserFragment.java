@@ -37,6 +37,7 @@ import cn.lingyikz.soundbook.soundbook.databinding.FragmentUserBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
+import cn.lingyikz.soundbook.soundbook.user.activity.SettingActivity;
 import cn.lingyikz.soundbook.soundbook.user.fragment.CollectionFragment;
 import cn.lingyikz.soundbook.soundbook.user.fragment.PlayHistoryFragment;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
@@ -70,6 +71,7 @@ public class UserFragment extends BaseFragment {
 
     @Override
     protected void setView() {
+        binding.titleBar.setting.setVisibility(View.VISIBLE);
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.GONE);
         binding.titleBar.title.setText("我的");
@@ -114,7 +116,7 @@ public class UserFragment extends BaseFragment {
 
     }
 
-    @AClick({R.id.go_play, R.id.userAvatar,R.id.titleSpinKit})
+    @AClick({R.id.go_play, R.id.userAvatar,R.id.titleSpinKit,R.id.setting})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_play:
@@ -129,6 +131,9 @@ public class UserFragment extends BaseFragment {
                 }
                 break;
             case R.id.userAvatar:
+                break;
+            case R.id.setting:
+                IntentAction.toNextActivity(getActivity(), SettingActivity.class);
                 break;
         }
     }

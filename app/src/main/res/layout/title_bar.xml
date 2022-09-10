@@ -25,6 +25,16 @@
         android:src="@mipmap/search"
         >
     </ImageView>
+    <ImageView
+        android:id="@+id/setting"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        android:visibility="gone"
+        android:src="@mipmap/setting"
+        >
+    </ImageView>
 
     <ImageView
         android:id="@+id/to_search"

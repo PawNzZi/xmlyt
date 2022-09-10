@@ -3,9 +3,11 @@ package cn.lingyikz.soundbook.soundbook.api;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumCount;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
+import cn.lingyikz.soundbook.soundbook.modle.Version;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import rx.Observable;
 
@@ -31,5 +33,8 @@ public interface Api {
       @FormUrlEncoded
       @POST("xmly/episodesCount")
       Observable<AlbumCount> episodesCount(@Field("albumId") int albumId);
+
+      @GET("version/getVersion")
+      Observable<Version> getVersion();
 
 }
