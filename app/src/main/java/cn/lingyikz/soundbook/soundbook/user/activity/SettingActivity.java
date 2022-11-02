@@ -1,7 +1,5 @@
 package cn.lingyikz.soundbook.soundbook.user.activity;
 
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,6 +15,7 @@ import cn.lingyikz.soundbook.soundbook.databinding.ActivitySettingBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
 import cn.lingyikz.soundbook.soundbook.modle.Version;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.VersionUtil;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -31,7 +30,7 @@ public class SettingActivity extends BaseActivity {
 
     @Override
     protected void setView() {
-        binding.versionNubmer.setText(Constans.VERSION_NUBMER);
+        binding.versionNubmer.setText(VersionUtil.getVersonName(this));
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goPlay.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.VISIBLE);
@@ -58,7 +57,8 @@ public class SettingActivity extends BaseActivity {
     public void checkVersion(){
 //        Log.i("TAG：",  "checkVersion");
         WaitDialog.show(Constans.CHECKING_UPDATE);
-        Observable<Version> observable  = RequestService.getInstance().getApi().getVersion();
+        int versionCode = VersionUtil.getVersonCode(this);
+        Observable<Version> observable  = RequestService.getInstance().getApi().getVersion(versionCode);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
                 .subscribe(new BaseObsever<Version>() { // 订阅
@@ -71,9 +71,9 @@ public class SettingActivity extends BaseActivity {
 
                     @Override
                     public void onNext(Version bean) {
-                        Log.i("TAG：", bean.toString() + "");
+//                        Log.i("TAG：", bean.toString() + "");
                         if(bean.getCode() == 200 && bean.getData() != null){
-                            if(!Constans.VERSION_NUBMER.equals(bean.getData().getNumber())){
+                            if(versionCode < bean.getData().getCode()){
                                 MessageDialog.show("温馨提示", "最新版本为"+bean.getData().getNumber()+"，请及时加群更新", "确定")
                                         .setCancelable(false);
                             }else {

@@ -1,14 +1,17 @@
 package cn.lingyikz.soundbook.soundbook.api;
 
 import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.AlbumCategoryBean;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumCount;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
+import cn.lingyikz.soundbook.soundbook.modle.Category;
 import cn.lingyikz.soundbook.soundbook.modle.Version;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 import rx.Observable;
 
 public interface Api {
@@ -34,7 +37,15 @@ public interface Api {
       @POST("xmly/episodesCount")
       Observable<AlbumCount> episodesCount(@Field("albumId") int albumId);
 
+      //检查版本
       @GET("version/getVersion")
-      Observable<Version> getVersion();
+      Observable<Version> getVersion(@Query("versonCode") int versonCode);
+
+      @POST("zmlmcategory/list")
+      Observable<Category> getCategory();
+
+      @FormUrlEncoded
+      @POST("albumcategory/list")
+      Observable<AlbumCategoryBean> getAlbumCategory(@Field("categoryId") int categoryId,@Field("page") int page,@Field("size") int size);
 
 }

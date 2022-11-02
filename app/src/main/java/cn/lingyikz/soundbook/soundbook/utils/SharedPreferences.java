@@ -12,6 +12,7 @@ public class SharedPreferences {
     private static final String OLD_AUDIO_INFO = "oldAudioInfo";
     private static final String UUID = "uuid" ;
     private static final String BLOCK_CLOSE = "BLOCK_CLOSE";
+    private static final String CATEGORY_POSTION = "CATEGORY_POSTION";
     public static void saveOldAudioInfo(Activity activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
@@ -117,5 +118,15 @@ public class SharedPreferences {
         bundle.putString("lable",bolckClose.getString("lable",""));
         bundle.putInt("index",bolckClose.getInt("index",-1));
         return bundle;
+    }
+    public static void  saveCategoryIndex(Context context,int position){
+        android.content.SharedPreferences categoryIndex = context.getSharedPreferences(CATEGORY_POSTION, Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = categoryIndex.edit();
+        editor.putInt("position",position);
+        editor.commit();
+    }
+    public static int getCategoryIndex(Context context){
+        android.content.SharedPreferences categoryIndex = context.getSharedPreferences(CATEGORY_POSTION, Context.MODE_PRIVATE);
+        return categoryIndex.getInt("position",0);
     }
 }

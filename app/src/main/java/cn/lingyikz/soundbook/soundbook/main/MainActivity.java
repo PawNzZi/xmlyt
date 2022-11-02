@@ -1,7 +1,9 @@
 package cn.lingyikz.soundbook.soundbook.main;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -15,6 +17,7 @@ import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -39,6 +42,7 @@ import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.UUIDUtils;
+import cn.lingyikz.soundbook.soundbook.utils.VersionUtil;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -65,7 +69,10 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
         viewBinding.navigation.setOnNavigationItemSelectedListener(this);
         Intent intent = new Intent(this,AudioService.class);
         intent.setAction(Constans.START_SERVICE);
-        startForegroundService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        }
+        SharedPreferences.saveCategoryIndex(getApplicationContext(),0);
         this.checkVersion();
 
     }
@@ -117,16 +124,19 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
 
     public void checkVersion(){
 //        Log.i("TAG：",  "checkVersion");
-        Observable<Version> observable  = RequestService.getInstance().getApi().getVersion();
+        int versionCode = VersionUtil.getVersonCode(this);
+        Observable<Version> observable  = RequestService.getInstance().getApi().getVersion(versionCode);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
                 .subscribe(new BaseObsever<Version>() { // 订阅
 
                     @Override
                     public void onNext(Version bean) {
-                        Log.i("TAG：", bean.toString() + "");
+//                        Log.i("TAG：", bean.toString() + "");
                         if(bean.getCode() == 200 && bean.getData() != null){
-                            if(!Constans.VERSION_NUBMER.equals(bean.getData().getNumber())){
+//                            Log.i("TAG：",  "200");
+                            if(versionCode < bean.getData().getCode()){
+//                                Log.i("TAG：",  "300");
                                 MessageDialog.show("温馨提示", "最新版本为"+bean.getData().getNumber()+"，请及时加群更新", "确定")
                                         .setCancelable(false);
                             }

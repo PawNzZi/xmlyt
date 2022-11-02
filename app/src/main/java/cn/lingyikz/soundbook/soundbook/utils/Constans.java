@@ -24,4 +24,6 @@ public class Constans {
     public final static String LATEST_VERSION = "已是最新版本";
     public final static String CHECKING_UPDATE = "检查中...";
 
+    public final static String NO_LOADING = "别拉了，无了！" ;
+
 }
