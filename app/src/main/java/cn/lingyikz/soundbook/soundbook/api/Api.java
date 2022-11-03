@@ -4,6 +4,7 @@ import cn.lingyikz.soundbook.soundbook.modle.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumCategoryBean;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumCount;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
+import cn.lingyikz.soundbook.soundbook.modle.Banner;
 import cn.lingyikz.soundbook.soundbook.modle.Category;
 import cn.lingyikz.soundbook.soundbook.modle.Version;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
@@ -41,11 +42,16 @@ public interface Api {
       @GET("version/getVersion")
       Observable<Version> getVersion(@Query("versonCode") int versonCode);
 
+      //查询分类
       @POST("zmlmcategory/list")
       Observable<Category> getCategory();
 
+      //查询分类下的专辑
       @FormUrlEncoded
       @POST("albumcategory/list")
       Observable<AlbumCategoryBean> getAlbumCategory(@Field("categoryId") int categoryId,@Field("page") int page,@Field("size") int size);
 
+      //查询banner
+      @GET("dictdata/banner")
+      Observable<Banner> getBanner(@Query("typeId") int typeId);
 }

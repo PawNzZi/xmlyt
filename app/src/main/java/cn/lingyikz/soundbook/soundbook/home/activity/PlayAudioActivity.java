@@ -241,7 +241,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
                                 reslutBundle.putInt("episodes",dataDTO.getEpisodes());
                                 reslutBundle.putString("title",dataDTO.getName());
                                 reslutBundle.putString("audioDes","");
-                                reslutBundle.putLong("audioDuration",0);
+                                reslutBundle.putString("audioDuration","0");
                                 reslutBundle.putString("audioCreated", String.valueOf(dataDTO.getCreated()));
                                 reslutBundle.putString("src",dataDTO.getUrl());
                                 reslutBundle.putInt("audioId",dataDTO.getId());
@@ -378,7 +378,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
             case R.id.startPlay:
                 if(superMediaPlayer.isPlaying()){
                     superMediaPlayer.pause();
-                    bundle.putLong("audioDuration",superMediaPlayer.getCurrentPosition());
+                    bundle.putString("audioDuration", String.valueOf(superMediaPlayer.getCurrentPosition()));
                     dataBaseHelper.addPlayHistory(bundle);
                     dataBaseHelper.close();
                     SharedPreferences.saveOldAudioInfo(this,bundle);

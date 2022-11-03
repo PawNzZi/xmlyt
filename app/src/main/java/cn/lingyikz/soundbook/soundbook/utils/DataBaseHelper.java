@@ -152,7 +152,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             contentValues.put("episodes",bundle.getInt("episodes"));
             contentValues.put("audioTitle",bundle.getString("title"));
             contentValues.put("audioDes",bundle.getString("audioDes"));
-            contentValues.put("audioDuration",String.valueOf(bundle.getLong("audioDuration")));
+            contentValues.put("audioDuration",bundle.getString("audioDuration"));
             contentValues.put("audioCreated",bundle.getString("audioCreated"));
             contentValues.put("audioSrc",bundle.getString("src"));
             contentValues.put("audioId",bundle.getInt("audioId"));
@@ -177,7 +177,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             contentValues.put("episodes",bundle.getInt("episodes"));
             contentValues.put("audioTitle",bundle.getString("title"));
             contentValues.put("audioDes",bundle.getString("audioDes"));
-            contentValues.put("audioDuration",String.valueOf(bundle.getLong("audioDuration")));
+            contentValues.put("audioDuration",bundle.getString("audioDuration"));
             contentValues.put("audioCreated",bundle.getString("audioCreated"));
             contentValues.put("audioSrc",bundle.getString("src"));
             contentValues.put("audioId",bundle.getInt("audioId"));

@@ -15,6 +15,8 @@
     <string name="total_duration">00:00</string>
     <string name="check_update">检查更新</string>
     <string name="author">""@阿威湿了</string>
+    <string name="loading">正在加载...</string>
+    <string name="nodata">瞅，这是底线</string>
 
 
 </resources>

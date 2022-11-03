@@ -21,7 +21,7 @@ public class SharedPreferences {
         editor.putInt("audioId",bundle.getInt("audioId"));
         editor.putString("audioCreated",bundle.getString("audioCreated"));
         editor.putString("audioDes",bundle.getString("audioDes"));
-        editor.putLong("audioDuration",bundle.getLong("audioDuration"));
+        editor.putString("audioDuration",bundle.getString("audioDuration"));
         editor.putString("title",bundle.getString("title"));
         editor.putString("src",bundle.getString("src"));
         editor.commit();
@@ -34,7 +34,7 @@ public class SharedPreferences {
         editor.putInt("audioId",bundle.getInt("audioId"));
         editor.putString("audioCreated",bundle.getString("audioCreated"));
         editor.putString("audioDes",bundle.getString("audioDes"));
-        editor.putLong("audioDuration",bundle.getLong("audioDuration"));
+        editor.putString("audioDuration",bundle.getString("audioDuration"));
         editor.putString("title",bundle.getString("title"));
         editor.putString("src",bundle.getString("src"));
         editor.commit();

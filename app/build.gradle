@@ -6,8 +6,8 @@ android {
         applicationId "cn.lingyikz.soundbook"
         minSdkVersion 24
         targetSdkVersion 32
-        versionCode 58
-        versionName "0.5.8"
+        versionCode 60
+        versionName "0.6.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary= true
 //添加如下配置 开启annotation processor
@@ -79,6 +79,8 @@ dependencies {
     def dialogx_version = "0.0.45"
     implementation "com.github.kongzue.DialogX:DialogX:${dialogx_version}"
     implementation "com.github.kongzue.DialogX:DialogXKongzueStyle:${dialogx_version}"
+    //banner
+    implementation 'io.github.youth5201314:banner:2.2.2'
 
 
 }

@@ -138,10 +138,12 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
         @Override
         public void onLoadMore() {
             if(hasNextPage){
+                bottomAdapter.setLoadState(bottomAdapter.LOADING);
                 getAlbumCategory(mCategoryId,nextPage,size,false);
             }else{
                 //不加载
-                Toast.makeText(getContext(), Constans.NO_LOADING, Toast.LENGTH_SHORT).show();
+                bottomAdapter.setLoadState(bottomAdapter.LOADING_END);
+                //Toast.makeText(getContext(), Constans.NO_LOADING, Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -153,7 +155,7 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
                 .subscribe(new BaseObsever<AlbumCategoryBean>() { // 订阅
                     @Override
                     public void onNext(AlbumCategoryBean category) {
-                        Log.i("http返回：", category.toString() + "");
+                       // Log.i("http返回：", category.toString() + "");
                         if(category.getCode() == 200 && category.getData().getList().size() > 0 ){
 
                                 if(albumList == null){
@@ -171,11 +173,11 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
                                     bottomAdapter = new BottomAdapter(albumList,getContext());
                                     binding.recyclerViewBottom.setLayoutManager(new LinearLayoutManager(getContext()));
                                     binding.recyclerViewBottom.setAdapter(bottomAdapter);
-                                    LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-                                    layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                                    binding.recyclerViewBottom.setLayoutManager(layoutManager);
-                                    DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                    binding.recyclerViewBottom.addItemDecoration(divider);
+                                    //LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+                                    //layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                                    //binding.recyclerViewBottom.setLayoutManager(layoutManager);
+                                    //DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                    //binding.recyclerViewBottom.addItemDecoration(divider);
                                 }
                                 bottomAdapter.notifyDataSetChanged();
 
@@ -185,6 +187,7 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
                             Toast.makeText(getContext(), Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
                             hasNextPage = false;
                         }
+                        binding.spinKit1.setVisibility(View.GONE);
                     }
                 });
         observable.unsubscribeOn(Schedulers.io());

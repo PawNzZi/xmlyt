@@ -14,10 +14,17 @@ import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 import com.wyt.searchbox.SearchFragment;
 import com.wyt.searchbox.custom.IOnSearchClickListener;
+import com.youth.banner.indicator.CircleIndicator;
+import com.youth.banner.util.BannerLifecycleObserver;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.R;
@@ -27,8 +34,10 @@ import cn.lingyikz.soundbook.soundbook.databinding.FragmentHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.activity.SearchActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
+import cn.lingyikz.soundbook.soundbook.home.adapter.ImageAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.Banner;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
@@ -43,8 +52,10 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
 
     private FragmentHomeBinding binding;
     private HomeAdapter homeAdapter = null;
+    private ImageAdapter imageAdapter = null ;
     private SearchFragment searchFragment ;
     private List<Album.DataDTO.ListDTO> mList  = new ArrayList<>();
+    private List<Banner.DataDTO> bannerList = new ArrayList<>();
 
 
     public static HomeFragment newInstance() {
@@ -80,9 +91,10 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
             getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         }
     };
+
     public void initData(View view){
 
-        Observable<Album> observable  = RequestService.getInstance().getApi().getPostInfo(1,Constans.PAGE_SIZE,"");
+        Observable<Album> observable  = RequestService.getInstance().getApi().getPostInfo(1,Constans.INDEX_PAGE_SIZE,"");
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
                 .subscribe(new BaseObsever<Album>() { // 订阅
@@ -102,8 +114,8 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
                                 homeAdapter = new HomeAdapter(mList,getContext(),0,HomeFragment.this);
                                 binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                                 binding.recyclerView.setAdapter(homeAdapter);
-                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                binding.recyclerView.addItemDecoration(divider);
+                                //DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                //binding.recyclerView.addItemDecoration(divider);
                             }
                             homeAdapter.notifyDataSetChanged();
                         }else{
@@ -115,6 +127,36 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
                     }
                 });
         observable.unsubscribeOn(Schedulers.io());
+
+        Observable<Banner> bannerObservable  = RequestService.getInstance().getApi().getBanner(3);
+        bannerObservable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
+                .subscribe(new BaseObsever<Banner>() { // 订阅
+
+                    @Override
+                    public void onNext(Banner postInfo) {
+//                        Log.i("http返回：", postInfo.toString() + "");
+                        if(postInfo.getCode() == 200 && postInfo.getData().size() > 0){
+                            if(bannerList == null){
+                                bannerList = new ArrayList<>();
+                            }
+                            bannerList.clear();
+                            List<Banner.DataDTO> newList = postInfo.getData();
+                            bannerList.addAll(newList) ;
+
+                            if(imageAdapter == null){
+                                imageAdapter = new ImageAdapter(bannerList);
+                                binding.banner.setAdapter(imageAdapter)
+                                        .addBannerLifecycleObserver(getActivity())
+                                        .setIndicator(new CircleIndicator(getContext()));
+                            }
+
+                            imageAdapter.notifyDataSetChanged();
+                        }
+
+                    }
+                });
+        bannerObservable.unsubscribeOn(Schedulers.io());
     }
     @Override
     public void onStart() {

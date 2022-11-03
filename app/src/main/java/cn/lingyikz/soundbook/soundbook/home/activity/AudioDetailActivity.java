@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
@@ -88,6 +89,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
 
 //        activityAudiodetailBinding.spinKit.setVisibility(View.VISIBLE);
         //调接口查询列表
+//        Log.i("TAG","ID:"+albumDetail.getId());
         this.queryList(albumDetail.getId(),true);
 
     }

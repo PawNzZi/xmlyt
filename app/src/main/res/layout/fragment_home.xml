@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-
-    <include
-        android:id="@+id/title_bar"
-        layout="@layout/title_bar">
-
-    </include>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/title_bar"
-        android:visibility="gone"
-        >
-    </androidx.recyclerview.widget.RecyclerView>
-    <com.github.ybq.android.spinkit.SpinKitView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/spin_kit1"
-        style="@style/SpinKitView.CubeGrid"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:layout_below="@id/title_bar"
-        app:SpinKit_Color="@color/colorPrimaryDark"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        />
-</RelativeLayout>
+        android:layout_height="match_parent">
+        <include
+            android:id="@+id/title_bar"
+            layout="@layout/title_bar">
+
+        </include>
+        <com.youth.banner.Banner
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_below="@id/title_bar"
+            android:layout_height="200dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/banner"
+            android:visibility="gone"
+            >
+        </androidx.recyclerview.widget.RecyclerView>
+        <com.github.ybq.android.spinkit.SpinKitView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/spin_kit1"
+            style="@style/SpinKitView.CubeGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_below="@id/banner"
+            app:SpinKit_Color="@color/colorPrimaryDark"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            />
+
+    </RelativeLayout>
+
+</ScrollView>
