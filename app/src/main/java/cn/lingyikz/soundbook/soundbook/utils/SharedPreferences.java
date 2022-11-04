@@ -46,7 +46,7 @@ public class SharedPreferences {
         bundle.putInt("episodes", oldAudioInfo.getInt("episodes",0));
         bundle.putInt("audioId", oldAudioInfo.getInt("audioId",0));
         bundle.putString("audioCreated", oldAudioInfo.getString("audioCreated","0"));
-        bundle.putLong("audioDuration", oldAudioInfo.getLong("audioDuration",0));
+        bundle.putString("audioDuration", oldAudioInfo.getString("audioDuration","0"));
         bundle.putString("audioDes", oldAudioInfo.getString("audioDes",null));
         bundle.putString("title", oldAudioInfo.getString("title",null));
         bundle.putString("src", oldAudioInfo.getString("src",null));
@@ -61,7 +61,7 @@ public class SharedPreferences {
         bundle.putInt("episodes", oldAudioInfo.getInt("episodes",0));
         bundle.putInt("audioId", oldAudioInfo.getInt("audioId",0));
         bundle.putString("audioCreated", oldAudioInfo.getString("audioCreated","0"));
-        bundle.putLong("audioDuration", oldAudioInfo.getLong("audioDuration",0));
+        bundle.putString("audioDuration", oldAudioInfo.getString("audioDuration","0"));
         bundle.putString("audioDes", oldAudioInfo.getString("audioDes",null));
         bundle.putString("title", oldAudioInfo.getString("title",null));
         bundle.putString("src", oldAudioInfo.getString("src",null));

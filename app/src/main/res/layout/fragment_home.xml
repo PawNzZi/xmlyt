@@ -19,12 +19,43 @@
             android:layout_width="match_parent"
             android:layout_below="@id/title_bar"
             android:layout_height="200dp" />
+        <LinearLayout
+            android:id="@+id/hotLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:orientation="horizontal"
+            android:layout_below="@id/banner"
+            android:background="@color/colorBackground"
+            >
+            <TextView
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimaryDark"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="热门小说"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
 
+                />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/dirverLine"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDivider"
+            android:layout_below="@id/hotLinearLayout"
+            />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/banner"
+            android:layout_below="@id/dirverLine"
             android:visibility="gone"
             >
         </androidx.recyclerview.widget.RecyclerView>

@@ -110,8 +110,8 @@ public class SearchActivity extends BaseFragmentActivity implements HomeAdapter.
                                 homeAdapter = new HomeAdapter(mList,SearchActivity.this,0,SearchActivity.this);
                                 binding.recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
                                 binding.recyclerView.setAdapter(homeAdapter);
-                                DividerItemDecoration divider = new DividerItemDecoration(SearchActivity.this,DividerItemDecoration.VERTICAL);
-                                binding.recyclerView.addItemDecoration(divider);
+                                //DividerItemDecoration divider = new DividerItemDecoration(SearchActivity.this,DividerItemDecoration.VERTICAL);
+                                //binding.recyclerView.addItemDecoration(divider);
                             }
                             homeAdapter.notifyDataSetChanged();
                         }else{
