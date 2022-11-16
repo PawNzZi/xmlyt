@@ -121,7 +121,6 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
         }
         return false;
     }
-
     public void checkVersion(){
 //        Log.i("TAG：",  "checkVersion");
         int versionCode = VersionUtil.getVersonCode(this);
@@ -134,7 +133,7 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
                     public void onNext(Version bean) {
 //                        Log.i("TAG：", bean.toString() + "");
                         if(bean.getCode() == 200 && bean.getData() != null){
-//                            Log.i("TAG：",  "200");
+//                            Log.i("TAG：",  "200："+versionCode);
                             if(versionCode < bean.getData().getCode()){
 //                                Log.i("TAG：",  "300");
                                 MessageDialog.show("温馨提示", "最新版本为"+bean.getData().getNumber()+"，请及时加群更新", "确定")

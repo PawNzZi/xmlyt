@@ -6,7 +6,7 @@ android {
         applicationId "cn.lingyikz.soundbook"
         minSdkVersion 24
         targetSdkVersion 32
-        versionCode 60
+        versionCode 61
         versionName "0.6.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary= true
