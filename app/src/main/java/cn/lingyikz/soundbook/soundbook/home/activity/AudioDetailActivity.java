@@ -30,8 +30,9 @@ import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityAudiodetailBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
-import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
+import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
@@ -44,11 +45,11 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
 
     private ActivityAudiodetailBinding activityAudiodetailBinding;
     private AudioListAdapter adapter = null;
-    private List<AlbumDetail.DataDTO.ListDTO> mList  = new ArrayList<>();
+    private List<AlbumSound.DataDTO.RowsDTO> mList  = new ArrayList<>();
 
     private int nextPage = 1;
     private int basePostion = 0 ;
-    private Album.DataDTO.ListDTO albumDetail ;
+    private Album.DataDTO.RowsDTO albumDetail ;
     private DataBaseHelper dataBaseHelper;
 
     @Override
@@ -59,14 +60,13 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
     @Override
     protected void setView() {
         Bundle bundle = getIntent().getExtras();
-        albumDetail = (Album.DataDTO.ListDTO) bundle.getSerializable("bookObject");
+        albumDetail = (Album.DataDTO.RowsDTO) bundle.getSerializable("bookObject");
         dataBaseHelper = DataBaseHelper.getInstance(this);
         int count = dataBaseHelper.queryCollectionCount(albumDetail.getId());
         dataBaseHelper.close();
         if(count == 0 ){
 //            Log.i("TAG","结果为空");
         }else if(count > 0){
-
             Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
         }
 
@@ -94,36 +94,31 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
 
     }
     @SuppressLint("SetTextI18n")
-    public void queryList(int id,boolean isSpinner){
+    public void queryList(Long id,boolean isSpinner){
         activityAudiodetailBinding.recyclerView.setVisibility(View.GONE);
         activityAudiodetailBinding.spinKit.setVisibility(View.VISIBLE);
         basePostion = nextPage ;
-        Observable<AlbumDetail> observable  = RequestService.getInstance().getApi().getAlbumDetail(nextPage, Constans.PAGE_SIZE,id);
+        Observable<AlbumSound> observable  = RequestService.getInstance().getApi().getAlbumDetail(nextPage, Constans.PAGE_SIZE,id);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                .subscribe(new BaseObsever<AlbumDetail>() { // 订阅
+                .subscribe(new BaseObsever<AlbumSound>() { // 订阅
                     @Override
-                    public void onNext(AlbumDetail reslut) {
-                        if(reslut.getCode() == 200 && reslut.getData().getList().size() > 0 ) {
-//                            Log.i("TAG：", reslut.toString() + "");
-//                        mList = null ;
+                    public void onNext(AlbumSound reslut) {
+                        if(reslut.getCode() == 200 && reslut.getData().getRows().size() > 0 ) {
                             if(mList == null){
                                 mList = new ArrayList<>();
                             }
                             mList.clear();
-                            List<AlbumDetail.DataDTO.ListDTO> newList = reslut.getData().getList();
+                            List<AlbumSound.DataDTO.RowsDTO> newList = reslut.getData().getRows();
                             mList.addAll(newList);
-//                        Log.i("TAG",mList+"");
-//                        Log.i("TAG：", mList.get(0).getName() + "");
                             nextPage = reslut.getData().getNextPage();
                             if(adapter == null){
-//                                Log.i("TAG","adapter == null");
                                 adapter = new AudioListAdapter(mList,AudioDetailActivity.this,AudioDetailActivity.this,0);
                                 activityAudiodetailBinding.recyclerView.setLayoutManager(new LinearLayoutManager(AudioDetailActivity.this));
                                 activityAudiodetailBinding.recyclerView.setAdapter(adapter);
                                 DividerItemDecoration divider = new DividerItemDecoration(AudioDetailActivity.this,DividerItemDecoration.VERTICAL);
                                 activityAudiodetailBinding.recyclerView.addItemDecoration(divider);
-                                activityAudiodetailBinding.listLen.setText("共"+ reslut.getData().getTotal() +"集");
+                                activityAudiodetailBinding.listLen.setText("共"+ reslut.getData().getTotalRows() +"集");
                             }else {
 //                                Log.i("TAG","adapter != null" + nextPage);
                                 adapter.notifyDataSetChange(basePostion - 1);      //数据没有刷新，是因为mList对象被指向新的地址，
@@ -131,13 +126,13 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
                             }
 
                             if(isSpinner){
-                                int pages = reslut.getData().getPages();
+                                int pages = reslut.getData().getTotalPage();
 //                                totalCount  = reslut.getData().getTotal();
                                 List<String> spinnerItemList = new ArrayList<>();
                                 if(pages == 1){
                                     for (int i = 0; i < pages + 1; i++) {
                                         String str = "" ;
-                                        str = "第1"+"—"+ reslut.getData().getTotal() +"集";
+                                        str = "第1—"+ reslut.getData().getTotalRows() +"集";
 //                                       str = "第" + (i*SIZE+1) +"—"+(reslut.getData().getTotal() - (i*SIZE)) +  +"集";
 //                                        Log.i("TAG","STR:"+str);
                                         spinnerItemList.add(str);
@@ -146,7 +141,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
                                     for (int i = 0; i < pages; i++) {
                                         String str = "" ;
                                         if(i == pages - 1){
-                                            str = "第" + (i*Constans.PAGE_SIZE+1) +"—"+ reslut.getData().getTotal() +"集";
+                                            str = "第" + (i*Constans.PAGE_SIZE+1) +"—"+ reslut.getData().getTotalRows() +"集";
 //                                        str = "第" + (i*SIZE+1) +"—"+(reslut.getData().getTotal() - (i*SIZE)) +  +"集";
 //                                            Log.i("TAG","STR:"+str);
                                         }else {
@@ -161,7 +156,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
                                 activityAudiodetailBinding.niceSpinner.attachDataSource(spinnerItemList);
                                 activityAudiodetailBinding.niceSpinner.setOnSpinnerItemSelectedListener(AudioDetailActivity.this);
                             }
-                        }else if(reslut.getCode() == 200 && reslut.getData().getList().size() == 0){
+                        }else if(reslut.getCode() == 200 && reslut.getData().getRows().size() == 0){
                             Toast.makeText(AudioDetailActivity.this, Constans.ALBUM_CONTENT_NULL, Toast.LENGTH_SHORT).show();
                             activityAudiodetailBinding.niceSpinner.setVisibility(View.GONE);
                             activityAudiodetailBinding.listLen.setText(Constans.ALBUM_CONTENT_NULL);
@@ -252,7 +247,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
     }
 
     @Override
-    public void onDeleteItem(int albumId) {
+    public void onDeleteItem(Long albumId) {
 
     }
 

@@ -1,5 +1,6 @@
 package cn.lingyikz.soundbook.soundbook.user.activity;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -13,7 +14,7 @@ import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivitySettingBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
-import cn.lingyikz.soundbook.soundbook.modle.Version;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Version;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.VersionUtil;
 import rx.Observable;
@@ -76,10 +77,10 @@ public class SettingActivity extends BaseActivity {
                             if(versionCode < bean.getData().getCode()){
                                 MessageDialog.show("温馨提示", "最新版本为"+bean.getData().getNumber()+"，请及时加群更新", "确定")
                                         .setCancelable(false);
-                            }else {
+                            }else if(versionCode == bean.getData().getCode()) {
                                 Toast.makeText(getApplicationContext(), Constans.LATEST_VERSION, Toast.LENGTH_SHORT).show();
                             }
-                        }else if(bean.getCode() == 200 && bean.getData() == null){
+                        }else if(bean.getCode() != 200){
                             Toast.makeText(getApplicationContext(), Constans.VERSION_ERROR, Toast.LENGTH_SHORT).show();
                         }
 

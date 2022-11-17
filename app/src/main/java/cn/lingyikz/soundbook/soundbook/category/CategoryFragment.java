@@ -10,7 +10,6 @@ import com.liys.onclickme.LOnClickMe;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
@@ -20,7 +19,8 @@ import cn.lingyikz.soundbook.soundbook.category.adapter.LeftAdapter;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCategoryBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumCategoryBean;
-import cn.lingyikz.soundbook.soundbook.modle.Category;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Category;
+import cn.lingyikz.soundbook.soundbook.modle.v2.CategoryAlbum;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.EndlessRecyclerOnScrollListener;
 import rx.Observable;
@@ -37,7 +37,7 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
 
     private List<Category.DataDTO> mList = new ArrayList<>();
 
-    private List<AlbumCategoryBean.DataDTO.ListDTO> albumList = new ArrayList<>();
+    private List<CategoryAlbum.DataDTO.RowsDTO> albumList = new ArrayList<>();
 
     private int nextPage = 1;
 
@@ -45,7 +45,7 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
 
     private boolean hasNextPage = false;
 
-    public int mCategoryId = 0 ;
+    public Long mCategoryId = 0L ;
 
     public static CategoryFragment newInstance() {
         return new CategoryFragment();
@@ -128,7 +128,7 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
     }
 
     @Override
-    public void clickItem(int categortId) {
+    public void clickItem(Long categortId) {
         //加载当前分类的音频
         this.mCategoryId = categortId;
         getAlbumCategory(categortId,1,size,true);
@@ -148,15 +148,15 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
         }
     };
 
-    private void getAlbumCategory(int categoryId,int page,int size,boolean isChangeCategory){
-        Observable<AlbumCategoryBean> observable  = RequestService.getInstance().getApi().getAlbumCategory(categoryId,page,size);
+    private void getAlbumCategory(Long categoryId,int page,int size,boolean isChangeCategory){
+        Observable<CategoryAlbum> observable  = RequestService.getInstance().getApi().getAlbumCategory(categoryId,page,size);
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                .subscribe(new BaseObsever<AlbumCategoryBean>() { // 订阅
+                .subscribe(new BaseObsever<CategoryAlbum>() { // 订阅
                     @Override
-                    public void onNext(AlbumCategoryBean category) {
+                    public void onNext(CategoryAlbum category) {
                        // Log.i("http返回：", category.toString() + "");
-                        if(category.getCode() == 200 && category.getData().getList().size() > 0 ){
+                        if(category.getCode() == 200 && category.getData().getRows().size() > 0 ){
 
                                 if(albumList == null){
                                     albumList = new ArrayList<>();
@@ -166,7 +166,7 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
                                     albumList.clear();
                                 }
 
-                                List<AlbumCategoryBean.DataDTO.ListDTO> newList = category.getData().getList();
+                                List<CategoryAlbum.DataDTO.RowsDTO> newList = category.getData().getRows();
                                 albumList.addAll(newList) ;
 
                                 if(bottomAdapter == null){

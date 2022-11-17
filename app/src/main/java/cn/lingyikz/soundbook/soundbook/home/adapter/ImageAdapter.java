@@ -11,11 +11,12 @@ import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
 import cn.lingyikz.soundbook.soundbook.modle.Banner;
+import cn.lingyikz.soundbook.soundbook.modle.v2.HomeBanner;
 
-public class ImageAdapter extends BannerAdapter<Banner.DataDTO,ImageAdapter.BannerViewHolder> {
+public class ImageAdapter extends BannerAdapter<HomeBanner.DataDTO,ImageAdapter.BannerViewHolder> {
 
 
-    public ImageAdapter(List<Banner.DataDTO> datas) {
+    public ImageAdapter(List<HomeBanner.DataDTO> datas) {
         super(datas);
     }
 
@@ -28,7 +29,7 @@ public class ImageAdapter extends BannerAdapter<Banner.DataDTO,ImageAdapter.Bann
     }
 
     @Override
-    public void onBindView(BannerViewHolder holder, Banner.DataDTO data, int position, int size) {
+    public void onBindView(BannerViewHolder holder, HomeBanner.DataDTO data, int position, int size) {
         Glide.with(holder.imageView).load(data.getValue())
                 .into(holder.imageView);
     }

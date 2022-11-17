@@ -81,6 +81,8 @@ dependencies {
     implementation "com.github.kongzue.DialogX:DialogXKongzueStyle:${dialogx_version}"
     //banner
     implementation 'io.github.youth5201314:banner:2.2.2'
+    //hutool
+    implementation 'cn.hutool:hutool-all:5.8.10'
 
 
 }

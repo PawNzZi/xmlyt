@@ -1,5 +1,7 @@
 package cn.lingyikz.soundbook.soundbook.utils;
 
+import cn.lingyikz.soundbook.soundbook.modle.v2.User;
+
 public class Constans {
 
     public final static String CHANGE_PLAY_IMG = "change_play_img";
@@ -24,7 +26,11 @@ public class Constans {
     public final static String VERSION_NUBMER = "0.5.7";
     public final static String LATEST_VERSION = "已是最新版本";
     public final static String CHECKING_UPDATE = "检查中...";
-
     public final static String NO_LOADING = "别拉了，无了！" ;
+
+    public final static String HOME_BANNER = "home_banner";
+    public static final String REGISTER_USERNAME_REGEX = "^(?![0-9]+$)(?![a-z]+$)[0-9a-z]{8,16}$";
+    public static final String REGISTER_PASSWORD_REGEX = "^(?![0-9]+$)(?![a-z]+$)[0-9a-z]{6,12}$";
+    public static User user = new User() ;
 
 }

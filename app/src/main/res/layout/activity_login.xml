@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <include
         android:id="@+id/title_bar"
         layout="@layout/title_bar">
@@ -19,7 +20,7 @@
             android:layout_height="70dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
-            android:src="@mipmap/avatar"
+            android:src="@mipmap/logo_round"
             >
         </ImageView>
         <TextView
@@ -29,7 +30,8 @@
             android:layout_below="@id/userAvatar"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            android:textSize="20sp"
+            android:text="@string/login_tip"
+            android:textSize="13sp"
             android:textColor="@color/cardview_light_background"
             >
 
@@ -48,7 +50,7 @@
         app:tabSelectedTextColor="@color/colorPrimary"
         app:tabTextColor="@color/colorTitle"
         app:tabUnboundedRipple="true"
-      >
+        >
 
     </com.google.android.material.tabs.TabLayout>
 
@@ -67,25 +69,4 @@
         >
 
     </androidx.viewpager2.widget.ViewPager2>
-<!--    <LinearLayout-->
-<!--        android:id="@+id/collectionHistory"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="50dp"-->
-<!--        android:gravity="center_vertical"-->
-<!--        android:paddingLeft="20dp"-->
-<!--        android:paddingRight="20dp"-->
-<!--        android:orientation="horizontal">-->
-<!--        <ImageView-->
-<!--            android:layout_width="30dp"-->
-<!--            android:layout_height="30dp"-->
-<!--            android:src="@mipmap/like"-->
-<!--            >-->
-<!--        </ImageView>-->
-<!--        <TextView-->
-<!--            android:text=""-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content">-->
-
-<!--        </TextView>-->
-<!--    </LinearLayout>-->
 </LinearLayout>

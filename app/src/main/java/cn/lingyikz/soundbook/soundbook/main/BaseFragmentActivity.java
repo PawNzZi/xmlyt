@@ -6,6 +6,7 @@ import android.view.Window;
 
 import com.kongzue.dialogx.DialogX;
 import com.kongzue.dialogx.style.KongzueStyle;
+import com.liys.onclickme.LOnClickMe;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -21,6 +22,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         //设置为Kongzue主题
         DialogX.globalStyle = new KongzueStyle();
         setContentView(setLayout());
+
         setView();
         setData();
     }

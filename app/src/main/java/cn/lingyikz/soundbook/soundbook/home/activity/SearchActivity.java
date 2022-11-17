@@ -26,7 +26,7 @@ import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivitySearchlistBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragmentActivity;
-import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
@@ -40,7 +40,7 @@ public class SearchActivity extends BaseFragmentActivity implements HomeAdapter.
 
     private ActivitySearchlistBinding binding ;
     private HomeAdapter homeAdapter = null;
-    private List<Album.DataDTO.ListDTO> mList = new ArrayList<>() ;
+    private List<Album.DataDTO.RowsDTO> mList = new ArrayList<>() ;
     private int nextPage = 1;
     private SearchFragment searchFragment ;
 
@@ -97,13 +97,13 @@ public class SearchActivity extends BaseFragmentActivity implements HomeAdapter.
 
                     @Override
                     public void onNext(Album postInfo) {
-                        if(postInfo.getCode() == 200 && postInfo.getData().getList().size() > 0){
+                        if(postInfo.getCode() == 200 && postInfo.getData().getRows().size() > 0){
 //                            Log.i("http返回：", postInfo.toString() + "");
                             if(mList == null) {
                                 mList = new ArrayList<>();
                             }
                             mList.clear();
-                            List<Album.DataDTO.ListDTO> newList = postInfo.getData().getList();
+                            List<Album.DataDTO.RowsDTO> newList = postInfo.getData().getRows();
                             nextPage = postInfo.getData().getNextPage();
                             mList.addAll(newList);
                             if(homeAdapter == null){
@@ -198,7 +198,7 @@ public class SearchActivity extends BaseFragmentActivity implements HomeAdapter.
     }
 
     @Override
-    public void deleteItem(int albumId) {
+    public void deleteItem(Long albumId) {
 
     }
 }

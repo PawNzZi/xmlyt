@@ -1,15 +1,17 @@
 package cn.lingyikz.soundbook.soundbook.api;
 
-import cn.lingyikz.soundbook.soundbook.modle.Album;
-import cn.lingyikz.soundbook.soundbook.modle.AlbumCategoryBean;
-import cn.lingyikz.soundbook.soundbook.modle.AlbumCount;
-import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
-import cn.lingyikz.soundbook.soundbook.modle.Banner;
-import cn.lingyikz.soundbook.soundbook.modle.Category;
-import cn.lingyikz.soundbook.soundbook.modle.Version;
-import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
+
+import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Category;
+import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
+import cn.lingyikz.soundbook.soundbook.modle.v2.CategoryAlbum;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Sound;
+import cn.lingyikz.soundbook.soundbook.modle.v2.User;
+import cn.lingyikz.soundbook.soundbook.modle.v2.UserInfo;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Version;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
+import cn.lingyikz.soundbook.soundbook.modle.v2.HomeBanner;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -19,39 +21,38 @@ public interface Api {
 
 
       //专辑列表查询
-      @FormUrlEncoded
-      @POST("album/list")
-      Observable<Album> getPostInfo(@Field("page") int page , @Field("size") int size, @Field("keyword") String keyword) ;
+      @GET("/zmlmAlbum/app/home/list")
+      Observable<Album> getPostInfo(@Query("pageNo") int page , @Query("pageSize") int size, @Query("keyword") String keyword) ;
 
       //专辑详情查询
-      @FormUrlEncoded
-      @POST("xmly/list")
-      Observable<AlbumDetail> getAlbumDetail(@Field("page") int page , @Field("size") int size, @Field("albumId") int albumId) ;
+      @GET("/zmlmSound/app/list")
+      Observable<AlbumSound> getAlbumDetail(@Query("pageNo") int page , @Query("pageSize") int size, @Query("albumId") Long albumId) ;
 
       //查询下一集
-      @FormUrlEncoded
-      @POST("xmly/nextPlay")
-      Observable<XmlyNextPaly> getNextPlay(@Field("albumId") int albumId , @Field("episodes") int episodes);
+      @GET("/zmlmSound/app/nextEpisodes")
+      Observable<Sound> getNextPlay(@Query("albumId") Long albumId , @Query("episodes") int episodes);
 
-      //查询下一集
-      @FormUrlEncoded
-      @POST("xmly/episodesCount")
-      Observable<AlbumCount> episodesCount(@Field("albumId") int albumId);
 
       //检查版本
-      @GET("version/getVersion")
+      @GET("/zmlmVersion/app/checkVersion")
       Observable<Version> getVersion(@Query("versonCode") int versonCode);
 
       //查询分类
-      @POST("zmlmcategory/list")
+      @GET("/zmlmCategory/app/getList")
       Observable<Category> getCategory();
 
       //查询分类下的专辑
-      @FormUrlEncoded
-      @POST("albumcategory/list")
-      Observable<AlbumCategoryBean> getAlbumCategory(@Field("categoryId") int categoryId,@Field("page") int page,@Field("size") int size);
+      @GET("/zmlmMidCategory/app/list")
+      Observable<CategoryAlbum> getAlbumCategory(@Query("categoryId") Long categoryId, @Query("pageNo") int page, @Query("pageSize") int size);
 
       //查询banner
-      @GET("dictdata/banner")
-      Observable<Banner> getBanner(@Query("typeId") int typeId);
+      @GET("/zmlmConfig/app/config")
+      Observable<HomeBanner> getHomeBanner(@Query("code") String code);
+
+      //用户注册
+      @POST("/zmlmUser/app/register")
+      Observable<BaseModel> userRegister(@Body User user);
+
+      @POST("/zmlmUser/app/login")
+      Observable<UserInfo> login(@Body User user);
 }

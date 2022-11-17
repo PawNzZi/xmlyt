@@ -10,14 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCollectionBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
-import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 
 public class CollectionFragment extends BaseFragment implements HomeAdapter.ItemOperaCallBack {
 
     private FragmentCollectionBinding binding ;
     private HomeAdapter adapter = null;
-    private List<Album.DataDTO.ListDTO> mList = new ArrayList<>();
+    private List<Album.DataDTO.RowsDTO> mList = new ArrayList<>();
     private DataBaseHelper dataBaseHelper ;
 
     public static CollectionFragment newInstance() {
@@ -49,7 +49,7 @@ public class CollectionFragment extends BaseFragment implements HomeAdapter.Item
             mList = new ArrayList<>();
         }
         mList.clear();
-        List<Album.DataDTO.ListDTO> newList = dataBaseHelper.queryCollectionAll();
+        List<Album.DataDTO.RowsDTO> newList = dataBaseHelper.queryCollectionAll();
 //        Log.i("TAG","CollectionFragment:initData = "+newList.size());
         mList.addAll(newList);
         dataBaseHelper.close();
@@ -86,7 +86,7 @@ public class CollectionFragment extends BaseFragment implements HomeAdapter.Item
     }
 
     @Override
-    public void deleteItem(int albumId) {
+    public void deleteItem(Long albumId) {
         dataBaseHelper = DataBaseHelper.getInstance(getContext());
         dataBaseHelper.cancleCollection(albumId);
         dataBaseHelper.close();

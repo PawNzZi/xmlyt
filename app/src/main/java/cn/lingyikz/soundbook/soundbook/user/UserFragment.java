@@ -32,11 +32,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
+import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentUserBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
+import cn.lingyikz.soundbook.soundbook.user.activity.LoginActivity;
 import cn.lingyikz.soundbook.soundbook.user.activity.SettingActivity;
 import cn.lingyikz.soundbook.soundbook.user.fragment.CollectionFragment;
 import cn.lingyikz.soundbook.soundbook.user.fragment.PlayHistoryFragment;
@@ -75,6 +77,11 @@ public class UserFragment extends BaseFragment {
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.GONE);
         binding.titleBar.title.setText("我的");
+        if (ObjectUtil.isNull(Constans.user)) {
+            binding.userName.setText("点击登录");
+        } else {
+            binding.userName.setText(Constans.user.getNickname());
+        }
     }
 
     @Override
@@ -116,7 +123,7 @@ public class UserFragment extends BaseFragment {
 
     }
 
-    @AClick({R.id.go_play, R.id.userAvatar,R.id.titleSpinKit,R.id.setting})
+    @AClick({R.id.go_play, R.id.userAvatar,R.id.titleSpinKit,R.id.setting,R.id.userName})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_play:
@@ -134,6 +141,9 @@ public class UserFragment extends BaseFragment {
                 break;
             case R.id.setting:
                 IntentAction.toNextActivity(getActivity(), SettingActivity.class);
+                break;
+            case R.id.userName:
+                IntentAction.toNextActivity(getActivity(), LoginActivity.class);
                 break;
         }
     }

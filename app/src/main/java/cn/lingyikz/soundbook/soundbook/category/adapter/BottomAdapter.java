@@ -12,13 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import cn.lingyikz.soundbook.soundbook.databinding.FootviewBinding;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.AudioDetailActivity;
-import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumCategoryBean;
+import cn.lingyikz.soundbook.soundbook.modle.v2.CategoryAlbum;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 
 public class BottomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    private List<AlbumCategoryBean.DataDTO.ListDTO> list ;
+    private List<CategoryAlbum.DataDTO.RowsDTO> list ;
     private Context context ;
     // 普通布局
     private final int TYPE_ITEM = 1;
@@ -34,7 +35,7 @@ public class BottomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public final int LOADING_END = 3;
 
 
-    public BottomAdapter(List<AlbumCategoryBean.DataDTO.ListDTO> list, Context context){
+    public BottomAdapter(List<CategoryAlbum.DataDTO.RowsDTO> list, Context context){
         this.list = list ;
         this.context = context ;
     }
@@ -88,23 +89,23 @@ public class BottomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
          }
         }else if(holder instanceof ViewHolder){
             ViewHolder viewHolder = (ViewHolder) holder;
-            viewHolder.itemHomeBinding.itemBookName.setText(list.get(position).getAlbum().getName());
+            viewHolder.itemHomeBinding.itemBookName.setText(list.get(position).getZmlmAlbum().getName());
 //        Log.i("tag",list.get(position).getBookName());
-            viewHolder.itemHomeBinding.itemBookDescription.setText(list.get(position).getAlbum().getDescription());
-            Glide.with(viewHolder.itemHomeBinding.getRoot()).load(list.get(position).getAlbum().getThumb()).into(viewHolder.itemHomeBinding.itemThumb);
+            viewHolder.itemHomeBinding.itemBookDescription.setText(list.get(position).getZmlmAlbum().getDescription());
+            Glide.with(viewHolder.itemHomeBinding.getRoot()).load(list.get(position).getZmlmAlbum().getThumb()).into(viewHolder.itemHomeBinding.itemThumb);
             viewHolder.itemHomeBinding.contentLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 //                Log.i("TAG",""+position);
                     Bundle bundle = new Bundle();
 
-                    Album.DataDTO.ListDTO albumDetail = new Album.DataDTO.ListDTO();
-                    albumDetail.setThumb(list.get(position).getAlbum().getThumb());
-                    albumDetail.setDescription(list.get(position).getAlbum().getDescription());
-                    albumDetail.setName(list.get(position).getAlbum().getName());
+                    Album.DataDTO.RowsDTO albumDetail = new Album.DataDTO.RowsDTO();
+                    albumDetail.setThumb(list.get(position).getZmlmAlbum().getThumb());
+                    albumDetail.setDescription(list.get(position).getZmlmAlbum().getDescription());
+                    albumDetail.setName(list.get(position).getZmlmAlbum().getName());
                     albumDetail.setId(list.get(position).getAlbumId());
-                    albumDetail.setCategories(list.get(position).getAlbum().getCategories());
-                    albumDetail.setAuthor(list.get(position).getAlbum().getAuthor());
+//                    albumDetail.setCategories(list.get(position).getAlbum().getCategories());
+                    albumDetail.setAuthor(list.get(position).getZmlmAlbum().getAuthor());
 
                     bundle.putSerializable("bookObject", albumDetail);
                     IntentAction.setValueContext(context, AudioDetailActivity.class,bundle);

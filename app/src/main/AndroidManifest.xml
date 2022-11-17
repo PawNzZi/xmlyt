@@ -39,6 +39,8 @@
         <activity
             android:name=".home.activity.PlayAudioActivity"
             android:exported="false" />
+        <activity android:name=".user.activity.LoginActivity"
+            android:exported="false"/>
 
         <service
             android:name=".service.AudioService"

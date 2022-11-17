@@ -5,6 +5,7 @@ import android.content.Context;
 
 import android.os.Bundle;
 
+import cn.lingyikz.soundbook.soundbook.modle.v2.User;
 
 
 public class SharedPreferences {
@@ -13,12 +14,13 @@ public class SharedPreferences {
     private static final String UUID = "uuid" ;
     private static final String BLOCK_CLOSE = "BLOCK_CLOSE";
     private static final String CATEGORY_POSTION = "CATEGORY_POSTION";
+    private static final String USER_INFO = "USERINFO";
     public static void saveOldAudioInfo(Activity activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
-        editor.putInt("albumId",bundle.getInt("albumId"));
+        editor.putLong("albumId",bundle.getLong("albumId"));
         editor.putInt("episodes",bundle.getInt("episodes"));
-        editor.putInt("audioId",bundle.getInt("audioId"));
+        editor.putLong("audioId",bundle.getLong("audioId"));
         editor.putString("audioCreated",bundle.getString("audioCreated"));
         editor.putString("audioDes",bundle.getString("audioDes"));
         editor.putString("audioDuration",bundle.getString("audioDuration"));
@@ -29,9 +31,9 @@ public class SharedPreferences {
     public static void saveOldAudioInfo(Context activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
-        editor.putInt("albumId",bundle.getInt("albumId"));
+        editor.putLong("albumId",bundle.getLong("albumId"));
         editor.putInt("episodes",bundle.getInt("episodes"));
-        editor.putInt("audioId",bundle.getInt("audioId"));
+        editor.putLong("audioId",bundle.getLong("audioId"));
         editor.putString("audioCreated",bundle.getString("audioCreated"));
         editor.putString("audioDes",bundle.getString("audioDes"));
         editor.putString("audioDuration",bundle.getString("audioDuration"));
@@ -42,9 +44,9 @@ public class SharedPreferences {
     public static Bundle  getOldAudioInfo(Activity activity){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         Bundle bundle = new Bundle() ;
-        bundle.putInt("albumId", oldAudioInfo.getInt("albumId",0));
+        bundle.putLong("albumId", oldAudioInfo.getLong("albumId",0));
         bundle.putInt("episodes", oldAudioInfo.getInt("episodes",0));
-        bundle.putInt("audioId", oldAudioInfo.getInt("audioId",0));
+        bundle.putLong("audioId", oldAudioInfo.getLong("audioId",0));
         bundle.putString("audioCreated", oldAudioInfo.getString("audioCreated","0"));
         bundle.putString("audioDuration", oldAudioInfo.getString("audioDuration","0"));
         bundle.putString("audioDes", oldAudioInfo.getString("audioDes",null));
@@ -57,9 +59,9 @@ public class SharedPreferences {
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         Bundle bundle = new Bundle() ;
 
-        bundle.putInt("albumId", oldAudioInfo.getInt("albumId",0));
+        bundle.putLong("albumId", oldAudioInfo.getLong("albumId",0));
         bundle.putInt("episodes", oldAudioInfo.getInt("episodes",0));
-        bundle.putInt("audioId", oldAudioInfo.getInt("audioId",0));
+        bundle.putLong("audioId", oldAudioInfo.getLong("audioId",0));
         bundle.putString("audioCreated", oldAudioInfo.getString("audioCreated","0"));
         bundle.putString("audioDuration", oldAudioInfo.getString("audioDuration","0"));
         bundle.putString("audioDes", oldAudioInfo.getString("audioDes",null));
@@ -129,4 +131,46 @@ public class SharedPreferences {
         android.content.SharedPreferences categoryIndex = context.getSharedPreferences(CATEGORY_POSTION, Context.MODE_PRIVATE);
         return categoryIndex.getInt("position",0);
     }
+
+    public static void saveUser(Context context, User user){
+        android.content.SharedPreferences sp = context.getSharedPreferences(USER_INFO,Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = sp.edit();
+        editor.putLong("id", user.getId());
+        editor.putString("nickname",user.getNickname());
+        editor.putString("",user.getEmail());
+        editor.putString("",user.getAvatar());
+        editor.putString("",user.getPhone());
+        editor.putInt("",user.getStatus());
+        editor.putInt("",user.getLevel());
+        editor.commit();
+    }
+    public static void saveUser(Activity context, User user){
+        android.content.SharedPreferences sp = context.getSharedPreferences(USER_INFO,Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = sp.edit();
+        editor.putLong("id", user.getId());
+        editor.putString("nickname",user.getNickname());
+        editor.putString("email",user.getEmail());
+        editor.putString("avatar",user.getAvatar());
+        editor.putString("phone",user.getPhone());
+        editor.putInt("status",user.getStatus());
+        editor.putInt("level",user.getLevel());
+        editor.commit();
+    }
+    public static User getUser(Context context){
+        android.content.SharedPreferences sp = context.getSharedPreferences(USER_INFO,Context.MODE_PRIVATE);
+        User user = new User();
+        user.setId(sp.getLong("id",-1));
+        if(user.getId() == -1){
+            return null ;
+        }else{
+            user.setNickname(sp.getString("nickname",null));
+            user.setEmail(sp.getString("email",null));
+            user.setAvatar(sp.getString("avatar",null));
+            user.setPhone(sp.getString("phone",null));
+            user.setLevel(sp.getInt("level",-1));
+            user.setStatus(sp.getInt("status",-1));
+            return user ;
+        }
+    }
+
 }

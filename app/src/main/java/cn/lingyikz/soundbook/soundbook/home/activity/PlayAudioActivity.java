@@ -33,6 +33,7 @@ import cn.lingyikz.soundbook.soundbook.databinding.ActivityPalyaduioBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
 
+import cn.lingyikz.soundbook.soundbook.modle.v2.Sound;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
@@ -106,7 +107,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
             binding.bolckIime.setVisibility(View.VISIBLE);
             binding.bolckIime.setText(blockBundle.getString("lable")+" 后关闭");
         }
-        Bundle historyBundle = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
+        Bundle historyBundle = dataBaseHelper.queryPlayHistory(bundle.getLong("albumId"),bundle.getLong("audioId"));
         dataBaseHelper.close();
 
         if(historyBundle.getString("audioDuration") == null){
@@ -223,28 +224,28 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
                 binding.bookThumb.clearAnimation();
             }
 
-            Observable<XmlyNextPaly> observable  = RequestService.getInstance().getApi().getNextPlay(bundle.getInt("albumId"),bundle.getInt("episodes") + 1);
+            Observable<Sound> observable  = RequestService.getInstance().getApi().getNextPlay(bundle.getLong("albumId"),bundle.getInt("episodes") + 1);
             observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                     .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                    .subscribe(new BaseObsever<XmlyNextPaly>() { // 订阅
+                    .subscribe(new BaseObsever<Sound>() { // 订阅
                         @Override
-                        public void onNext(XmlyNextPaly xmlyNextPaly) {
+                        public void onNext(Sound sound) {
 //                            Log.i("TAG", xmlyNextPaly.toString() + "");
-                            if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() > 0 && SuperMediaPlayer.error == 0) {
+                            if(sound.getCode() == 200 && sound.getData() != null && SuperMediaPlayer.error == 0) {
 //                                Log.i("TAG", xmlyNextPaly.toString() + "");
-                                XmlyNextPaly.DataDTO dataDTO = xmlyNextPaly.getData().get(0);
+                                Sound.DataDTO dataDTO = sound.getData();
                                 if(binding != null){
                                     binding.titleBar.title.setText(dataDTO.getName());
                                 }
                                 Bundle reslutBundle = new Bundle();
-                                reslutBundle.putInt("albumId",dataDTO.getAlbumId());
+                                reslutBundle.putLong("albumId",dataDTO.getAlbumId());
                                 reslutBundle.putInt("episodes",dataDTO.getEpisodes());
                                 reslutBundle.putString("title",dataDTO.getName());
                                 reslutBundle.putString("audioDes","");
                                 reslutBundle.putString("audioDuration","0");
-                                reslutBundle.putString("audioCreated", String.valueOf(dataDTO.getCreated()));
+                                reslutBundle.putString("audioCreated", dataDTO.getCreateTime());
                                 reslutBundle.putString("src",dataDTO.getUrl());
-                                reslutBundle.putInt("audioId",dataDTO.getId());
+                                reslutBundle.putLong("audioId",dataDTO.getId());
                                 superMediaPlayer.stop();
                                 superMediaPlayer.reset();
                                 onRead(dataDTO.getUrl());
@@ -254,7 +255,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
                                 bundle = reslutBundle;
                                 SharedPreferences.saveOldAudioInfo(PlayAudioActivity.this,reslutBundle);
 
-                            }else if(xmlyNextPaly.getCode() == 200 && xmlyNextPaly.getData().size() == 0){
+                            }else if(sound.getCode() == 200 && sound == null){
                                 superMediaPlayer.stop();
                                 bundle.putLong("audioDuration",0);
                                 bundle.putString("audioCreated", String.valueOf(System.currentTimeMillis()));

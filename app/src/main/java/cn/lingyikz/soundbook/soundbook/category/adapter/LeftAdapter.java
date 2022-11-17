@@ -13,7 +13,7 @@ import java.util.List;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemLeftBinding;
-import cn.lingyikz.soundbook.soundbook.modle.Category;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Category;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 public class LeftAdapter extends RecyclerView.Adapter<LeftAdapter.ViewHolder>{
@@ -75,6 +75,6 @@ public class LeftAdapter extends RecyclerView.Adapter<LeftAdapter.ViewHolder>{
     }
 
     public interface AdapterOnClick{
-       void  clickItem(int categortId);
+       void  clickItem(Long categortId);
     }
 }

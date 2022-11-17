@@ -11,17 +11,17 @@ import java.util.List;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.AudioDetailActivity;
-import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
-    private List<Album.DataDTO.ListDTO> list ;
+    private List<Album.DataDTO.RowsDTO> list ;
     private Context context ;
     private ItemOperaCallBack itemOperaCallBack;
     private int Tag  ;
-    public HomeAdapter(List<Album.DataDTO.ListDTO> list,Context context,int Tag,ItemOperaCallBack itemOperaCallBack){
+    public HomeAdapter(List<Album.DataDTO.RowsDTO> list,Context context,int Tag,ItemOperaCallBack itemOperaCallBack){
         this.list = list ;
         this.context = context ;
         this.Tag = Tag ;
@@ -86,6 +86,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     public interface ItemOperaCallBack{
-        void deleteItem(int albumId);
+        void deleteItem(Long albumId);
     }
 }

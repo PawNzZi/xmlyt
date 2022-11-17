@@ -1,10 +1,10 @@
 package cn.lingyikz.soundbook.soundbook.main;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+
 import android.os.Build;
 import android.os.Bundle;
+
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,15 +17,8 @@ import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
@@ -33,13 +26,11 @@ import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.category.CategoryFragment;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityMainBinding;
 import cn.lingyikz.soundbook.soundbook.home.HomeFragment;
-import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
-import cn.lingyikz.soundbook.soundbook.modle.Album;
-import cn.lingyikz.soundbook.soundbook.modle.Version;
+import cn.lingyikz.soundbook.soundbook.modle.v2.User;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Version;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.user.UserFragment;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
-import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.UUIDUtils;
 import cn.lingyikz.soundbook.soundbook.utils.VersionUtil;
@@ -74,6 +65,8 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
         }
         SharedPreferences.saveCategoryIndex(getApplicationContext(),0);
         this.checkVersion();
+        Constans.user = SharedPreferences.getUser(getApplicationContext());
+        Log.i("TAG",Constans.user+"");
 
     }
 
@@ -133,13 +126,11 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
                     public void onNext(Version bean) {
 //                        Log.i("TAG：", bean.toString() + "");
                         if(bean.getCode() == 200 && bean.getData() != null){
-//                            Log.i("TAG：",  "200："+versionCode);
                             if(versionCode < bean.getData().getCode()){
-//                                Log.i("TAG：",  "300");
                                 MessageDialog.show("温馨提示", "最新版本为"+bean.getData().getNumber()+"，请及时加群更新", "确定")
                                         .setCancelable(false);
                             }
-                        }else if(bean.getCode() == 200 && bean.getData() == null){
+                        }else if(bean.getCode() != 200){
                             Toast.makeText(getApplicationContext(), Constans.VERSION_ERROR, Toast.LENGTH_SHORT).show();
                         }
 

@@ -20,12 +20,6 @@ import com.youth.banner.util.BannerLifecycleObserver;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
@@ -36,8 +30,9 @@ import cn.lingyikz.soundbook.soundbook.home.activity.SearchActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.home.adapter.ImageAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
-import cn.lingyikz.soundbook.soundbook.modle.Album;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.modle.Banner;
+import cn.lingyikz.soundbook.soundbook.modle.v2.HomeBanner;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
@@ -54,8 +49,8 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
     private HomeAdapter homeAdapter = null;
     private ImageAdapter imageAdapter = null ;
     private SearchFragment searchFragment ;
-    private List<Album.DataDTO.ListDTO> mList  = new ArrayList<>();
-    private List<Banner.DataDTO> bannerList = new ArrayList<>();
+    private List<Album.DataDTO.RowsDTO> mList  = new ArrayList<>();
+    private List<HomeBanner.DataDTO> bannerList = new ArrayList<>();
 
 
     public static HomeFragment newInstance() {
@@ -102,12 +97,12 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
                     @Override
                     public void onNext(Album postInfo) {
 //                        Log.i("http返回：", postInfo.toString() + "");
-                        if(postInfo.getCode() == 200 && postInfo.getData().getList().size() > 0){
+                        if(postInfo.getCode() == 200 && postInfo.getData().getRows().size() > 0){
                             if(mList == null){
                                 mList = new ArrayList<>();
                             }
                             mList.clear();
-                            List<Album.DataDTO.ListDTO> newList = postInfo.getData().getList();
+                            List<Album.DataDTO.RowsDTO> newList = postInfo.getData().getRows();
                             mList.addAll(newList) ;
 
                             if(homeAdapter == null){
@@ -128,20 +123,20 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
                 });
         observable.unsubscribeOn(Schedulers.io());
 
-        Observable<Banner> bannerObservable  = RequestService.getInstance().getApi().getBanner(3);
+        Observable<HomeBanner> bannerObservable  = RequestService.getInstance().getApi().getHomeBanner(Constans.HOME_BANNER);
         bannerObservable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
-                .subscribe(new BaseObsever<Banner>() { // 订阅
+                .subscribe(new BaseObsever<HomeBanner>() { // 订阅
 
                     @Override
-                    public void onNext(Banner postInfo) {
+                    public void onNext(HomeBanner postInfo) {
 //                        Log.i("http返回：", postInfo.toString() + "");
                         if(postInfo.getCode() == 200 && postInfo.getData().size() > 0){
                             if(bannerList == null){
                                 bannerList = new ArrayList<>();
                             }
                             bannerList.clear();
-                            List<Banner.DataDTO> newList = postInfo.getData();
+                            List<HomeBanner.DataDTO> newList = postInfo.getData();
                             bannerList.addAll(newList) ;
 
                             if(imageAdapter == null){
@@ -245,7 +240,7 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
     }
 
     @Override
-    public void deleteItem(int albumId) {
+    public void deleteItem(Long albumId) {
 
     }
 }

@@ -7,8 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RequestService {
     private static Retrofit retrofit ;
     private volatile static RequestService requestService ;
-//    public static final String BASE_URL = "http://lingyikz.qicp.vip/" ;
-    public static final String BASE_URL = "https://app-api.lingyikz.cn/" ;
+    public static final String BASE_URL = "http://lingyikz.qicp.vip" ;
+//    public static final String BASE_URL = "https://app-api.lingyikz.cn" ;
 
     private RequestService(){
 

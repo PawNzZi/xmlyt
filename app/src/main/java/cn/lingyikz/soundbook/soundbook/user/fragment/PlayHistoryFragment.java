@@ -20,6 +20,7 @@ import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
+import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
@@ -28,7 +29,7 @@ import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 public class PlayHistoryFragment extends BaseFragment implements AudioListAdapter.AudioListen {
     private FragmentPalyhistoryBinding binding ;
     private AudioListAdapter adapter = null;
-    private List<AlbumDetail.DataDTO.ListDTO> mList = new ArrayList<>();
+    private List<AlbumSound.DataDTO.RowsDTO> mList = new ArrayList<>();
     private DataBaseHelper dataBaseHelper ;
 
 
@@ -61,7 +62,7 @@ public class PlayHistoryFragment extends BaseFragment implements AudioListAdapte
             mList = new ArrayList<>();
         }
         mList.clear();
-        List<AlbumDetail.DataDTO.ListDTO> newList = dataBaseHelper.queryPlayHistoryAll();
+        List<AlbumSound.DataDTO.RowsDTO> newList = dataBaseHelper.queryPlayHistoryAll();
 //        Log.i("TAG","PlayHistoryFragment:initData = "+newList.size());
         mList.addAll(newList);
         dataBaseHelper.close();
@@ -132,7 +133,7 @@ public class PlayHistoryFragment extends BaseFragment implements AudioListAdapte
     }
 
     @Override
-    public void onDeleteItem(int albumId) {
+    public void onDeleteItem(Long albumId) {
         dataBaseHelper = DataBaseHelper.getInstance(getActivity());
         dataBaseHelper.deletePlayHistory(albumId);
         dataBaseHelper.close();
