@@ -77,11 +77,7 @@ public class UserFragment extends BaseFragment {
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.GONE);
         binding.titleBar.title.setText("我的");
-        if (ObjectUtil.isNull(Constans.user)) {
-            binding.userName.setText("点击登录");
-        } else {
-            binding.userName.setText(Constans.user.getNickname());
-        }
+
     }
 
     @Override
@@ -175,18 +171,26 @@ public class UserFragment extends BaseFragment {
     }
     @Override
     public void onStart() {
+//        Log.i("TAG","onStart");
+        if (ObjectUtil.isNull(Constans.user)) {
+            binding.userName.setText("点击登录");
+        } else {
+            binding.userName.setText(Constans.user.getNickname());
+        }
         super.onStart();
 
     }
 
     @Override
     public void onResume() {
+//        Log.i("TAG","onResume");
         super.onResume();
         handler.sendEmptyMessage(Constans.UPDATE_AUDIO);
     }
 
     @Override
     public void onDestroy() {
+//        Log.i("TAG","onDestroy");
         super.onDestroy();
         binding = null ;
 

@@ -21,6 +21,7 @@ import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.modle.v2.User;
 import cn.lingyikz.soundbook.soundbook.modle.v2.UserInfo;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -66,10 +67,6 @@ public class LoginFragment extends BaseFragment {
             return ;
         }
         String password = binding.passwordEditText.getText().toString();
-        if(!ReUtil.isMatch(Constans.REGISTER_PASSWORD_REGEX,password)){
-            PopTip.show("账号格式不正确").showLong();
-            return ;
-        }
 
         User user = new User();
         user.setNickname(username);
@@ -91,13 +88,15 @@ public class LoginFragment extends BaseFragment {
 
                     @Override
                     public void onNext(UserInfo bean) {
-                        Log.i("TAG：", bean.toString() + "");
+//                        Log.i("TAG：", bean.toString() + "");
                         if(bean.getSuccess() && bean.getCode() == 200){
                             PopTip.show("登录成功").showLong();
                             Constans.user = bean.getData();
-                            Log.i("TAG：", Constans.user.toString());
+//                            Log.i("TAG：", Constans.user.toString());
                             binding.userNameEditText.setText("");
                             binding.passwordEditText.setText("");
+                            SharedPreferences.saveUser(getContext(),bean.getData());
+                            getActivity().finish();
                         }else if(!bean.getSuccess() && bean.getCode() == 201){
                             PopTip.show(bean.getMessage()).showLong();
                         }

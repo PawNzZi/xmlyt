@@ -7,10 +7,13 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCollectionBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 
 public class CollectionFragment extends BaseFragment implements HomeAdapter.ItemOperaCallBack {
@@ -44,24 +47,27 @@ public class CollectionFragment extends BaseFragment implements HomeAdapter.Item
 
     private void initData() {
 //        Log.i("TAG","initData");
-        dataBaseHelper = DataBaseHelper.getInstance(getActivity());
-        if(mList == null){
-            mList = new ArrayList<>();
-        }
-        mList.clear();
-        List<Album.DataDTO.RowsDTO> newList = dataBaseHelper.queryCollectionAll();
+        if(ObjectUtil.isNotNull(Constans.user)){
+            dataBaseHelper = DataBaseHelper.getInstance(getActivity());
+            if(mList == null){
+                mList = new ArrayList<>();
+            }
+            mList.clear();
+            List<Album.DataDTO.RowsDTO> newList = dataBaseHelper.queryCollectionAll();
 //        Log.i("TAG","CollectionFragment:initData = "+newList.size());
-        mList.addAll(newList);
-        dataBaseHelper.close();
+            mList.addAll(newList);
+            dataBaseHelper.close();
 //        Log.i("TAG","mList.size:"+mList.size());
-        if(adapter == null){
-            binding.swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            adapter = new HomeAdapter(mList,getActivity(),1,this);
-            binding.swipeRecyclerView.setAdapter(adapter);
-            //DividerItemDecoration divider = new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL);
-            //binding.swipeRecyclerView.addItemDecoration(divider);
+            if(adapter == null){
+                binding.swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                adapter = new HomeAdapter(mList,getActivity(),1,this);
+                binding.swipeRecyclerView.setAdapter(adapter);
+                //DividerItemDecoration divider = new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL);
+                //binding.swipeRecyclerView.addItemDecoration(divider);
+            }
+            adapter.notifyDataSetChanged();
         }
-        adapter.notifyDataSetChanged();
+
 
 
     }

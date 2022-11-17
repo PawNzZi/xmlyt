@@ -15,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentPalyhistoryBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
@@ -22,6 +24,7 @@ import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
@@ -57,23 +60,26 @@ public class PlayHistoryFragment extends BaseFragment implements AudioListAdapte
     private void initData() {
 //        Log.i("TAG","initData");
 //        dataBaseHelper = new DataBaseHelper(getActivity());
-        dataBaseHelper = DataBaseHelper.getInstance(getActivity());
-        if(mList == null){
-            mList = new ArrayList<>();
-        }
-        mList.clear();
-        List<AlbumSound.DataDTO.RowsDTO> newList = dataBaseHelper.queryPlayHistoryAll();
+        if(ObjectUtil.isNotNull(Constans.user)){
+            dataBaseHelper = DataBaseHelper.getInstance(getActivity());
+            if(mList == null){
+                mList = new ArrayList<>();
+            }
+            mList.clear();
+            List<AlbumSound.DataDTO.RowsDTO> newList = dataBaseHelper.queryPlayHistoryAll();
 //        Log.i("TAG","PlayHistoryFragment:initData = "+newList.size());
-        mList.addAll(newList);
-        dataBaseHelper.close();
-        if(adapter == null){
-            binding.swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            adapter = new AudioListAdapter(mList,getContext(), this,1);
-            binding.swipeRecyclerView.setAdapter(adapter);
-            DividerItemDecoration divider = new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL);
-            binding.swipeRecyclerView.addItemDecoration(divider);
+            mList.addAll(newList);
+            dataBaseHelper.close();
+            if(adapter == null){
+                binding.swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                adapter = new AudioListAdapter(mList,getContext(), this,1);
+                binding.swipeRecyclerView.setAdapter(adapter);
+                DividerItemDecoration divider = new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL);
+                binding.swipeRecyclerView.addItemDecoration(divider);
+            }
+            adapter.notifyDataSetChanged();
         }
-        adapter.notifyDataSetChanged();
+
     }
     @Override
     public void onStart() {

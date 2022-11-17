@@ -75,7 +75,7 @@ public class AudioService extends Service  {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.i("TAG","onStartCommand");
+//        Log.i("TAG","onStartCommand");
         startForeground(1,getNotificationBuilder().build());
         if(intent.getAction().equals(Constans.SET_BLOCK)){
             int index = intent.getIntExtra("index",-1);

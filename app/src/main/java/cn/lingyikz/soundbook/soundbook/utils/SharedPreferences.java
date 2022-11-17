@@ -137,11 +137,11 @@ public class SharedPreferences {
         android.content.SharedPreferences.Editor editor = sp.edit();
         editor.putLong("id", user.getId());
         editor.putString("nickname",user.getNickname());
-        editor.putString("",user.getEmail());
-        editor.putString("",user.getAvatar());
-        editor.putString("",user.getPhone());
-        editor.putInt("",user.getStatus());
-        editor.putInt("",user.getLevel());
+        editor.putString("email",user.getEmail());
+        editor.putString("avatar",user.getAvatar());
+        editor.putString("phone",user.getPhone());
+        editor.putInt("status",user.getStatus());
+        editor.putInt("level",user.getLevel());
         editor.commit();
     }
     public static void saveUser(Activity context, User user){

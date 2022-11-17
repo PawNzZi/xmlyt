@@ -13,7 +13,7 @@ public class VersionUtil {
         try {
             PackageInfo packageInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
             mVersionName = packageInfo.versionName;
-            Log.i("TAG",mVersionName);
+//            Log.i("TAG",mVersionName);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -25,7 +25,7 @@ public class VersionUtil {
         try {
             PackageInfo packageInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
             mVersionCode = packageInfo.versionCode;
-            Log.i("TAG",mVersionCode+"");
+//            Log.i("TAG",mVersionCode+"");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

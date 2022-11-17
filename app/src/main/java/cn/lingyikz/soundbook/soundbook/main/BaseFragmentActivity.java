@@ -1,6 +1,7 @@
 package cn.lingyikz.soundbook.soundbook.main;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
@@ -10,6 +11,9 @@ import com.liys.onclickme.LOnClickMe;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
+
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 public abstract class BaseFragmentActivity extends FragmentActivity {
 
@@ -22,9 +26,11 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         //设置为Kongzue主题
         DialogX.globalStyle = new KongzueStyle();
         setContentView(setLayout());
-
+        Constans.user = SharedPreferences.getUser(getApplicationContext());
+        Log.i("TAG",Constans.user+"");
         setView();
         setData();
+
     }
     protected abstract void setData();
 

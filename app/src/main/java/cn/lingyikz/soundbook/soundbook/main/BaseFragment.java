@@ -2,6 +2,7 @@ package cn.lingyikz.soundbook.soundbook.main;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
+
+import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 public abstract class BaseFragment extends Fragment {
 
@@ -21,14 +25,23 @@ public abstract class BaseFragment extends Fragment {
      */
     @Override
     public void onAttach(@NonNull Context context) {
+//        Log.i("TAG","onAttach");
         super.onAttach(context);
     }
 
     @Nullable
     @Override
     public View onCreateView( LayoutInflater inflater,  ViewGroup container,Bundle savedInstanceState) {
+//        Log.i("TAG","onCreateView");
 
         return setLayout( inflater, container);
+    }
+
+    @Override
+    public void onStart() {
+//        Log.i("TAG"," base onStart");
+//        Constans.user = SharedPreferences.getUser(getContext());
+        super.onStart();
     }
 
     /**
@@ -39,6 +52,7 @@ public abstract class BaseFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+//        Log.i("TAG","onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         setView();
         setData();
