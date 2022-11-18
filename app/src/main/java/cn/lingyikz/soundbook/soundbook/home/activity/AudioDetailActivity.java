@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.kongzue.dialogx.dialogs.PopTip;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 
@@ -24,6 +25,8 @@ import java.util.List;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
@@ -33,6 +36,7 @@ import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
+import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
@@ -50,7 +54,6 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
     private int nextPage = 1;
     private int basePostion = 0 ;
     private Album.DataDTO.RowsDTO albumDetail ;
-    private DataBaseHelper dataBaseHelper;
 
     @Override
     protected void setData() {
@@ -61,13 +64,8 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
     protected void setView() {
         Bundle bundle = getIntent().getExtras();
         albumDetail = (Album.DataDTO.RowsDTO) bundle.getSerializable("bookObject");
-        dataBaseHelper = DataBaseHelper.getInstance(this);
-        int count = dataBaseHelper.queryCollectionCount(albumDetail.getId());
-        dataBaseHelper.close();
-        if(count == 0 ){
-//            Log.i("TAG","结果为空");
-        }else if(count > 0){
-            Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
+        if(ObjectUtil.isNotNull(Constans.user)){
+            this.isCollection(albumDetail.getId());
         }
 
         //设置图片圆角
@@ -175,6 +173,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
                         },500);
                     }
                 });
+        observable.unsubscribeOn(Schedulers.io());
     }
 
     @AClick({R.id.backIcon,R.id.collection})
@@ -187,26 +186,51 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
             case R.id.collection:
                 //收藏
 //                Log.i("TAG","collection");
-                if(mList.size() == 0){
-                    Toast.makeText(this, Constans.DO_NOT_COLLECT, Toast.LENGTH_SHORT).show();
+                if(ObjectUtil.isNotNull(Constans.user)){
+                   this.changeCollection(albumDetail.getId());
                 }else {
-                    dataBaseHelper = DataBaseHelper.getInstance(this);
-                    int count = dataBaseHelper.queryCollectionCount(albumDetail.getId());
-                    if( count > 0 ){
-                        //取消
-                        dataBaseHelper.cancleCollection(albumDetail.getId());
-                        Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.unlike).into(activityAudiodetailBinding.collection);
-                    }else{
-                        //关注
-                        dataBaseHelper.addCollection(albumDetail);
-                        Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
-                    }
-                    dataBaseHelper.close();
+                    PopTip.show("请先登录,登录后才能收藏").showLong();
                 }
              
                 break;
         }
     }
+
+    private void isCollection(Long albumId){
+        Observable<BaseModel> observable  = RequestService.getInstance().getApi().isCollection(Constans.user.getId(),albumId);
+        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new BaseObsever<BaseModel>() {
+                    @Override
+                    public void onNext(BaseModel baseModel) {
+                        if(baseModel.getCode() == 200 && Integer.parseInt(baseModel.getData()) == 0){
+                            Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
+                        }
+
+                    }
+                });
+        observable.unsubscribeOn(Schedulers.io());
+    }
+    private void changeCollection(Long albumId){
+        Observable<BaseModel> observable  = RequestService.getInstance().getApi().changeCollection(Constans.user.getId(),albumId);
+        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new BaseObsever<BaseModel>() {
+                    @Override
+                    public void onNext(BaseModel baseModel) {
+                        if(baseModel.getCode() == 200 && Integer.parseInt(baseModel.getData()) == 0){
+                            Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.like).into(activityAudiodetailBinding.collection);
+                        }else if(baseModel.getCode() == 200 && Integer.parseInt(baseModel.getData()) == 1){
+                            Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.unlike).into(activityAudiodetailBinding.collection);
+                        }else {
+                            PopTip.show("修改失败："+baseModel.getMessage()).showLong();
+                        }
+
+                    }
+                });
+        observable.unsubscribeOn(Schedulers.io());
+    }
+
 
     @Override
     public void onAudioPlay(Bundle bundle){

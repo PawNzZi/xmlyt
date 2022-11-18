@@ -173,11 +173,6 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
                                     bottomAdapter = new BottomAdapter(albumList,getContext());
                                     binding.recyclerViewBottom.setLayoutManager(new LinearLayoutManager(getContext()));
                                     binding.recyclerViewBottom.setAdapter(bottomAdapter);
-                                    //LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-                                    //layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                                    //binding.recyclerViewBottom.setLayoutManager(layoutManager);
-                                    //DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                    //binding.recyclerViewBottom.addItemDecoration(divider);
                                 }
                                 bottomAdapter.notifyDataSetChanged();
 

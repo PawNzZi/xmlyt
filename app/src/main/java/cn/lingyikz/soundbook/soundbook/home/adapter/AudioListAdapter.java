@@ -86,7 +86,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
             holder.binding.listDate.setText(tip + list.get(position).getCreateTime().substring(0,10));
         }else {
 //            holder.binding.listDate.setText(tip + list.get(position).getCreateTime());
-            holder.binding.listDate.setText(tip + dateFormat.format(new Date(Long.parseLong(list.get(position).getCreateTime()))));
+//            holder.binding.listDate.setText(tip + dateFormat.format(new Date(Long.parseLong(list.get(position).getCreateTime()))));
         }
         new Date();
         holder.binding.itemView.setOnClickListener(new View.OnClickListener() {

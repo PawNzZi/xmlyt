@@ -5,6 +5,8 @@ import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Category;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
 import cn.lingyikz.soundbook.soundbook.modle.v2.CategoryAlbum;
+import cn.lingyikz.soundbook.soundbook.modle.v2.Collection;
+import cn.lingyikz.soundbook.soundbook.modle.v2.CollectionHistory;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Sound;
 import cn.lingyikz.soundbook.soundbook.modle.v2.User;
 import cn.lingyikz.soundbook.soundbook.modle.v2.UserInfo;
@@ -52,7 +54,16 @@ public interface Api {
       //用户注册
       @POST("/zmlmUser/app/register")
       Observable<BaseModel> userRegister(@Body User user);
-
+      //用户登录
       @POST("/zmlmUser/app/login")
       Observable<UserInfo> login(@Body User user);
+      //是否收藏
+      @GET("/zmlmCollectionHistory/app/isCollection")
+      Observable<BaseModel> isCollection(@Query("userId") Long userId,@Query("albumId") Long albumId);
+      //修改收藏
+      @GET("/zmlmCollectionHistory/app/changeCollection")
+      Observable<BaseModel> changeCollection(@Query("userId") Long userId,@Query("albumId") Long albumId);
+      //收藏历史列表
+      @GET("/zmlmCollectionHistory/app/list")
+      Observable<CollectionHistory> collectionList(@Query("userId") Long userId, @Query("pageNo") int page, @Query("pageSize") int size);
 }
