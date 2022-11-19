@@ -24,15 +24,15 @@ import com.liys.onclickme_annotations.AClick;
 
 import java.io.IOException;
 
-import androidx.annotation.Nullable;
-
+import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityPalyaduioBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
-import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
 
+import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
+import cn.lingyikz.soundbook.soundbook.modle.v2.PlayHistory;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Sound;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
@@ -40,14 +40,12 @@ import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
 import rx.Observable;
-import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener {
 
     private static ActivityPalyaduioBinding binding ;
-    private DataBaseHelper dataBaseHelper;
     private static final int UPDATE_PROGRESS = 0;
     private static final int CHANGE_SECONDE = 15 ;
     private static final int UPDATE_CURRENT_POSITION = 1;
@@ -93,13 +91,12 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
      */
     @SuppressLint("SetTextI18n")
     private void initData() {
-
-        dataBaseHelper = DataBaseHelper.getInstance(this);
         superMediaPlayer.setOnPreparedListener(onPreparedListener);
         superMediaPlayer.setOnSeekCompleteListener(onSeekCompleteListener);
         superMediaPlayer.setOnCompletionListener(onCompletionListener);
         superMediaPlayer.setOnErrorListener(onErrorListener);
 
+        //查询是否有定时关闭
         Bundle blockBundle = SharedPreferences.getBolckClose(this);
         if(blockBundle.getInt("index") == -1){
             binding.bolckIime.setVisibility(View.GONE);
@@ -107,63 +104,101 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
             binding.bolckIime.setVisibility(View.VISIBLE);
             binding.bolckIime.setText(blockBundle.getString("lable")+" 后关闭");
         }
-        Bundle historyBundle = dataBaseHelper.queryPlayHistory(bundle.getLong("albumId"),bundle.getLong("audioId"));
-        dataBaseHelper.close();
 
-        if(historyBundle.getString("audioDuration") == null){
-//            Log.i("TAG","audioDuration == null");
-            bundle.putString("audioDuration","0");
+        if(ObjectUtil.isNotNull(Constans.user)){
+            getPlayHistory();
         }else {
-//            Log.i("TAG","audioDuration != null");
-//            Log.i("TAG","audioDuration != null"+historyBundle.getString("audioDuration"));
-            bundle.putString("audioDuration",historyBundle.getString("audioDuration"));
+            noLoginPlay();
         }
-        playAudio();
+
     }
+    //查询当前音频是否有播放记录
+    private void getPlayHistory(){
+        Observable<PlayHistory> observable  = RequestService.getInstance().getApi()
+                .getPlayHistory(Constans.user.getId(),bundle.getLong("albumId"),bundle.getLong("audioId"));
+        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new BaseObsever<PlayHistory>() {
+                    @Override
+                    public void onNext(PlayHistory baseModel) {
+                        if(baseModel.getCode() == 200 && ObjectUtil.isNotNull(baseModel.getData())){
+                            loginPlay(baseModel.getData());
+                        }else {
+                            noLoginPlay();
+                        }
 
-    /**
-     * 启动服务播放
-     */
-    private void playAudio(){
+                    }
+                });
+        observable.unsubscribeOn(Schedulers.io());
+    }
+    //修改或创建播放记录
+    private void changePlayHistory(Long albumId,Long soundId,Long playPiont){
+        Observable<BaseModel> observable  = RequestService.getInstance().getApi()
+                .changePlayHistory(Constans.user.getId(),albumId
+                        ,soundId,playPiont);
+        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new BaseObsever<BaseModel>() {
+                    @Override
+                    public void onNext(BaseModel baseModel) {
+
+                    }
+                });
+        observable.unsubscribeOn(Schedulers.io());
+    }
+    private void noLoginPlay(){
         SuperMediaPlayer.error = 0 ;
+        Bundle currentPlayHistoryInfo = SharedPreferences.currentPlayHistoryInfo(this);
         if(superMediaPlayer.isPlaying()){
-
-            Bundle oldAudioInfo = SharedPreferences.getOldAudioInfo(this);
-//            Log.i("TAG",oldAudioInfo.getString("title" ));
-//            Log.i("TAG",bundle.getString("title" ));
-            if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
+            if(currentPlayHistoryInfo.getString("src").equals(bundle.getString("src"))){
                 binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
                 binding.spinKit.setVisibility(View.GONE);
                 binding.bookThumb.startAnimation(animation);
             }else {
                 superMediaPlayer.stop();
-                oldAudioInfo.putLong("audioDuration",superMediaPlayer.getCurrentPosition());
-                dataBaseHelper.addPlayHistory(oldAudioInfo);
-                dataBaseHelper.close();
                 superMediaPlayer.reset();
-                if(Long.parseLong(bundle.getString("audioDuration")) > 0){
-                    onSeekToRead(bundle.getString("src"),Long.parseLong(bundle.getString("audioDuration")));
-                }else {
-                    onRead(bundle.getString("src"));
-                }
-                SharedPreferences.saveOldAudioInfo(this,bundle);
-
-
+                onRead(bundle.getString("src"));
             }
         }else{
             superMediaPlayer.stop();
             superMediaPlayer.reset();
-            if(Long.parseLong(bundle.getString("audioDuration")) > 0){
-                onSeekToRead(bundle.getString("src"),Long.parseLong(bundle.getString("audioDuration")));
-            }else {
-                onRead(bundle.getString("src"));
+            onRead(bundle.getString("src"));
+        }
+        SharedPreferences.saveCurrentPlayHistoryInfo(this,bundle);
+    }
+
+    private void loginPlay(PlayHistory.DataDTO data){
+        SuperMediaPlayer.error = 0 ;
+        Bundle currentPlayHistoryInfo = SharedPreferences.currentPlayHistoryInfo(this);
+        if(superMediaPlayer.isPlaying()){
+            if(currentPlayHistoryInfo.getString("src").equals(bundle.getString("src"))){
+                binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
+                binding.spinKit.setVisibility(View.GONE);
+                binding.bookThumb.startAnimation(animation);
+            }else{
+                superMediaPlayer.stop();
+                superMediaPlayer.reset();
+                if(data.getPlayPiont() > 0 ){
+                    onSeekToRead(data.getZmlmSound().getUrl(),data.getPlayPiont());
+                }else{
+                    onRead(data.getZmlmSound().getUrl());
+                }
             }
-            SharedPreferences.saveOldAudioInfo(this,bundle);
+
+        }else{
+            superMediaPlayer.stop();
+            superMediaPlayer.reset();
+            if(data.getPlayPiont() > 0 ){
+                onSeekToRead(data.getZmlmSound().getUrl(),data.getPlayPiont());
+            }else{
+                onRead(data.getZmlmSound().getUrl());
+            }
 
         }
 
-
+        SharedPreferences.saveCurrentPlayHistoryInfo(this,bundle);
     }
+
     private void onRead(String url){
         try {
             superMediaPlayer.setDataSource(url);
@@ -242,26 +277,25 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
                                 reslutBundle.putInt("episodes",dataDTO.getEpisodes());
                                 reslutBundle.putString("title",dataDTO.getName());
                                 reslutBundle.putString("audioDes","");
-                                reslutBundle.putString("audioDuration","0");
                                 reslutBundle.putString("audioCreated", dataDTO.getCreateTime());
                                 reslutBundle.putString("src",dataDTO.getUrl());
                                 reslutBundle.putLong("audioId",dataDTO.getId());
                                 superMediaPlayer.stop();
+                                if(ObjectUtil.isNotNull(Constans.user)){
+                                    changePlayHistory(bundle.getLong("albumId"),bundle.getLong("audioId"),(long) superMediaPlayer.getCurrentPosition());
+                                }
                                 superMediaPlayer.reset();
                                 onRead(dataDTO.getUrl());
-//                                SharedPreferences.saveOldAudioInfo(PlayAudioActivity.this,bundle);
-                                dataBaseHelper.addPlayHistory(bundle);
-                                dataBaseHelper.close();
                                 bundle = reslutBundle;
-                                SharedPreferences.saveOldAudioInfo(PlayAudioActivity.this,reslutBundle);
+                                SharedPreferences.saveCurrentPlayHistoryInfo(PlayAudioActivity.this,reslutBundle);
 
                             }else if(sound.getCode() == 200 && sound == null){
                                 superMediaPlayer.stop();
-                                bundle.putLong("audioDuration",0);
-                                bundle.putString("audioCreated", String.valueOf(System.currentTimeMillis()));
+                                if(ObjectUtil.isNotNull(Constans.user)){
+                                    changePlayHistory(bundle.getLong("albumId"),bundle.getLong("audioId"),(long) superMediaPlayer.getCurrentPosition());
+                                }
                                 superMediaPlayer.reset();
-                                dataBaseHelper.addPlayHistory(bundle);
-                                dataBaseHelper.close();
+
                             }
                         }
                     });
@@ -379,10 +413,10 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
             case R.id.startPlay:
                 if(superMediaPlayer.isPlaying()){
                     superMediaPlayer.pause();
-                    bundle.putString("audioDuration", String.valueOf(superMediaPlayer.getCurrentPosition()));
-                    dataBaseHelper.addPlayHistory(bundle);
-                    dataBaseHelper.close();
-                    SharedPreferences.saveOldAudioInfo(this,bundle);
+                    if(ObjectUtil.isNotNull(Constans.user)){
+                        changePlayHistory(bundle.getLong("albumId"),bundle.getLong("audioId"),(long) superMediaPlayer.getCurrentPosition());
+                    }
+                    SharedPreferences.saveCurrentPlayHistoryInfo(this,bundle);
                     binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_pause, null));
                     binding.bookThumb.clearAnimation();
                 }else {

@@ -65,7 +65,7 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
         }
         SharedPreferences.saveCategoryIndex(getApplicationContext(),0);
         this.checkVersion();
-
+//        SharedPreferences.cleanCurrentPlayHistoryInfo(getParent());
 
     }
 

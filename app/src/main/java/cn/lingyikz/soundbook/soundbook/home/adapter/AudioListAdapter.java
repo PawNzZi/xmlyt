@@ -35,18 +35,13 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     private List<AlbumSound.DataDTO.RowsDTO> list ;
     private Context context ;
     private AudioListen audioListen ;
-    private SimpleDateFormat dateFormat ;
     private int nextPage = 0 ;
-    private int Tag ;
+
     @SuppressLint("SimpleDateFormat")
-    public AudioListAdapter(List<AlbumSound.DataDTO.RowsDTO> list, Context context, AudioListen audioListen ,int Tag){
+    public AudioListAdapter(List<AlbumSound.DataDTO.RowsDTO> list, Context context, AudioListen audioListen ){
         this.list = list ;
         this.context = context ;
         this.audioListen = audioListen;
-        this.Tag = Tag ;
-        if(Tag == 1){
-            dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        }
     }
     @NonNull
 
@@ -64,31 +59,18 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
 //        LOnClickMe.init(this,holder.binding.getRoot());
 //        Log.i("TAG","onBindViewHolder" + this.nextPage);
         String tip = "";
-        if(Tag == 1){
-            tip = "上一次播放 ";
-            holder.binding.listDate.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
-            holder.binding.donwloadAudio.setImageDrawable(context.getResources().getDrawable(R.mipmap.delete, context.getTheme()));
-        }
         holder.binding.donwloadAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(Tag == 1){
-                    audioListen.onDeleteItem(list.get(position).getAlbumId());
-                }else{
-                    Toast.makeText(context, "暂未开放", Toast.LENGTH_SHORT).show();
-                }
+
+                Toast.makeText(context, "暂未开放", Toast.LENGTH_SHORT).show();
+
             }
         });
-        holder.binding.listIndex.setText(nextPage * 50 + position +1 +"");
+        holder.binding.listIndex.setText(nextPage * 50 + position + 1 +"");
         holder.binding.listName.setText(list.get(position).getName());
-//        Log.i("TAG","onBindViewHolder"+list.get(position).getName());
-        if(Tag == 0){
-            holder.binding.listDate.setText(tip + list.get(position).getCreateTime().substring(0,10));
-        }else {
-//            holder.binding.listDate.setText(tip + list.get(position).getCreateTime());
+        holder.binding.listDate.setText(list.get(position).getCreateTime());
 //            holder.binding.listDate.setText(tip + dateFormat.format(new Date(Long.parseLong(list.get(position).getCreateTime()))));
-        }
-        new Date();
         holder.binding.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,10 +85,10 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
                 bundle.putString("src",list.get(position).getUrl());
                 bundle.putLong("audioId",list.get(position).getId());
                 bundle.putInt("playModel", Constans.PLAY_MODLE_LIST);
+
                 audioListen.onAudioPlay(bundle);
             }
         });
-
     }
     public void notifyDataSetChange(int nextPage){
         this.nextPage = nextPage ;

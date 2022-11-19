@@ -183,7 +183,7 @@ public class SearchActivity extends BaseFragmentActivity implements HomeAdapter.
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 break;
             case R.id.go_play:
-                Bundle bundle = SharedPreferences.getOldAudioInfo(this);
+                Bundle bundle = SharedPreferences.currentPlayHistoryInfo(this);
                 if(bundle.getString("src") == null){
                     Toast.makeText(this, Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
                 }else {

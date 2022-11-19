@@ -229,7 +229,7 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
     }
 
     private void toNextActivity(){
-        Bundle bundle = SharedPreferences.getOldAudioInfo(getActivity());
+        Bundle bundle = SharedPreferences.currentPlayHistoryInfo(getActivity());
 //                Log.i("TAG",bundle.getString("src"));
         if(bundle.getString("src") == null){
             Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();

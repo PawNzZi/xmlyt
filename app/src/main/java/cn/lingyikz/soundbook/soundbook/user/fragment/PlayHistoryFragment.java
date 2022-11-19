@@ -16,24 +16,37 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import androidx.recyclerview.widget.RecyclerView;
 import cn.hutool.core.util.ObjectUtil;
+import cn.lingyikz.soundbook.soundbook.api.RequestService;
+import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentPalyhistoryBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
+import cn.lingyikz.soundbook.soundbook.modle.v2.CollectionHistory;
+import cn.lingyikz.soundbook.soundbook.modle.v2.PlayHistories;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
+import cn.lingyikz.soundbook.soundbook.user.adapter.CollectionAdapter;
+import cn.lingyikz.soundbook.soundbook.user.adapter.PlayHistoryAdapter;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
+import cn.lingyikz.soundbook.soundbook.utils.EndlessRecyclerOnScrollListener;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
-public class PlayHistoryFragment extends BaseFragment implements AudioListAdapter.AudioListen {
+public class PlayHistoryFragment extends BaseFragment implements PlayHistoryAdapter.ItemOperaCallBack {
     private FragmentPalyhistoryBinding binding ;
-    private AudioListAdapter adapter = null;
-    private List<AlbumSound.DataDTO.RowsDTO> mList = new ArrayList<>();
-    private DataBaseHelper dataBaseHelper ;
+    private PlayHistoryAdapter adapter = null;
+    private List<PlayHistories.DataDTO.RowsDTO> mList = new ArrayList<>();
+
+    private int nextPage = 1;
+    private boolean hasNextPage = false;
 
 
     public static PlayHistoryFragment newInstance() {
@@ -49,7 +62,7 @@ public class PlayHistoryFragment extends BaseFragment implements AudioListAdapte
 
     @Override
     protected void setView() {
-
+        binding.swipeRecyclerView.addOnScrollListener(onScrollListener);
     }
 
     @Override
@@ -58,26 +71,8 @@ public class PlayHistoryFragment extends BaseFragment implements AudioListAdapte
     }
 
     private void initData() {
-//        Log.i("TAG","initData");
-//        dataBaseHelper = new DataBaseHelper(getActivity());
         if(ObjectUtil.isNotNull(Constans.user)){
-            dataBaseHelper = DataBaseHelper.getInstance(getActivity());
-            if(mList == null){
-                mList = new ArrayList<>();
-            }
-            mList.clear();
-            List<AlbumSound.DataDTO.RowsDTO> newList = dataBaseHelper.queryPlayHistoryAll();
-//        Log.i("TAG","PlayHistoryFragment:initData = "+newList.size());
-            mList.addAll(newList);
-            dataBaseHelper.close();
-            if(adapter == null){
-                binding.swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                adapter = new AudioListAdapter(mList,getContext(), this,1);
-                binding.swipeRecyclerView.setAdapter(adapter);
-                DividerItemDecoration divider = new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL);
-                binding.swipeRecyclerView.addItemDecoration(divider);
-            }
-            adapter.notifyDataSetChanged();
+            playHistoryList();
         }
 
     }
@@ -111,51 +106,55 @@ public class PlayHistoryFragment extends BaseFragment implements AudioListAdapte
         binding = null ;
     }
 
-    @Override
-    public void onAudioPlay(Bundle bundle) {
-        IntentAction.setValueActivity(getActivity(), PlayAudioActivity.class,bundle);
-//        Intent intent = new Intent(getContext(), AudioService.class);
-//        long audioDuration = dataBaseHelper.queryPlayHistory(bundle.getInt("albumId"),bundle.getInt("audioId"));
-//        dataBaseHelper.close();
-//        Bundle oldAudioInfo =  SharedPreferences.getOldAudioInfo(getContext());
-//        if(oldAudioInfo.getString("src" ) != null){
-//            if(oldAudioInfo.getString("src" ).equals(bundle.getString("src" ))){
-////                Log.i("TAG","暂停");
-//                bundle.putBoolean("continuePlay",true);
-//
-//            }else{
-//                //stop并重新播放
-////                Log.i("TAG","stop并重新播放");
-//                bundle.putBoolean("continuePlay",false);
-//            }
-//        }else {
-//            bundle.putBoolean("continuePlay",false);
-//        }
-//        bundle.putLong("audioDuration", audioDuration);
-//        intent.putExtras(bundle);
-//        getContext().startService(intent);
-//        this.sendBroadCast();
+    private void playHistoryList(){
+        Observable<PlayHistories> observable = RequestService.getInstance().getApi().playHistoriesList(Constans.user.getId(),nextPage,Constans.PAGE_SIZE);
+        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new BaseObsever<PlayHistories>() {
+                    @Override
+                    public void onNext(PlayHistories baseModel) {
+                        if(baseModel.getCode() == 200 && baseModel.getData().getRows().size() > 0){
+//                            Log.i("TAG",baseModel.toString());
+                            if(ObjectUtil.isNull(mList)){
+                                mList = new ArrayList<>();
+                            }
+                            List<PlayHistories.DataDTO.RowsDTO> newList = baseModel.getData().getRows();
+                            mList.addAll(newList);
+                            if(ObjectUtil.isNull(adapter)){
+                                binding.swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                adapter = new PlayHistoryAdapter(mList,getContext(),PlayHistoryFragment.this);
+                                binding.swipeRecyclerView.setAdapter(adapter);
+                            }
 
+                            nextPage = baseModel.getData().getNextPage();
+                            hasNextPage = baseModel.getData().getHasNextPage();
+                        }else {
+                            // PopTip.show("修改失败："+baseModel.getMessage()).showLong();
+
+                        }
+                        adapter.notifyDataSetChanged();
+
+                    }
+                });
+        observable.unsubscribeOn(Schedulers.io());
     }
 
+    private  RecyclerView.OnScrollListener  onScrollListener = new EndlessRecyclerOnScrollListener() {
+        @Override
+        public void onLoadMore() {
+            if(hasNextPage){
+                adapter.setLoadState(adapter.LOADING);
+                playHistoryList();
+            }else{
+                //不加载
+                adapter.setLoadState(adapter.LOADING_END);
+                //Toast.makeText(getContext(), Constans.NO_LOADING, Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
     @Override
-    public void onDeleteItem(Long albumId) {
-        dataBaseHelper = DataBaseHelper.getInstance(getActivity());
-        dataBaseHelper.deletePlayHistory(albumId);
-        dataBaseHelper.close();
-        initData();
+    public void deleteItem(Long albumId) {
+
     }
-
-//    public void sendBroadCast(){
-//        Intent broadIntent = new Intent(Constans.CHANGE_PLAY_IMG);
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(Constans.CHANGE_PLAY_IMG);
-//        //设置接收优先级[-1000,1000]，默认为0
-//        filter.setPriority(1000);
-//        //实例化广播接收者
-//        changePlayReceiver = new UserFragment.ChangePlayReceiver();
-//        getContext().registerReceiver(changePlayReceiver,filter);
-//        getContext().sendBroadcast(broadIntent);
-//    }
-
 }

@@ -126,7 +126,7 @@ public class UserFragment extends BaseFragment {
             case R.id.titleSpinKit:
 //                IntentAction.startService(getActivity(), AudioService.class, (ImageView) view, DataBaseHelper.getInstance(getActivity()));
 //                Bundle bundle = DataBaseHelper.getInstance(getActivity()).queryPlayHistoryRecent();
-                Bundle bundle = SharedPreferences.getOldAudioInfo(getActivity());
+                Bundle bundle = SharedPreferences.currentPlayHistoryInfo(getActivity());
                 if(bundle.getString("src") == null){
                     Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
                 }else {

@@ -15,7 +15,14 @@ public class SharedPreferences {
     private static final String BLOCK_CLOSE = "BLOCK_CLOSE";
     private static final String CATEGORY_POSTION = "CATEGORY_POSTION";
     private static final String USER_INFO = "USERINFO";
-    public static void saveOldAudioInfo(Activity activity, Bundle bundle){
+
+    public static void cleanCurrentPlayHistoryInfo(Activity activity){
+        android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
+        editor.clear();
+        editor.commit();
+    }
+    public static void saveCurrentPlayHistoryInfo(Activity activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
         editor.putLong("albumId",bundle.getLong("albumId"));
@@ -28,7 +35,7 @@ public class SharedPreferences {
         editor.putString("src",bundle.getString("src"));
         editor.commit();
     }
-    public static void saveOldAudioInfo(Context activity, Bundle bundle){
+    public static void saveCurrentPlayHistoryInfo(Context activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
         editor.putLong("albumId",bundle.getLong("albumId"));
@@ -41,7 +48,7 @@ public class SharedPreferences {
         editor.putString("src",bundle.getString("src"));
         editor.commit();
     }
-    public static Bundle  getOldAudioInfo(Activity activity){
+    public static Bundle  currentPlayHistoryInfo(Activity activity){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         Bundle bundle = new Bundle() ;
         bundle.putLong("albumId", oldAudioInfo.getLong("albumId",0));
@@ -55,7 +62,7 @@ public class SharedPreferences {
 
         return bundle ;
     }
-    public static Bundle  getOldAudioInfo(Context activity){
+    public static Bundle  currentPlayHistoryInfo(Context activity){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
         Bundle bundle = new Bundle() ;
 

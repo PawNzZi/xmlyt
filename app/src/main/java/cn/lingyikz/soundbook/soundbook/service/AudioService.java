@@ -24,8 +24,10 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
+import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.modle.XmlyNextPaly;
+import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
@@ -146,10 +148,8 @@ public class AudioService extends Service  {
                 superMediaPlayer.pause();
 //                Log.i("TAG","updateBlock:"+superMediaPlayer.getCurrentPosition());
                 bundle.putLong("audioDuration",superMediaPlayer.getCurrentPosition());
-                dataBaseHelper = DataBaseHelper.getInstance(getApplication());
-                dataBaseHelper.addPlayHistory(bundle);
-                dataBaseHelper.close();
-                SharedPreferences.saveOldAudioInfo(this,bundle);
+                changePlayHistory((long) superMediaPlayer.getCurrentPosition());
+                SharedPreferences.saveCurrentPlayHistoryInfo(this,bundle);
                 Bundle spBundle = new Bundle();
                 spBundle.putString("lable","");
                 spBundle.putInt("index",-1);
@@ -165,6 +165,21 @@ public class AudioService extends Service  {
         }
         bundle = null ;
 
+    }
+    //修改或创建播放记录
+    private void changePlayHistory(Long playPiont){
+        Observable<BaseModel> observable  = RequestService.getInstance().getApi()
+                .changePlayHistory(Constans.user.getId(),bundle.getLong("albumId")
+                        ,bundle.getLong("soundId"),playPiont);
+        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new BaseObsever<BaseModel>() {
+                    @Override
+                    public void onNext(BaseModel baseModel) {
+
+                    }
+                });
+        observable.unsubscribeOn(Schedulers.io());
     }
     private Notification.Builder getNotificationBuilder(){
 

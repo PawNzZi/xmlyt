@@ -111,7 +111,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
                             mList.addAll(newList);
                             nextPage = reslut.getData().getNextPage();
                             if(adapter == null){
-                                adapter = new AudioListAdapter(mList,AudioDetailActivity.this,AudioDetailActivity.this,0);
+                                adapter = new AudioListAdapter(mList,AudioDetailActivity.this,AudioDetailActivity.this);
                                 activityAudiodetailBinding.recyclerView.setLayoutManager(new LinearLayoutManager(AudioDetailActivity.this));
                                 activityAudiodetailBinding.recyclerView.setAdapter(adapter);
                                 DividerItemDecoration divider = new DividerItemDecoration(AudioDetailActivity.this,DividerItemDecoration.VERTICAL);
