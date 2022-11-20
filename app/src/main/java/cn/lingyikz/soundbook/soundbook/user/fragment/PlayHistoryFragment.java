@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.kongzue.dialogx.dialogs.PopTip;
+
 import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
@@ -26,6 +29,7 @@ import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
+import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.modle.v2.CollectionHistory;
 import cn.lingyikz.soundbook.soundbook.modle.v2.PlayHistories;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
@@ -94,6 +98,7 @@ public class PlayHistoryFragment extends BaseFragment implements PlayHistoryAdap
     public void onResume() {
         super.onResume();
 //        Log.i("TAG","onResume");
+        mList.clear();
         initData();
 //        Log.i("TAG","PlayHistoryFragment:onResume");
 
@@ -152,9 +157,26 @@ public class PlayHistoryFragment extends BaseFragment implements PlayHistoryAdap
             }
         }
     };
+    private void deletePlayHistory(Long playHistoryId){
+        Observable<BaseModel> observable  = RequestService.getInstance().getApi().deleteHistroy(playHistoryId,Constans.user.getId());
+        observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new BaseObsever<BaseModel>() {
+                    @Override
+                    public void onNext(BaseModel baseModel) {
+                        if(baseModel.getCode() == 200){
+                            mList.clear();
+                            initData();
+                        }else {
+                            PopTip.show("删除失败："+baseModel.getMessage()).showLong();
+                        }
 
+                    }
+                });
+        observable.unsubscribeOn(Schedulers.io());
+    }
     @Override
-    public void deleteItem(Long albumId) {
-
+    public void deleteItem(Long playHistoryId) {
+        deletePlayHistory(playHistoryId);
     }
 }

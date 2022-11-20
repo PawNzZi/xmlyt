@@ -77,8 +77,8 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
     @Override
     protected View setLayout() {
         viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        AppCenter.start(getApplication(), Constans.APP_CENTER_SECRET,
-                Analytics.class, Crashes.class);
+//        AppCenter.start(getApplication(), Constans.APP_CENTER_SECRET,
+//                Analytics.class, Crashes.class);
         return viewBinding.getRoot();
     }
 

@@ -58,7 +58,6 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     public void onBindViewHolder(@NonNull  AudioListAdapter.ViewHolder holder, int position) {
 //        LOnClickMe.init(this,holder.binding.getRoot());
 //        Log.i("TAG","onBindViewHolder" + this.nextPage);
-        String tip = "";
         holder.binding.donwloadAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,7 +68,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
         });
         holder.binding.listIndex.setText(nextPage * 50 + position + 1 +"");
         holder.binding.listName.setText(list.get(position).getName());
-        holder.binding.listDate.setText(list.get(position).getCreateTime());
+        holder.binding.listDate.setText(list.get(position).getCreateTime().substring(0,19));
 //            holder.binding.listDate.setText(tip + dateFormat.format(new Date(Long.parseLong(list.get(position).getCreateTime()))));
         holder.binding.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

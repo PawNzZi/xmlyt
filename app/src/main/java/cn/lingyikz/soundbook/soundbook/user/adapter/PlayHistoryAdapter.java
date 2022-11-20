@@ -17,6 +17,7 @@ import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.FootviewBinding;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.AudioDetailActivity;
+import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.modle.v2.CollectionHistory;
 import cn.lingyikz.soundbook.soundbook.modle.v2.PlayHistories;
@@ -74,8 +75,8 @@ public class PlayHistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull  RecyclerView.ViewHolder holder, int position) {
-        if(holder instanceof CollectionAdapter.FootViewHolder){
-            CollectionAdapter.FootViewHolder footViewHolder = (CollectionAdapter.FootViewHolder) holder;
+        if(holder instanceof PlayHistoryAdapter.FootViewHolder){
+            PlayHistoryAdapter.FootViewHolder footViewHolder = (PlayHistoryAdapter.FootViewHolder) holder;
             switch (loadState){
                 case LOADING://正在加载
                     footViewHolder.footviewBinding.loadingLinearLayout.setVisibility(View.VISIBLE);
@@ -94,22 +95,22 @@ public class PlayHistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 default:
                     break;
             }
-        }else if(holder instanceof CollectionAdapter.ViewHolder){
-            CollectionAdapter.ViewHolder viewHolder = (CollectionAdapter.ViewHolder) holder;
+        }else if(holder instanceof PlayHistoryAdapter.ViewHolder){
+            PlayHistoryAdapter.ViewHolder viewHolder = (PlayHistoryAdapter.ViewHolder) holder;
 
             viewHolder.itemHomeBinding.itemBookDescription.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
             viewHolder.itemHomeBinding.collectionIcon.setImageDrawable(context.getResources().getDrawable(R.mipmap.delete, context.getTheme()));
             viewHolder.itemHomeBinding.collectionIcon.setVisibility(View.VISIBLE);
 //        Log.i("tag",list.get(position).getBookName());
             viewHolder.itemHomeBinding.itemBookName.setText(list.get(position).getZmlmAlbum().getName());
-            viewHolder.itemHomeBinding.itemBookDescription.setText(Constans.PLAY_HISTORY_TIP +
-                    list.get(position).getZmlmSound().getName() +" "+ list.get(position).getCreateTime());
+            viewHolder.itemHomeBinding.itemBookDescription.setText(Constans.PLAY_HISTORY_TIP + " 第"+ list.get(position).getZmlmSound().getEpisodes() +"集: " +
+                    list.get(position).getZmlmSound().getName() );
             Glide.with(viewHolder.itemHomeBinding.getRoot()).load(list.get(position).getZmlmAlbum().getThumb()).into(viewHolder.itemHomeBinding.itemThumb);
 
             viewHolder.itemHomeBinding.collectionIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    itemOperaCallBack.deleteItem(list.get(position).getZmlmAlbum().getId());
+                    itemOperaCallBack.deleteItem(list.get(position).getId());
                 }
             });
             viewHolder.itemHomeBinding.contentLayout.setOnClickListener(new View.OnClickListener() {
@@ -117,17 +118,26 @@ public class PlayHistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public void onClick(View v) {
                     Bundle bundle = new Bundle();
 
-                    Album.DataDTO.RowsDTO albumDetail = new Album.DataDTO.RowsDTO();
-//                    BeanUtil.copyProperties(list.get(position), albumDetail);
-                    albumDetail.setThumb(list.get(position).getZmlmAlbum().getThumb());
-                    albumDetail.setDescription(list.get(position).getZmlmAlbum().getDescription());
-                    albumDetail.setName(list.get(position).getZmlmAlbum().getName());
-                    albumDetail.setId(list.get(position).getAlbumId());
-//                    albumDetail.setCategories(list.get(position).getAlbum().getCategories());
-                    albumDetail.setAuthor(list.get(position).getZmlmAlbum().getAuthor());
+//                    Album.DataDTO.RowsDTO albumDetail = new Album.DataDTO.RowsDTO();
+//                    albumDetail.setThumb(list.get(position).getZmlmAlbum().getThumb());
+//                    albumDetail.setDescription(list.get(position).getZmlmAlbum().getDescription());
+//                    albumDetail.setName(list.get(position).getZmlmAlbum().getName());
+//                    albumDetail.setId(list.get(position).getAlbumId());
+////                    albumDetail.setCategories(list.get(position).getAlbum().getCategories());
+//                    albumDetail.setAuthor(list.get(position).getZmlmAlbum().getAuthor());
+//
+//                    bundle.putSerializable("bookObject", albumDetail);
 
-                    bundle.putSerializable("bookObject", albumDetail);
-                    IntentAction.setValueContext(context, AudioDetailActivity.class,bundle);
+                    bundle.putLong("albumId",list.get(position).getZmlmSound().getAlbumId());
+                    bundle.putInt("episodes",list.get(position).getZmlmSound().getEpisodes());
+                    bundle.putString("audioCreated", (String)list.get(position).getZmlmSound().getCreateTime());
+                    bundle.putString("audioDes", list.get(position).getZmlmSound().getDescription());
+
+                    bundle.putString("title",list.get(position).getZmlmSound().getName());
+                    bundle.putString("src",list.get(position).getZmlmSound().getUrl());
+                    bundle.putLong("audioId",list.get(position).getZmlmSound().getId());
+                    bundle.putInt("playModel", Constans.PLAY_MODLE_LIST);
+                    IntentAction.setValueContext(context, PlayAudioActivity.class,bundle);
                 }
             });
         }
@@ -169,6 +179,6 @@ public class PlayHistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public interface ItemOperaCallBack{
-        void deleteItem(Long albumId);
+        void deleteItem(Long playHistoryId);
     }
 }
