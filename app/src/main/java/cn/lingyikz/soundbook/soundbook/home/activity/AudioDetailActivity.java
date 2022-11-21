@@ -4,10 +4,16 @@ import android.annotation.SuppressLint;
 
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.arialyy.annotations.Download;
+import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
@@ -18,6 +24,7 @@ import com.liys.onclickme_annotations.AClick;
 import org.angmarch.views.NiceSpinner;
 import org.angmarch.views.OnSpinnerItemSelectedListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +95,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
 //        activityAudiodetailBinding.spinKit.setVisibility(View.VISIBLE);
         //调接口查询列表
 //        Log.i("TAG","ID:"+albumDetail.getId());
+//        Aria.download(this).register();
         this.queryList(albumDetail.getId(),true);
 
     }
@@ -271,7 +279,11 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
     }
 
     @Override
-    public void onDeleteItem(Long albumId) {
+    public void downLoad(String url, String targetPath, ProgressBar progressBar) {
+        Aria.download(this)
+                .load(url)     //读取下载地址
+                .setFilePath(targetPath) //设置文件保存的完整路径
+                .create();   //创建并启动下载
 
     }
 

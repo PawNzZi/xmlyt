@@ -3,31 +3,34 @@ package cn.lingyikz.soundbook.soundbook.home.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+
 import android.util.Log;
-import android.util.TypedValue;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 
-import com.bumptech.glide.Glide;
-
-import java.lang.reflect.TypeVariable;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
+import com.liulishuo.okdownload.DownloadTask;
+import com.liulishuo.okdownload.SpeedCalculator;
+import com.liulishuo.okdownload.core.Util;
+import com.liulishuo.okdownload.core.breakpoint.BlockInfo;
+import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
+import com.liulishuo.okdownload.core.cause.EndCause;
+import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
+import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
 import java.util.List;
 import java.util.Map;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemAudiolistBinding;
-import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.DownLoadUtil;
 
 
 public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.ViewHolder>{
@@ -62,7 +65,38 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(context, "暂未开放", Toast.LENGTH_SHORT).show();
+                XXPermissions.with(context)
+                        // 申请权限
+                        .permission(Permission.WRITE_EXTERNAL_STORAGE)
+                        .permission(Permission.READ_EXTERNAL_STORAGE)
+                        .request(new OnPermissionCallback() {
+                            @Override
+                            public void onGranted(List<String> permissions, boolean all) {
+                                if (!all) {
+                                    return;
+                                }
+                                holder.binding.donwloadAudio.setVisibility(View.GONE);
+                                holder.binding.progressBar.setVisibility(View.VISIBLE);
+//                                String targetPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Download" + File.separator + list.get(position).getName() + ".mp3" ;
+//                                audioListen.downLoad(list.get(position).getUrl(),targetPath,holder.binding.progressBar);
+                                DownLoadUtil downLoadUtil = new DownLoadUtil(list.get(position).getName(),list.get(position).getUrl());
+                                DownloadTask task =  downLoadUtil.createDownloadTask();
+                                task.enqueue(new MyDownloadListener4WithSpeed(holder.binding.progressBar));
+
+                            }
+                            @Override
+                            public void onDenied(List<String> permissions, boolean never) {
+                                if (never) {
+
+                                    // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                                    XXPermissions.startPermissionActivity(context, permissions);
+                                } else {
+
+                                }
+                            }
+                        });
+
+//                Toast.makeText(context, "暂未开放", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -112,6 +146,72 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
 
     public interface AudioListen{
         void onAudioPlay(Bundle bundle);
-        void onDeleteItem(Long albumId);
+//        void onDeleteItem(Long albumId);
+        void downLoad(String url , String targetPath, ProgressBar progressBar);
+    }
+
+    public class MyDownloadListener4WithSpeed extends DownloadListener4WithSpeed {
+
+        private long totalLength;
+        private String readableTotalLength;
+        private ProgressBar progressBar;//谨防内存泄漏
+        private Context context;//谨防内存泄漏
+
+        private String TAG = "download";
+
+        public MyDownloadListener4WithSpeed(ProgressBar progressBar){
+            this.progressBar = progressBar;
+            this.context = progressBar.getContext();
+        }
+        @Override
+        public void taskStart( DownloadTask task) {
+            Log.i(TAG,"taskStart");
+        }
+
+        @Override
+        public void connectStart( DownloadTask task, int blockIndex,  Map<String, List<String>> requestHeaderFields) {
+            Log.i(TAG,"connectStart");
+        }
+
+        @Override
+        public void connectEnd( DownloadTask task, int blockIndex, int responseCode,  Map<String, List<String>> responseHeaderFields) {
+            Log.i(TAG,"connectEnd");
+        }
+
+        @Override
+        public void infoReady(DownloadTask task, BreakpointInfo info, boolean fromBreakpoint, Listener4SpeedAssistExtend.Listener4SpeedModel model) {
+            Log.i(TAG,"infoReady");
+            totalLength = info.getTotalLength();
+            readableTotalLength = Util.humanReadableBytes(totalLength, true);
+            progressBar.setMax((int) totalLength);
+            Log.i(TAG, "【2、infoReady】当前进度" + (float) info.getTotalOffset() / totalLength * 100 + "%" + "，" + info.toString());
+        }
+
+        @Override
+        public void progressBlock( DownloadTask task, int blockIndex, long currentBlockOffset,  SpeedCalculator blockSpeed) {
+            Log.i(TAG,"progressBlock");
+        }
+
+        @Override
+        public void progress( DownloadTask task, long currentOffset, SpeedCalculator taskSpeed) {
+            Log.i(TAG,"progress");
+            String readableOffset = Util.humanReadableBytes(currentOffset, true);
+            String progressStatus = readableOffset + "/" + readableTotalLength;
+            String speed = taskSpeed.speed();
+            float percent = (float) currentOffset / totalLength * 100;
+            Log.i("bqt", "【6、progress】" + currentOffset + "[" + progressStatus + "]，速度：" + speed + "，进度：" + percent + "%");
+            progressBar.setProgress((int) currentOffset);
+        }
+
+        @Override
+        public void blockEnd(DownloadTask task, int blockIndex, BlockInfo info, SpeedCalculator blockSpeed) {
+            Log.i(TAG,"blockEnd");
+        }
+
+        @Override
+        public void taskEnd(DownloadTask task, EndCause cause, Exception realCause, SpeedCalculator taskSpeed) {
+            Log.i(TAG,"taskEnd");
+            progressBar.setVisibility(View.GONE);
+        }
     }
 }

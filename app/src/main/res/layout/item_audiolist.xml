@@ -1,65 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:orientation="horizontal"
+    android:layout_height="71dp"
+    android:orientation="vertical"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
     >
-    <TextView
-        android:id="@+id/listIndex"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:textColor="@color/colorContent"
-        android:textSize="20sp"
-        android:text="1"
-        android:gravity="center_vertical"
-        android:textStyle="bold"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        >
-
-    </TextView>
     <LinearLayout
-        android:id="@+id/itemView"
-        android:layout_weight="9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:orientation="vertical"
-        android:layout_gravity="center_vertical"
-        >
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
         <TextView
-            android:id="@+id/listName"
+            android:id="@+id/listIndex"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textColor="@color/colorTitle"
-            android:textSize="15sp"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:layout_weight="1"
-            android:gravity="top"
+            android:textColor="@color/colorContent"
+            android:textSize="20sp"
+            android:text="1"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
             >
+
         </TextView>
-        <TextView
-            android:id="@+id/listDate"
+        <LinearLayout
+            android:id="@+id/itemView"
+            android:layout_weight="9"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorContent"
-            android:textSize="13sp"
-            android:layout_marginTop="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
             >
-        </TextView>
+            <TextView
+                android:id="@+id/listName"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/colorTitle"
+                android:textSize="15sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_weight="1"
+                android:gravity="top"
+                >
+            </TextView>
+            <TextView
+                android:id="@+id/listDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorContent"
+                android:textSize="13sp"
+                android:layout_marginTop="10dp"
+                >
+            </TextView>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/donwloadAudio"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/download"
+            >
+        </ImageView>
+
     </LinearLayout>
-    <ImageView
-        android:id="@+id/donwloadAudio"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
         android:layout_gravity="center_vertical"
-        android:src="@mipmap/download"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         >
-    </ImageView>
+
+    </ProgressBar>
 </LinearLayout>
