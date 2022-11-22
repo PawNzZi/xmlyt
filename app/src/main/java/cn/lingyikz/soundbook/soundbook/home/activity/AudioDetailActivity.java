@@ -169,10 +169,11 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
 
                                         spinnerItemList.add(str);
                                     }
+                                    activityAudiodetailBinding.niceSpinner.setOnSpinnerItemSelectedListener(AudioDetailActivity.this);
                                 }
 
                                 activityAudiodetailBinding.niceSpinner.attachDataSource(spinnerItemList);
-                                activityAudiodetailBinding.niceSpinner.setOnSpinnerItemSelectedListener(AudioDetailActivity.this);
+
                             }
                         }else if(reslut.getCode() == 200 && reslut.getData().getRows().size() == 0){
                             Toast.makeText(AudioDetailActivity.this, Constans.ALBUM_CONTENT_NULL, Toast.LENGTH_SHORT).show();

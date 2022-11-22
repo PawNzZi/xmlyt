@@ -24,6 +24,7 @@ import com.kongzue.dialogx.interfaces.OnMenuItemClickListener;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 
+import java.io.File;
 import java.io.IOException;
 
 import cn.hutool.core.util.ObjectUtil;
@@ -55,6 +56,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
     private Bundle bundle ;
     private Animation animation ;
     private SuperMediaPlayer superMediaPlayer = SuperMediaPlayer.getInstance();
+    private DataBaseHelper dataBaseHelper = null ;
 
 
     @Override
@@ -98,6 +100,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
         superMediaPlayer.setOnSeekCompleteListener(onSeekCompleteListener);
         superMediaPlayer.setOnCompletionListener(onCompletionListener);
         superMediaPlayer.setOnErrorListener(onErrorListener);
+        dataBaseHelper = DataBaseHelper.getInstance(this);
 
         //查询是否有定时关闭
         Bundle blockBundle = SharedPreferences.getBolckClose(this);
@@ -189,20 +192,34 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
                     changePlayHistory(currentPlayHistoryInfo.getLong("albumId"),currentPlayHistoryInfo.getLong("audioId"),(long) superMediaPlayer.getCurrentPosition());
                 }
                 superMediaPlayer.reset();
+                String soundPath = dataBaseHelper.queryDownLoadRecorde(data.getZmlmSound().getUrl(),data.getAlbumId()
+                ,data.getSoundId(),Constans.user.getId()) ;
+                if(ObjectUtil.isNotNull(soundPath) && new File(soundPath).exists()){
+
+                }else {
+                    soundPath = data.getZmlmSound().getUrl();
+                }
                 if(data.getPlayPiont() > 0 ){
-                    onSeekToRead(data.getZmlmSound().getUrl(),data.getPlayPiont());
+                    onSeekToRead(soundPath,data.getPlayPiont());
                 }else{
-                    onRead(data.getZmlmSound().getUrl());
+                    onRead(soundPath);
                 }
             }
 
         }else{
             superMediaPlayer.stop();
             superMediaPlayer.reset();
+            String soundPath = dataBaseHelper.queryDownLoadRecorde(data.getZmlmSound().getUrl(),data.getAlbumId()
+                    ,data.getSoundId(),Constans.user.getId()) ;
+            if(ObjectUtil.isNotNull(soundPath) && new File(soundPath).exists()){
+
+            }else {
+                soundPath = data.getZmlmSound().getUrl();
+            }
             if(data.getPlayPiont() > 0 ){
-                onSeekToRead(data.getZmlmSound().getUrl(),data.getPlayPiont());
+                onSeekToRead(soundPath,data.getPlayPiont());
             }else{
-                onRead(data.getZmlmSound().getUrl());
+                onRead(soundPath);
             }
 
         }
@@ -260,7 +277,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
             mediaPlayer.stop();
             mediaPlayer.reset();
             SuperMediaPlayer.error = 1;
-//            Toast.makeText(PlayAudioActivity.this, "加载失败,重新加载中", Toast.LENGTH_LONG).show();
+            Toast.makeText(PlayAudioActivity.this, "加载失败,重新加载中", Toast.LENGTH_LONG).show();
 //            PopTip.show("加载失败,重新加载中").showLong();
             return false;
         }

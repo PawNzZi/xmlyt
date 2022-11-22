@@ -105,7 +105,22 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                  result = cursor.getString(cursor.getColumnIndex("soundPath"));
             }
         }
-        Log.i("TAG","result:"+result);
+//        Log.i("TAG","result:"+result);
+        return result;
+    }
+
+    @SuppressLint("Range")
+    public String queryDownLoadRecorde(String url,Long albumId,Long soundId,Long userId){
+        String result = null ;
+        db = getReadLink();
+        Cursor cursor = db.rawQuery("select * from downloadrecorde where soundUrl = ? and albumId = ? and  soundId = ? and userId = ? "
+                ,new String[]{url,String.valueOf(albumId),String.valueOf(soundId),String.valueOf(userId)});
+        if(cursor.getCount() > 0){
+            if(cursor.moveToFirst()){
+                result = cursor.getString(cursor.getColumnIndex("soundPath"));
+            }
+        }
+//        Log.i("TAG","result:"+result);
         return result;
     }
     /**
