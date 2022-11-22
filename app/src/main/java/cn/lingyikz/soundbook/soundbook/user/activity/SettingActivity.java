@@ -5,10 +5,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.kongzue.dialogx.dialogs.MessageDialog;
+import com.kongzue.dialogx.dialogs.PopTip;
 import com.kongzue.dialogx.dialogs.WaitDialog;
+import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
@@ -16,12 +19,14 @@ import cn.lingyikz.soundbook.soundbook.databinding.ActivitySettingBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Version;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.VersionUtil;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class SettingActivity extends BaseActivity {
+
 
     private ActivitySettingBinding binding;
     @Override
@@ -44,7 +49,7 @@ public class SettingActivity extends BaseActivity {
         LOnClickMe.init(this,binding.getRoot());
         return binding.getRoot();
     }
-    @AClick({R.id.check_version,R.id.go_bacK})
+    @AClick({R.id.check_version,R.id.go_bacK,R.id.login_out_btn})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.go_bacK:
@@ -52,6 +57,23 @@ public class SettingActivity extends BaseActivity {
                 break;
             case R.id.check_version:
                 checkVersion();
+                break;
+            case R.id.login_out_btn:
+                if(ObjectUtil.isNotNull(Constans.user)){
+                    MessageDialog.show(Constans.WARN_TIP, "您确定要退出账号嘛？", Constans.DIALOG_SURE_BUTTON,Constans.DIALOG_CANCEL_BUTTON).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
+                        @Override
+                        public boolean onClick(MessageDialog baseDialog, View v) {
+                            Constans.user = null ;
+                            SharedPreferences.clearLoginUserInfo(SettingActivity.this);
+                            finish();
+                            return false;
+                        }
+                    });
+                }else {
+                    PopTip.show("无登录账号，无需退出").showShort();
+                }
+
+
                 break;
         }
     }

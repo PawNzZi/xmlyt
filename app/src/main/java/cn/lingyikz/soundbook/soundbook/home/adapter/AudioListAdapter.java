@@ -9,12 +9,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
+import com.kongzue.dialogx.dialogs.PopTip;
 import com.liulishuo.okdownload.DownloadTask;
 import com.liulishuo.okdownload.SpeedCalculator;
 import com.liulishuo.okdownload.core.Util;
@@ -23,13 +26,17 @@ import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
 import com.liulishuo.okdownload.core.cause.EndCause;
 import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
 import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
+
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemAudiolistBinding;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
+import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.DownLoadUtil;
 
 
@@ -39,12 +46,14 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     private Context context ;
     private AudioListen audioListen ;
     private int nextPage = 0 ;
+    private DataBaseHelper dataBaseHelper ;
 
     @SuppressLint("SimpleDateFormat")
     public AudioListAdapter(List<AlbumSound.DataDTO.RowsDTO> list, Context context, AudioListen audioListen ){
         this.list = list ;
         this.context = context ;
         this.audioListen = audioListen;
+        this.dataBaseHelper = DataBaseHelper.getInstance(context);
     }
     @NonNull
 
@@ -61,10 +70,15 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
     public void onBindViewHolder(@NonNull  AudioListAdapter.ViewHolder holder, int position) {
 //        LOnClickMe.init(this,holder.binding.getRoot());
 //        Log.i("TAG","onBindViewHolder" + this.nextPage);
+
         holder.binding.donwloadAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+//                Toast.makeText(context, "暂未开放", Toast.LENGTH_SHORT).show();
+                if(ObjectUtil.isNull(Constans.user)){
+                    PopTip.show("请登陆后再下载").showShort();
+                    return ;
+                }
                 XXPermissions.with(context)
                         // 申请权限
                         .permission(Permission.WRITE_EXTERNAL_STORAGE)
@@ -79,9 +93,11 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
                                 holder.binding.progressBar.setVisibility(View.VISIBLE);
 //                                String targetPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Download" + File.separator + list.get(position).getName() + ".mp3" ;
 //                                audioListen.downLoad(list.get(position).getUrl(),targetPath,holder.binding.progressBar);
-                                DownLoadUtil downLoadUtil = new DownLoadUtil(list.get(position).getName(),list.get(position).getUrl());
+                                DownLoadUtil downLoadUtil = new DownLoadUtil(+ list.get(position).getAlbumId()  + Constans.FSEPARATOR
+                                        + list.get(position).getId() + Constans.FSEPARATOR + list.get(position).getName(),
+                                        list.get(position).getUrl());
                                 DownloadTask task =  downLoadUtil.createDownloadTask();
-                                task.enqueue(new MyDownloadListener4WithSpeed(holder.binding.progressBar));
+                                task.enqueue(new MyDownloadListener4WithSpeed(context,holder.binding.progressBar,holder.binding.donwloadComplete,holder.binding.donwloadAudio,list.get(position)));
 
                             }
                             @Override
@@ -96,10 +112,26 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
                             }
                         });
 
-//                Toast.makeText(context, "暂未开放", Toast.LENGTH_SHORT).show();
-
             }
         });
+
+//        if(ObjectUtil.isNotNull(Constans.user)){
+//            String soundPath = dataBaseHelper.queryDownLoadRecorde(list.get(position)) ;
+//            if(ObjectUtil.isNotNull(soundPath) && new File(soundPath).exists()){
+//                holder.binding.donwloadAudio.setVisibility(View.GONE);
+//                holder.binding.donwloadComplete.setVisibility(View.VISIBLE);
+//            }else {
+//                holder.binding.donwloadAudio.setVisibility(View.VISIBLE);
+//                holder.binding.donwloadComplete.setVisibility(View.GONE);
+//            }
+//        }
+        if(list.get(position).isDownLoad()){
+            holder.binding.donwloadAudio.setVisibility(View.GONE);
+            holder.binding.donwloadComplete.setVisibility(View.VISIBLE);
+        }else{
+            holder.binding.donwloadAudio.setVisibility(View.VISIBLE);
+            holder.binding.donwloadComplete.setVisibility(View.GONE);
+        }
         holder.binding.listIndex.setText(nextPage * 50 + position + 1 +"");
         holder.binding.listName.setText(list.get(position).getName());
         holder.binding.listDate.setText(list.get(position).getCreateTime().substring(0,19));
@@ -115,10 +147,19 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
                 bundle.putString("audioDes", (String) list.get(position).getDescription());
 //                bundle.putString("audioDuration","0");
                 bundle.putString("title",list.get(position).getName());
-                bundle.putString("src",list.get(position).getUrl());
+                //bundle.putString("src",list.get(position).getUrl());
                 bundle.putLong("audioId",list.get(position).getId());
                 bundle.putInt("playModel", Constans.PLAY_MODLE_LIST);
-
+                if(ObjectUtil.isNotNull(Constans.user) ){
+                    String soundPath = dataBaseHelper.queryDownLoadRecorde(list.get(position)) ;
+                    if(ObjectUtil.isNotNull(soundPath) && new File(soundPath).exists()){
+                        bundle.putString("src",soundPath);
+                    }else {
+                        bundle.putString("src",list.get(position).getUrl());
+                    }
+                }else{
+                    bundle.putString("src",list.get(position).getUrl());
+                }
                 audioListen.onAudioPlay(bundle);
             }
         });
@@ -156,13 +197,21 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
         private String readableTotalLength;
         private ProgressBar progressBar;//谨防内存泄漏
         private Context context;//谨防内存泄漏
+        private AlbumSound.DataDTO.RowsDTO itemInfo ;
+
+        private ImageView downloadComplete ;
+        private ImageView downloadIcon ;
 
         private String TAG = "download";
 
-        public MyDownloadListener4WithSpeed(ProgressBar progressBar){
+        public MyDownloadListener4WithSpeed(Context context ,ProgressBar progressBar,ImageView downloadComplete ,ImageView downloadIcon ,AlbumSound.DataDTO.RowsDTO itemInfo){
             this.progressBar = progressBar;
             this.context = progressBar.getContext();
+            this.itemInfo = itemInfo ;
+            this.downloadComplete = downloadComplete;
+            this.downloadIcon = downloadIcon ;
         }
+
         @Override
         public void taskStart( DownloadTask task) {
             Log.i(TAG,"taskStart");
@@ -184,7 +233,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
             totalLength = info.getTotalLength();
             readableTotalLength = Util.humanReadableBytes(totalLength, true);
             progressBar.setMax((int) totalLength);
-            Log.i(TAG, "【2、infoReady】当前进度" + (float) info.getTotalOffset() / totalLength * 100 + "%" + "，" + info.toString());
+//            Log.i(TAG, "【2、infoReady】当前进度" + (float) info.getTotalOffset() / totalLength * 100 + "%" + "，" + info.toString());
         }
 
         @Override
@@ -196,10 +245,10 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
         public void progress( DownloadTask task, long currentOffset, SpeedCalculator taskSpeed) {
             Log.i(TAG,"progress");
             String readableOffset = Util.humanReadableBytes(currentOffset, true);
-            String progressStatus = readableOffset + "/" + readableTotalLength;
-            String speed = taskSpeed.speed();
-            float percent = (float) currentOffset / totalLength * 100;
-            Log.i("bqt", "【6、progress】" + currentOffset + "[" + progressStatus + "]，速度：" + speed + "，进度：" + percent + "%");
+//            String progressStatus = readableOffset + "/" + readableTotalLength;
+//            String speed = taskSpeed.speed();
+//            float percent = (float) currentOffset / totalLength * 100;
+//            Log.i("bqt", "【6、progress】" + currentOffset + "[" + progressStatus + "]，速度：" + speed + "，进度：" + percent + "%");
             progressBar.setProgress((int) currentOffset);
         }
 
@@ -210,8 +259,23 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
 
         @Override
         public void taskEnd(DownloadTask task, EndCause cause, Exception realCause, SpeedCalculator taskSpeed) {
-            Log.i(TAG,"taskEnd");
+//            Log.i(TAG,"taskEnd");
+//            Log.i(TAG,"cause:"+cause);
+//            Log.i(TAG,"realCause:"+realCause);
             progressBar.setVisibility(View.GONE);
+            if(cause.toString().equals("COMPLETED")){
+
+                downloadComplete.setVisibility(View.VISIBLE);
+                //显示已下载，将下载地址写进本地数据库
+                dataBaseHelper.addDownLoadRecorde(itemInfo,Constans.DOWNLOAD_FILE_PATH + File.separator
+                        + itemInfo.getAlbumId() + Constans.FSEPARATOR + itemInfo.getId() + Constans.FSEPARATOR + itemInfo.getName() + Constans.ENDWITH);
+            }else{
+                downloadIcon.setVisibility(View.VISIBLE);
+            }
+
+            progressBar = null;
+            downloadComplete = null;
+            downloadIcon = null;
         }
     }
 }

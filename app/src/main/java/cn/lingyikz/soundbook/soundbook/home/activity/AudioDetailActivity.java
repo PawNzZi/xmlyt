@@ -61,6 +61,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
     private int nextPage = 1;
     private int basePostion = 0 ;
     private Album.DataDTO.RowsDTO albumDetail ;
+    private DataBaseHelper dataBaseHelper ;
 
     @Override
     protected void setData() {
@@ -96,6 +97,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
         //调接口查询列表
 //        Log.i("TAG","ID:"+albumDetail.getId());
 //        Aria.download(this).register();
+        this.dataBaseHelper = DataBaseHelper.getInstance(getApplicationContext());
         this.queryList(albumDetail.getId(),true);
 
     }
@@ -116,6 +118,16 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
                             }
                             mList.clear();
                             List<AlbumSound.DataDTO.RowsDTO> newList = reslut.getData().getRows();
+                            if(ObjectUtil.isNotNull(Constans.user)){
+                                for(AlbumSound.DataDTO.RowsDTO dto : newList){
+                                    String soundPath = dataBaseHelper.queryDownLoadRecorde(dto) ;
+                                    if(ObjectUtil.isNotNull(soundPath) && new File(soundPath).exists()){
+                                         dto.setDownLoad(true);
+                                    }else {
+                                        dto.setDownLoad(false);
+                                    }
+                                }
+                            }
                             mList.addAll(newList);
                             nextPage = reslut.getData().getNextPage();
                             if(adapter == null){

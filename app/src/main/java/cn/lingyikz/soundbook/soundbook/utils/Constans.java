@@ -1,5 +1,9 @@
 package cn.lingyikz.soundbook.soundbook.utils;
 
+import android.os.Environment;
+
+import java.io.File;
+
 import cn.lingyikz.soundbook.soundbook.modle.v2.User;
 
 public class Constans {
@@ -31,6 +35,15 @@ public class Constans {
     public final static String HOME_BANNER = "home_banner";
     public static final String REGISTER_USERNAME_REGEX = "^(?![0-9]+$)(?![a-z]+$)[0-9a-z]{8,16}$";
     public static final String REGISTER_PASSWORD_REGEX = "^(?![0-9]+$)(?![a-z]+$)[0-9a-z]{6,12}$";
+
+    public final static String ENDWITH = ".mp3";
+    public final static String APP_NAME = "zmlm" ;
+
+    public final static String DOWNLOAD_FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Download" + File.separator + APP_NAME ;
+    public final static String FSEPARATOR = "_" ;
+    public final static String WARN_TIP = "友情提示";
+    public final static String DIALOG_SURE_BUTTON = "确定";
+    public final static String DIALOG_CANCEL_BUTTON = "取消";
     public static User user = new User() ;
 
 }

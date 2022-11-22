@@ -16,11 +16,11 @@ public class SharedPreferences {
     private static final String CATEGORY_POSTION = "CATEGORY_POSTION";
     private static final String USER_INFO = "USERINFO";
 
-    public static void cleanCurrentPlayHistoryInfo(Activity activity){
-        android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);
-        android.content.SharedPreferences.Editor editor = oldAudioInfo.edit();
-        editor.clear();
-        editor.commit();
+    public static void clearLoginUserInfo(Activity activity){
+        android.content.SharedPreferences userInfo = activity.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = userInfo.edit();
+        editor.clear().commit();
+
     }
     public static void saveCurrentPlayHistoryInfo(Activity activity, Bundle bundle){
         android.content.SharedPreferences oldAudioInfo = activity.getSharedPreferences(OLD_AUDIO_INFO, Context.MODE_PRIVATE);

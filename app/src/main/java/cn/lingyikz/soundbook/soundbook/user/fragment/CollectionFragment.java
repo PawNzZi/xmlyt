@@ -1,6 +1,7 @@
 package cn.lingyikz.soundbook.soundbook.user.fragment;
 
 
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +10,15 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.kongzue.dialogx.dialogs.PopTip;
+import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
@@ -25,10 +30,12 @@ import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.modle.v2.CollectionHistory;
+import cn.lingyikz.soundbook.soundbook.user.activity.SettingActivity;
 import cn.lingyikz.soundbook.soundbook.user.adapter.CollectionAdapter;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.EndlessRecyclerOnScrollListener;
+import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -68,18 +75,31 @@ public class CollectionFragment extends BaseFragment  implements CollectionAdapt
 
     private void initData() {
 //        Log.i("TAG","initData");
+        albumList.clear();
         if(ObjectUtil.isNotNull(Constans.user)){
-            albumList.clear();
            this.collectionList();
+        }else {
+            if(ObjectUtil.isNotNull(adapter)){
+                adapter.notifyDataSetChanged();
+            }
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        initData();
+
 //        Log.i("TAG","CollectionFragment:onResume");
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initData();
+//        Log.i("TAG","CollectionFragment:onStart");
+    }
+
+
 
     @Override
     public void onStop() {
@@ -160,6 +180,14 @@ public class CollectionFragment extends BaseFragment  implements CollectionAdapt
 
     @Override
     public void deleteItem(Long albumId) {
-        changeCollection(albumId);
+        MessageDialog.show(Constans.WARN_TIP, "您确定要取消对该专辑的收藏嘛？", Constans.DIALOG_SURE_BUTTON,Constans.DIALOG_CANCEL_BUTTON).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
+            @Override
+            public boolean onClick(MessageDialog baseDialog, View v) {
+                changeCollection(albumId);
+
+                return false;
+            }
+        });
+
     }
 }

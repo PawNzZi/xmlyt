@@ -66,6 +66,15 @@
             android:src="@mipmap/download"
             >
         </ImageView>
+        <ImageView
+            android:id="@+id/donwloadComplete"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/download_cpl"
+            android:visibility="gone"
+            >
+        </ImageView>
 
     </LinearLayout>
     <ProgressBar
@@ -74,6 +83,7 @@
         android:layout_height="1dp"
         android:layout_gravity="center_vertical"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:visibility="gone"
         >
 
     </ProgressBar>

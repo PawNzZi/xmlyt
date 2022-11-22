@@ -10,19 +10,19 @@ public class DownLoadUtil {
     private String fileName ;
     private String url ;
     private final static String TAG ="DownLoadUtil";
-    private final static String ENDWITH = ".mp3";
-    private String targetFilePath ;
+
+//    private String targetFilePath ;
     public DownLoadUtil(){}
 
     public DownLoadUtil(String fileName,String url){
         this.fileName = fileName;
         this.url = url ;
-        this.targetFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Download" + File.separator + fileName + ENDWITH ;
+//        this.targetFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Download" + File.separator + Constans.APP_NAME  ;
     }
 
     public DownloadTask createDownloadTask() {
-        return new DownloadTask.Builder(url, new File(targetFilePath)) //设置下载地址和下载目录，这两个是必须的参数
-                .setFilename(fileName + ENDWITH)//设置下载文件名，没提供的话先看 response header ，再看 url path(即启用下面那项配置)
+        return new DownloadTask.Builder(url, new File(Constans.DOWNLOAD_FILE_PATH)) //设置下载地址和下载目录，这两个是必须的参数
+                .setFilename(fileName + Constans.ENDWITH)//设置下载文件名，没提供的话先看 response header ，再看 url path(即启用下面那项配置)
                 .setFilenameFromResponse(false)//是否使用 response header or url path 作为文件名，此时会忽略指定的文件名，默认false
                 .setPassIfAlreadyCompleted(true)//如果文件已经下载完成，再次下载时，是否忽略下载，默认为true(忽略)，设为false会从头下载
                 .setConnectionCount(1)  //需要用几个线程来下载文件，默认根据文件大小确定；如果文件已经 split block，则设置后无效

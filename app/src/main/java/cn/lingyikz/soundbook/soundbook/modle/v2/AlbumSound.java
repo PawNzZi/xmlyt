@@ -38,6 +38,8 @@ public class AlbumSound {
             private String url;
             private Integer episodes;
             private Long albumId;
+            private boolean isDownLoad;
+
         }
     }
 }

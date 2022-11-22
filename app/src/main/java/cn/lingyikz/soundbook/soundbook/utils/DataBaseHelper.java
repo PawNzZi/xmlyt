@@ -42,10 +42,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 //        Log.i("TAG","SQLonCreate");
-        sqLiteDatabase.execSQL("CREATE TABLE collection(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,albumDes TEXT,albumThumb TEXT," +
-                "uuid TEXT);");
-        sqLiteDatabase.execSQL("CREATE TABLE playhistory(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,episodes INTEGER,audioTitle TEXT,audioDes TEXT," +
-                "audioCreated TEXT,audioDuration TEXT,audioSrc TEXT ,audioId INTEGER,uuid TEXT);");
+//        sqLiteDatabase.execSQL("CREATE TABLE collection(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,albumDes TEXT,albumThumb TEXT," +
+//                "uuid TEXT);");
+//        sqLiteDatabase.execSQL("CREATE TABLE playhistory(_id INTEGER PRIMARY KEY AUTOINCREMENT, albumId INTEGER, albumName TEXT,episodes INTEGER,audioTitle TEXT,audioDes TEXT," +
+//                "audioCreated TEXT,audioDuration TEXT,audioSrc TEXT ,audioId INTEGER,uuid TEXT);");
+        sqLiteDatabase.execSQL("CREATE TABLE downloadrecorde(_id INTEGER PRIMARY KEY AUTOINCREMENT,albumId LONG,soundId LONG,userId LONG,soundUrl TEXT,soundPath TEXT)");
     }
 
     @Override
@@ -70,6 +71,43 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * 添加下载记录
+     * @param itemInfo
+     * @param path
+     */
+    public void addDownLoadRecorde(AlbumSound.DataDTO.RowsDTO itemInfo,String path){
+        db = getReadLink();
+        Cursor cursor = db.rawQuery("select * from downloadrecorde where soundUrl = ? ",new String[]{itemInfo.getUrl()});
+        if(cursor.getCount() == 0){
+            //添加记录
+            db = getWriteLink();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("albumId",itemInfo.getAlbumId());
+            contentValues.put("soundId",itemInfo.getId());
+            contentValues.put("userId",Constans.user.getId());
+            contentValues.put("soundUrl",itemInfo.getUrl());
+            contentValues.put("soundPath",path);
+            db.insert("downloadrecorde",null,contentValues);
+        }
+        cursor.close();
+        close();
+    }
+
+    @SuppressLint("Range")
+    public String queryDownLoadRecorde(AlbumSound.DataDTO.RowsDTO itemInfo){
+        String result = null ;
+        db = getReadLink();
+        Cursor cursor = db.rawQuery("select * from downloadrecorde where soundUrl = ? and albumId = ? and  soundId = ? and userId = ? "
+                ,new String[]{itemInfo.getUrl(),String.valueOf(itemInfo.getAlbumId()),String.valueOf(itemInfo.getId()),String.valueOf(Constans.user.getId())});
+        if(cursor.getCount() > 0){
+            if(cursor.moveToFirst()){
+                 result = cursor.getString(cursor.getColumnIndex("soundPath"));
+            }
+        }
+        Log.i("TAG","result:"+result);
+        return result;
+    }
     /**
      * 查询改专辑是否被收藏
      * @param albumId

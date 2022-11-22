@@ -9,7 +9,11 @@ import java.util.List;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.kongzue.dialogx.dialogs.PopTip;
+import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
+
 import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
@@ -56,14 +60,20 @@ public class PlayHistoryFragment extends BaseFragment implements PlayHistoryAdap
     }
 
     private void initData() {
+        mList.clear();
         if(ObjectUtil.isNotNull(Constans.user)){
             playHistoryList();
+        }else {
+            if(ObjectUtil.isNotNull(adapter)){
+                adapter.notifyDataSetChanged();
+            }
         }
 
     }
     @Override
     public void onStart() {
         super.onStart();
+        initData();
 //        Log.i("TAG","onStart");
 //        Log.i("TAG","PlayHistoryFragment:onStart");
     }
@@ -79,8 +89,8 @@ public class PlayHistoryFragment extends BaseFragment implements PlayHistoryAdap
     public void onResume() {
         super.onResume();
 //        Log.i("TAG","onResume");
-        mList.clear();
-        initData();
+
+
 //        Log.i("TAG","PlayHistoryFragment:onResume");
 
     }
@@ -158,6 +168,13 @@ public class PlayHistoryFragment extends BaseFragment implements PlayHistoryAdap
     }
     @Override
     public void deleteItem(Long playHistoryId) {
-        deletePlayHistory(playHistoryId);
+        MessageDialog.show(Constans.WARN_TIP, "您确定要删除该记录嘛？", Constans.DIALOG_SURE_BUTTON,Constans.DIALOG_CANCEL_BUTTON).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
+            @Override
+            public boolean onClick(MessageDialog baseDialog, View v) {
+                deletePlayHistory(playHistoryId);
+                return false;
+            }
+        });
+
     }
 }
