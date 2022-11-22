@@ -96,7 +96,7 @@ public class RegisterFragment extends BaseFragment {
 
                     @Override
                     public void onNext(BaseModel bean) {
-                        Log.i("TAG：", bean.toString() + "");
+//                        Log.i("TAG：", bean.toString() + "");
                         if(bean.getSuccess() && bean.getCode() == 200){
                             PopTip.show("注册成功").showLong();
                             binding.userNameEditText.setText("");
