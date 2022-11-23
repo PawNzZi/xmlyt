@@ -24,4 +24,7 @@
     <string name="login_btn_text">登录</string>
     <string name="register_btn_text">注册</string>
     <string name="login_out">退出登录</string>
+    <string name="register_username_tip">*账号必须由8-16位的小写字母与数字组成</string>
+    <string name="register_psw_tip">*密码必须由6-12位的小写字母与数字组成</string>
+    <string name="register_warn_tip">Tip:之前播放历史和收藏存于本地，更新App后数据会被清理掉。账号仅用于存储播放记录和收藏。注册时随便填写，只要你记得住就行。</string>
 </resources>
