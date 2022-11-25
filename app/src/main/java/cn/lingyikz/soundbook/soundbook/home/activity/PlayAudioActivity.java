@@ -18,8 +18,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.SeekBar;
 import android.widget.Toast;
 import com.kongzue.dialogx.dialogs.BottomMenu;
-import com.kongzue.dialogx.dialogs.PopTip;
-import com.kongzue.dialogx.dialogs.WaitDialog;
 import com.kongzue.dialogx.interfaces.OnMenuItemClickListener;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
@@ -62,6 +60,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
     @Override
     protected void setData() {
         initData();
+
     }
 
     @Override
@@ -183,7 +182,7 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
         if(superMediaPlayer.isPlaying()){
             if(currentPlayHistoryInfo.getString("src").equals(bundle.getString("src"))){
                 binding.startPlay.setImageDrawable(getResources().getDrawable(R.mipmap.activity_start, null));
-//                binding.spinKit.setVisibility(View.GONE);
+                binding.spinKit.setVisibility(View.GONE);
                 binding.bookThumb.startAnimation(animation);
 //                WaitDialog.dismiss();
             }else{
@@ -271,16 +270,13 @@ public class PlayAudioActivity extends BaseActivity implements SeekBar.OnSeekBar
             mediaPlayer.start();
         }
     };
-    private final SuperMediaPlayer.OnErrorListener onErrorListener = new MediaPlayer.OnErrorListener() {
-        @Override
-        public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-            SuperMediaPlayer.error = 1;
-            Toast.makeText(PlayAudioActivity.this, "加载失败,重新加载中", Toast.LENGTH_LONG).show();
+    private final SuperMediaPlayer.OnErrorListener onErrorListener = (mediaPlayer, i, i1) -> {
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        SuperMediaPlayer.error = 1;
+        Toast.makeText(PlayAudioActivity.this, "加载失败,重新加载中", Toast.LENGTH_LONG).show();
 //            PopTip.show("加载失败,重新加载中").showLong();
-            return false;
-        }
+        return false;
     };
     private final SuperMediaPlayer.OnCompletionListener onCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override

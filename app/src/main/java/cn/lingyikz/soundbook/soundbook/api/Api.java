@@ -14,14 +14,10 @@ import cn.lingyikz.soundbook.soundbook.modle.v2.UserInfo;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Version;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.modle.v2.HomeBanner;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import retrofit2.http.Streaming;
-import retrofit2.http.Url;
 import rx.Observable;
 
 public interface Api {
@@ -91,5 +87,7 @@ public interface Api {
       //删除播放历史
       @GET("/zmlmPlayHistory/app/delete")
       Observable<BaseModel> deleteHistroy(@Query("id") Long id, @Query("userId") Long userId);
+
+
 
 }
