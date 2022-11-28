@@ -5,22 +5,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-
 import java.util.List;
-
-import cn.hutool.core.bean.BeanUtil;
-import cn.lingyikz.soundbook.soundbook.category.adapter.BottomAdapter;
 import cn.lingyikz.soundbook.soundbook.databinding.FootviewBinding;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.AudioDetailActivity;
-import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
-import cn.lingyikz.soundbook.soundbook.modle.v2.CategoryAlbum;
 import cn.lingyikz.soundbook.soundbook.modle.v2.CollectionHistory;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 

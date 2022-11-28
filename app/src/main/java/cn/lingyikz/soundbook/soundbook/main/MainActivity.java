@@ -1,32 +1,23 @@
 package cn.lingyikz.soundbook.soundbook.main;
 
 import android.content.Intent;
-
 import android.os.Build;
 import android.os.Bundle;
-
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kongzue.dialogx.dialogs.MessageDialog;
-import com.microsoft.appcenter.AppCenter;
-import com.microsoft.appcenter.analytics.Analytics;
-import com.microsoft.appcenter.crashes.Crashes;
-
+import com.kongzue.dialogx.dialogs.PopTip;
+import com.tencent.bugly.crashreport.CrashReport;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.category.CategoryFragment;
 import cn.lingyikz.soundbook.soundbook.databinding.ActivityMainBinding;
 import cn.lingyikz.soundbook.soundbook.home.HomeFragment;
-import cn.lingyikz.soundbook.soundbook.modle.v2.User;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Version;
 import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.user.UserFragment;
@@ -65,6 +56,8 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
         }
         SharedPreferences.saveCategoryIndex(getApplicationContext(),0);
         this.checkVersion();
+        CrashReport.initCrashReport(getApplicationContext(), Constans.BUGLY_APPID, false);
+//        CrashReport.testJavaCrash();
 //        SharedPreferences.cleanCurrentPlayHistoryInfo(getParent());
 
     }
@@ -130,7 +123,9 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
                                         .setCancelable(false);
                             }
                         }else if(bean.getCode() != 200){
-                            Toast.makeText(getApplicationContext(), Constans.VERSION_ERROR, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getApplicationContext(), Constans.VERSION_ERROR, Toast.LENGTH_SHORT).show();
+                            PopTip.show(R.mipmap.fail_tip,Constans.VERSION_ERROR).showShort().setAutoTintIconInLightOrDarkMode(false);
+
                         }
 
                     }

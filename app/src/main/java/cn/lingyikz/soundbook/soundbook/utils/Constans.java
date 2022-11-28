@@ -44,6 +44,7 @@ public class Constans {
     public final static String WARN_TIP = "友情提示";
     public final static String DIALOG_SURE_BUTTON = "确定";
     public final static String DIALOG_CANCEL_BUTTON = "取消";
+    public final static String BUGLY_APPID = "65570d87b8";
     public static User user = new User() ;
 
 }

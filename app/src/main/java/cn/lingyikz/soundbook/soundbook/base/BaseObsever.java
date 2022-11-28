@@ -1,7 +1,6 @@
 package cn.lingyikz.soundbook.soundbook.base;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import rx.Observer;
 

@@ -4,16 +4,10 @@ import android.annotation.SuppressLint;
 
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
-
-import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.task.DownloadTask;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
@@ -27,12 +21,8 @@ import org.angmarch.views.OnSpinnerItemSelectedListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
@@ -41,14 +31,12 @@ import cn.lingyikz.soundbook.soundbook.databinding.ActivityAudiodetailBinding;
 import cn.lingyikz.soundbook.soundbook.home.adapter.AudioListAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseActivity;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
-import cn.lingyikz.soundbook.soundbook.modle.AlbumDetail;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
 import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import rx.Observable;
-import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -176,11 +164,13 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
 
                             }
                         }else if(reslut.getCode() == 200 && reslut.getData().getRows().size() == 0){
-                            Toast.makeText(AudioDetailActivity.this, Constans.ALBUM_CONTENT_NULL, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(AudioDetailActivity.this, Constans.ALBUM_CONTENT_NULL, Toast.LENGTH_SHORT).show();
+                            PopTip.show(R.mipmap.warn_tip,Constans.ALBUM_CONTENT_NULL).showShort().setAutoTintIconInLightOrDarkMode(false);
                             activityAudiodetailBinding.niceSpinner.setVisibility(View.GONE);
                             activityAudiodetailBinding.listLen.setText(Constans.ALBUM_CONTENT_NULL);
                         }else {
-                            Toast.makeText(AudioDetailActivity.this, reslut.getMessage(), Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(AudioDetailActivity.this, reslut.getMessage(), Toast.LENGTH_SHORT).show();
+                            PopTip.show(R.mipmap.fail_tip,reslut.getMessage()).showShort().setAutoTintIconInLightOrDarkMode(false);
                             activityAudiodetailBinding.niceSpinner.setVisibility(View.GONE);
                             activityAudiodetailBinding.listLen.setText("共"+ 0 +"集");
                         }
@@ -210,7 +200,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
                 if(ObjectUtil.isNotNull(Constans.user)){
                    this.changeCollection(albumDetail.getId());
                 }else {
-                    PopTip.show("请先登录,登录后才能收藏").showLong();
+                    PopTip.show(R.mipmap.warn_tip,"请先登录,登录后才能收藏").showShort().setAutoTintIconInLightOrDarkMode(false);
                 }
              
                 break;
@@ -244,7 +234,7 @@ public class AudioDetailActivity extends BaseActivity implements AudioListAdapte
                         }else if(baseModel.getCode() == 200 && Integer.parseInt(baseModel.getData()) == 1){
                             Glide.with(activityAudiodetailBinding.getRoot()).load(R.mipmap.unlike).into(activityAudiodetailBinding.collection);
                         }else {
-                            PopTip.show("修改失败："+baseModel.getMessage()).showLong();
+                            PopTip.show(R.mipmap.fail_tip,"修改失败："+baseModel.getMessage()).showShort().setAutoTintIconInLightOrDarkMode(false);
                         }
 
                     }

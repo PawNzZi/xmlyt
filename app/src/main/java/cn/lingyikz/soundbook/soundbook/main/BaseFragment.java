@@ -2,18 +2,13 @@ package cn.lingyikz.soundbook.soundbook.main;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.viewbinding.ViewBinding;
 
-import cn.lingyikz.soundbook.soundbook.utils.Constans;
-import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 public abstract class BaseFragment extends Fragment {
 

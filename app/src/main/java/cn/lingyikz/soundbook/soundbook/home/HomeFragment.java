@@ -5,18 +5,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import com.kongzue.dialogx.dialogs.PopTip;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 import com.wyt.searchbox.SearchFragment;
 import com.wyt.searchbox.custom.IOnSearchClickListener;
 import com.youth.banner.indicator.CircleIndicator;
-import com.youth.banner.util.BannerLifecycleObserver;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,14 +29,12 @@ import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.home.adapter.ImageAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
-import cn.lingyikz.soundbook.soundbook.modle.Banner;
 import cn.lingyikz.soundbook.soundbook.modle.v2.HomeBanner;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
 import rx.Observable;
-import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -114,7 +110,9 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
                             }
                             homeAdapter.notifyDataSetChanged();
                         }else{
-                            Toast.makeText(getContext(), Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getContext(), Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+                            PopTip.show(R.mipmap.warn_tip,Constans.EMPTY_TOAST).showShort().setAutoTintIconInLightOrDarkMode(false);
+
                         }
                         binding.recyclerView.setVisibility(View.VISIBLE);
                         binding.spinKit1.setVisibility(View.GONE);
@@ -232,7 +230,9 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
         Bundle bundle = SharedPreferences.currentPlayHistoryInfo(getActivity());
 //                Log.i("TAG",bundle.getString("src"));
         if(bundle.getString("src") == null){
-            Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+            PopTip.show(R.mipmap.warn_tip,Constans.NO_OLD_AUDIOINFO).showShort().setAutoTintIconInLightOrDarkMode(false);
+
         }else {
             IntentAction.setValueActivity(getActivity(),PlayAudioActivity.class,bundle);
             getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);

@@ -6,8 +6,8 @@ android {
         applicationId "cn.lingyikz.soundbook"
         minSdkVersion 26
         targetSdkVersion 32
-        versionCode 70
-        versionName "0.7.0"
+        versionCode 71
+        versionName "0.7.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary= true
 //添加如下配置 开启annotation processor
@@ -16,6 +16,16 @@ android {
                includeCompileClasspath true
                 }
           }
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
+    }
+    // 自定义打包名称
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "zmlmt_${buildType.name}_v${versionName}_${generateTime()}.apk"
+        }
     }
     buildTypes {
         release {
@@ -30,6 +40,11 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+}
+
+//构建时间
+def generateTime() {
+    return new Date().format("yyyy-MM-dd_HH-mm-ss")
 }
 
 dependencies {
@@ -72,9 +87,9 @@ dependencies {
     //加载loading
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
     //appcenter
-    def appCenterSdkVersion = '4.3.1'
-    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
-    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+//    def appCenterSdkVersion = '4.3.1'
+//    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
+//    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
     //dialogX
     def dialogx_version = "0.0.45"
     implementation "com.github.kongzue.DialogX:DialogX:${dialogx_version}"
@@ -94,4 +109,7 @@ dependencies {
     annotationProcessor 'me.laoyuyu.aria:compiler:3.8.16'
     //权限请求框架
     implementation 'com.github.getActivity:XXPermissions:16.2'
+
+    //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如4.0.3
+    implementation 'com.tencent.bugly:crashreport:latest.release'
 }

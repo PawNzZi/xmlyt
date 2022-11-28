@@ -1,41 +1,29 @@
 package cn.lingyikz.soundbook.soundbook.user.fragment;
 
 
-import android.os.Bundle;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
 import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.kongzue.dialogx.dialogs.PopTip;
 import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
-
 import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCollectionBinding;
-import cn.lingyikz.soundbook.soundbook.home.adapter.HomeAdapter;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
-import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
 import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.modle.v2.CollectionHistory;
-import cn.lingyikz.soundbook.soundbook.user.activity.SettingActivity;
 import cn.lingyikz.soundbook.soundbook.user.adapter.CollectionAdapter;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
-import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.EndlessRecyclerOnScrollListener;
-import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -123,7 +111,7 @@ public class CollectionFragment extends BaseFragment  implements CollectionAdapt
                         if(baseModel.getCode() == 200){
                           initData();
                         }else {
-                            PopTip.show("修改失败："+baseModel.getMessage()).showLong();
+                            PopTip.show(R.mipmap.warn_tip,"修改失败："+baseModel.getMessage()).showShort().setAutoTintIconInLightOrDarkMode(false);
                         }
 
                     }

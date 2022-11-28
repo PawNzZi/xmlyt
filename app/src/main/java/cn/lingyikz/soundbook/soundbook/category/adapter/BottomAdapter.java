@@ -13,7 +13,6 @@ import cn.lingyikz.soundbook.soundbook.databinding.FootviewBinding;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.AudioDetailActivity;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
-import cn.lingyikz.soundbook.soundbook.modle.AlbumCategoryBean;
 import cn.lingyikz.soundbook.soundbook.modle.v2.CategoryAlbum;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 

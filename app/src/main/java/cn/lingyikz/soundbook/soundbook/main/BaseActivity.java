@@ -2,17 +2,13 @@ package cn.lingyikz.soundbook.soundbook.main;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import com.kongzue.dialogx.DialogX;
 import com.kongzue.dialogx.style.KongzueStyle;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.lingyikz.soundbook.soundbook.utils.Constans;
-import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 
 public abstract class BaseActivity extends Activity {
 

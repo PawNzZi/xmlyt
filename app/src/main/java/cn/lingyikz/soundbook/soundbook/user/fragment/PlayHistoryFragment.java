@@ -1,20 +1,18 @@
 package cn.lingyikz.soundbook.soundbook.user.fragment;
 
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.kongzue.dialogx.dialogs.PopTip;
 import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
-
 import cn.hutool.core.util.ObjectUtil;
+import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentPalyhistoryBinding;
@@ -24,7 +22,6 @@ import cn.lingyikz.soundbook.soundbook.modle.v2.PlayHistories;
 import cn.lingyikz.soundbook.soundbook.user.adapter.PlayHistoryAdapter;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
 import cn.lingyikz.soundbook.soundbook.utils.EndlessRecyclerOnScrollListener;
-
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -159,7 +156,7 @@ public class PlayHistoryFragment extends BaseFragment implements PlayHistoryAdap
                             mList.clear();
                             initData();
                         }else {
-                            PopTip.show("删除失败："+baseModel.getMessage()).showLong();
+                            PopTip.show(R.mipmap.fail_tip,"删除失败："+baseModel.getMessage()).showShort().setAutoTintIconInLightOrDarkMode(false);
                         }
 
                     }

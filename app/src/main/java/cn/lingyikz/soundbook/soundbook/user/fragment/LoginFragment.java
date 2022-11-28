@@ -1,15 +1,13 @@
 package cn.lingyikz.soundbook.soundbook.user.fragment;
 
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.kongzue.dialogx.dialogs.PopTip;
 import com.kongzue.dialogx.dialogs.WaitDialog;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
-
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.lingyikz.soundbook.soundbook.R;
@@ -17,7 +15,6 @@ import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentLoginBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
-import cn.lingyikz.soundbook.soundbook.modle.v2.BaseModel;
 import cn.lingyikz.soundbook.soundbook.modle.v2.User;
 import cn.lingyikz.soundbook.soundbook.modle.v2.UserInfo;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
@@ -63,7 +60,7 @@ public class LoginFragment extends BaseFragment {
     private void login() {
         String username = binding.userNameEditText.getText().toString();
         if(!ReUtil.isMatch(Constans.REGISTER_USERNAME_REGEX,username)){
-            PopTip.show("账号格式不正确").showLong();
+            PopTip.show(R.mipmap.warn_tip,"账号格式不正确").showShort().setAutoTintIconInLightOrDarkMode(false);
             return ;
         }
         String password = binding.passwordEditText.getText().toString();
@@ -90,7 +87,7 @@ public class LoginFragment extends BaseFragment {
                     public void onNext(UserInfo bean) {
 //                        Log.i("TAG：", bean.toString() + "");
                         if(bean.getSuccess() && bean.getCode() == 200){
-                            PopTip.show("登录成功").showLong();
+                            PopTip.show(R.mipmap.succes_tip,"登录成功").showShort().setAutoTintIconInLightOrDarkMode(false);
                             Constans.user = bean.getData();
 //                            Log.i("TAG：", Constans.user.toString());
                             binding.userNameEditText.setText("");
@@ -98,7 +95,7 @@ public class LoginFragment extends BaseFragment {
                             SharedPreferences.saveUser(getContext(),bean.getData());
                             getActivity().finish();
                         }else if(!bean.getSuccess() && bean.getCode() == 201){
-                            PopTip.show(bean.getMessage()).showLong();
+                            PopTip.show(R.mipmap.fail_tip,bean.getMessage()).showShort().setAutoTintIconInLightOrDarkMode(false);
                         }
                     }
                 });

@@ -1,24 +1,22 @@
 package cn.lingyikz.soundbook.soundbook.category;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import com.kongzue.dialogx.dialogs.PopTip;
 import com.liys.onclickme.LOnClickMe;
 import java.util.ArrayList;
 import java.util.List;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
 import cn.lingyikz.soundbook.soundbook.category.adapter.BottomAdapter;
 import cn.lingyikz.soundbook.soundbook.category.adapter.LeftAdapter;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentCategoryBinding;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
-import cn.lingyikz.soundbook.soundbook.modle.AlbumCategoryBean;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Category;
 import cn.lingyikz.soundbook.soundbook.modle.v2.CategoryAlbum;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
@@ -105,7 +103,8 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
                             mCategoryId = category.getData().get(0).getId() ;
                             getAlbumCategory(mCategoryId,1,size,true);
                         }else{
-                            Toast.makeText(getContext(), Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getContext(), Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+                            PopTip.show(R.mipmap.warn_tip,Constans.EMPTY_TOAST).showShort().setAutoTintIconInLightOrDarkMode(false);
                         }
                     }
                 });
@@ -179,7 +178,9 @@ public class CategoryFragment extends BaseFragment implements LeftAdapter.Adapte
                             nextPage = category.getData().getNextPage();
                             hasNextPage = category.getData().getHasNextPage();
                         }else{
-                            Toast.makeText(getContext(), Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getContext(), Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+                            PopTip.show(R.mipmap.warn_tip,Constans.EMPTY_TOAST).showShort().setAutoTintIconInLightOrDarkMode(false);
+
                             hasNextPage = false;
                         }
                         binding.spinKit1.setVisibility(View.GONE);

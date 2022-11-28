@@ -11,9 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.SeekBar;
-import android.widget.Toast;
-
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
@@ -33,6 +30,7 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cn.hutool.core.util.ObjectUtil;
+import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemAudiolistBinding;
 import cn.lingyikz.soundbook.soundbook.modle.v2.AlbumSound;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
@@ -76,7 +74,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.View
             public void onClick(View view) {
 //                Toast.makeText(context, "暂未开放", Toast.LENGTH_SHORT).show();
                 if(ObjectUtil.isNull(Constans.user)){
-                    PopTip.show("请登陆后再下载").showShort();
+                    PopTip.show(R.mipmap.warn_tip,"请登陆后再下载").showShort().setAutoTintIconInLightOrDarkMode(false);
                     return ;
                 }
                 XXPermissions.with(context)

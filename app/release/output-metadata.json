@@ -11,10 +11,10 @@
       "type": "SINGLE",
       "filters": [],
       "properties": [],
-      "versionCode": 70,
-      "versionName": "0.7.0",
+      "versionCode": 71,
+      "versionName": "0.7.1",
       "enabled": true,
-      "outputFile": "app-release.apk"
+      "outputFile": "zmlmt_release_v0.7.1_2022-11-28_15-46-32.apk"
     }
   ]
 }

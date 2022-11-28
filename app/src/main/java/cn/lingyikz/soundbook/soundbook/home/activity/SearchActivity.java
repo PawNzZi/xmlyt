@@ -6,19 +6,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+
+import com.kongzue.dialogx.dialogs.PopTip;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
 import com.wyt.searchbox.SearchFragment;
 import com.wyt.searchbox.custom.IOnSearchClickListener;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
@@ -32,7 +28,6 @@ import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
 import rx.Observable;
-import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -115,7 +110,9 @@ public class SearchActivity extends BaseFragmentActivity implements HomeAdapter.
                             }
                             homeAdapter.notifyDataSetChanged();
                         }else{
-                            Toast.makeText(SearchActivity.this, Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(SearchActivity.this, Constans.EMPTY_TOAST, Toast.LENGTH_SHORT).show();
+                            PopTip.show(R.mipmap.warn_tip,Constans.EMPTY_TOAST).showShort().setAutoTintIconInLightOrDarkMode(false);
+
                         }
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -185,7 +182,8 @@ public class SearchActivity extends BaseFragmentActivity implements HomeAdapter.
             case R.id.go_play:
                 Bundle bundle = SharedPreferences.currentPlayHistoryInfo(this);
                 if(bundle.getString("src") == null){
-                    Toast.makeText(this, Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+                    PopTip.show(R.mipmap.warn_tip,Constans.NO_OLD_AUDIOINFO).showShort().setAutoTintIconInLightOrDarkMode(false);
                 }else {
                     IntentAction.setValueActivity(this,PlayAudioActivity.class,bundle);
                     overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);

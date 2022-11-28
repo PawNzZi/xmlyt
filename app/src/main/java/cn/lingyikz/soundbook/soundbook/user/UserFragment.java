@@ -2,32 +2,21 @@ package cn.lingyikz.soundbook.soundbook.user;
 
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-
-
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
-
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.kongzue.dialogx.dialogs.PopTip;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -37,15 +26,12 @@ import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.databinding.FragmentUserBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.PlayAudioActivity;
 import cn.lingyikz.soundbook.soundbook.main.BaseFragment;
-import cn.lingyikz.soundbook.soundbook.service.AudioService;
 import cn.lingyikz.soundbook.soundbook.user.activity.LoginActivity;
 import cn.lingyikz.soundbook.soundbook.user.activity.SettingActivity;
 import cn.lingyikz.soundbook.soundbook.user.fragment.CollectionFragment;
 import cn.lingyikz.soundbook.soundbook.user.fragment.PlayHistoryFragment;
 import cn.lingyikz.soundbook.soundbook.utils.Constans;
-import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
-import cn.lingyikz.soundbook.soundbook.utils.MediaPlayer;
 import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
 import cn.lingyikz.soundbook.soundbook.utils.SuperMediaPlayer;
 
@@ -76,7 +62,7 @@ public class UserFragment extends BaseFragment {
         binding.titleBar.setting.setVisibility(View.VISIBLE);
         binding.titleBar.goSearch.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.GONE);
-        binding.titleBar.title.setText("我的");
+//        binding.titleBar.title.setText("我的");
 
     }
 
@@ -128,7 +114,8 @@ public class UserFragment extends BaseFragment {
 //                Bundle bundle = DataBaseHelper.getInstance(getActivity()).queryPlayHistoryRecent();
                 Bundle bundle = SharedPreferences.currentPlayHistoryInfo(getActivity());
                 if(bundle.getString("src") == null){
-                    Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), Constans.NO_OLD_AUDIOINFO, Toast.LENGTH_SHORT).show();
+                    PopTip.show(R.mipmap.warn_tip,Constans.NO_OLD_AUDIOINFO).showShort().setAutoTintIconInLightOrDarkMode(false);
                 }else {
                     IntentAction.setValueActivity(getActivity(),PlayAudioActivity.class,bundle);
                 }
@@ -139,7 +126,10 @@ public class UserFragment extends BaseFragment {
                 IntentAction.toNextActivity(getActivity(), SettingActivity.class);
                 break;
             case R.id.userName:
-                IntentAction.toNextActivity(getActivity(), LoginActivity.class);
+                if(ObjectUtil.isNull(Constans.user)){
+                    IntentAction.toNextActivity(getActivity(), LoginActivity.class);
+                }
+
                 break;
         }
     }

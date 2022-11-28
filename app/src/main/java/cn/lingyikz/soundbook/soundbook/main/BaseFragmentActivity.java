@@ -7,7 +7,6 @@ import android.view.Window;
 
 import com.kongzue.dialogx.DialogX;
 import com.kongzue.dialogx.style.KongzueStyle;
-import com.liys.onclickme.LOnClickMe;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;

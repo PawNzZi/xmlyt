@@ -2,7 +2,6 @@ package cn.lingyikz.soundbook.soundbook.home.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import cn.lingyikz.soundbook.soundbook.databinding.ItemHomeBinding;
 import cn.lingyikz.soundbook.soundbook.home.activity.AudioDetailActivity;
 import cn.lingyikz.soundbook.soundbook.modle.v2.Album;
-import cn.lingyikz.soundbook.soundbook.utils.DataBaseHelper;
 import cn.lingyikz.soundbook.soundbook.utils.IntentAction;
-import cn.lingyikz.soundbook.soundbook.utils.SharedPreferences;
+
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Album.DataDTO.RowsDTO> list ;
