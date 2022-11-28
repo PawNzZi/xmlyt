@@ -24,5 +24,6 @@ public class Version {
         private Integer code;
         private String number;
         private String descrition;
+        private String downloadUrl ;
     }
 }

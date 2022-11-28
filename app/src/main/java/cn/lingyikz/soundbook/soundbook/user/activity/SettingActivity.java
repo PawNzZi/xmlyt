@@ -1,13 +1,29 @@
 package cn.lingyikz.soundbook.soundbook.user.activity;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+
+import com.arialyy.annotations.Download;
+import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.task.DownloadTask;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.kongzue.dialogx.dialogs.PopTip;
 import com.kongzue.dialogx.dialogs.WaitDialog;
 import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 import com.liys.onclickme.LOnClickMe;
 import com.liys.onclickme_annotations.AClick;
+
+import java.io.File;
+import java.util.List;
+
+import androidx.core.content.FileProvider;
 import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
@@ -29,7 +45,8 @@ public class SettingActivity extends BaseActivity {
     private ActivitySettingBinding binding;
     @Override
     protected void setData() {
-
+        Aria.download(this).register();
+        Log.i("TAG",this.getPackageName());
     }
 
     @Override
@@ -109,8 +126,19 @@ public class SettingActivity extends BaseActivity {
                         Log.i("TAG：", bean.toString() + "");
                         if(bean.getCode() == 200 && ObjectUtil.isNotNull(bean.getData())){
                             if(versionCode < bean.getData().getCode()){
-                                MessageDialog.show("温馨提示", "最新版本为"+bean.getData().getNumber()+"，请及时加群更新", "确定")
-                                        .setCancelable(false);
+
+                                MessageDialog.show("发现新版本 v"+bean.getData().getNumber(), bean.getData().getDescrition(), Constans.APP_INSTALL,Constans.DIALOG_CANCEL_BUTTON).setOkButtonClickListener(new OnDialogButtonClickListener<MessageDialog>() {
+                                    @Override
+                                    public boolean onClick(MessageDialog baseDialog, View v) {
+                                        File appFile = new File(Constans.DOWNLOAD_APP_PATH);
+                                        if(appFile.exists()){
+                                            appFile.delete();
+                                        }
+                                       dowmloadAndInstall(bean.getData().getDownloadUrl());
+                                        return false;
+                                    }
+                                });
+
                             }else if(versionCode == bean.getData().getCode()) {
 //                                Toast.makeText(getApplicationContext(), Constans.LATEST_VERSION, Toast.LENGTH_SHORT).show();
                                 PopTip.show(R.mipmap.succes_tip,Constans.LATEST_VERSION).showShort().setAutoTintIconInLightOrDarkMode(false);
@@ -120,7 +148,7 @@ public class SettingActivity extends BaseActivity {
                         }
                         else if(bean.getCode() != 200){
 //                            Toast.makeText(getApplicationContext(), Constans.VERSION_ERROR, Toast.LENGTH_SHORT).show();
-                            PopTip.show(R.mipmap.fail_tip,Constans.VERSION_ERROR).showShort().setAutoTintIconInLightOrDarkMode(false);
+                            PopTip.show(R.mipmap.fail_tip,bean.getMessage()).showShort().setAutoTintIconInLightOrDarkMode(false);
 
                         }
 
@@ -128,9 +156,58 @@ public class SettingActivity extends BaseActivity {
                 });
         observable.unsubscribeOn(Schedulers.io());
     }
+
+    private void dowmloadAndInstall(String url){
+        XXPermissions.with(this)
+                // 申请权限
+                .permission(Permission.WRITE_EXTERNAL_STORAGE)
+                .permission(Permission.READ_EXTERNAL_STORAGE)
+                .permission(Permission.REQUEST_INSTALL_PACKAGES)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> permissions, boolean all) {
+                        if (!all) {
+                            return;
+                        }
+
+                        Aria.download(SettingActivity.this)
+                                .load(url)     //读取下载地址
+                                .setFilePath(Constans.DOWNLOAD_APP_PATH) //设置文件保存的完整路径
+                                .create();   //创建并启动下载
+
+                    }
+                    @Override
+                    public void onDenied(List<String> permissions, boolean never) {
+                        if (never) {
+                            // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                            XXPermissions.startPermissionActivity(SettingActivity.this, permissions);
+                        } else {
+
+                        }
+                    }
+                });
+    }
+    @Download.onTaskComplete void taskComplete(DownloadTask task) {
+        //下载完成进行安装
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(Intent.ACTION_VIEW);
+        File apkFile = new File(Constans.DOWNLOAD_APP_PATH);
+        Uri uri = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            uri = FileProvider.getUriForFile(this, this.getPackageName()+".fileprovider", apkFile);
+        } else {
+            uri = Uri.fromFile(apkFile);
+        }
+        intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        this.startActivity(intent);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
         binding = null ;
+        Aria.download(this).unRegister();
     }
 }
