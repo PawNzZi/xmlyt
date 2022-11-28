@@ -46,6 +46,7 @@ public class Constans {
     public final static String DIALOG_CANCEL_BUTTON = "取消";
     public final static String BUGLY_APPID = "65570d87b8";
     public final static String APP_INSTALL = "安装";
+    public final static String DOWNLOADING = "正在下载...";
     public final static String DOWNLOAD_APP_PATH = DOWNLOAD_FILE_PATH + File.separator + APP_NAME + ".apk";
     public static User user = new User() ;
 

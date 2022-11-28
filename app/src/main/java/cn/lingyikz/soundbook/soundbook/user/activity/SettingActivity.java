@@ -122,21 +122,22 @@ public class SettingActivity extends BaseActivity {
 
                     @Override
                     public void onNext(Version bean) {
-                        Log.i("TAG：", versionCode + "");
-                        Log.i("TAG：", bean.toString() + "");
                         if(bean.getCode() == 200 && ObjectUtil.isNotNull(bean.getData())){
                             if(versionCode < bean.getData().getCode()){
 
-                                MessageDialog.show("发现新版本 v"+bean.getData().getNumber(), bean.getData().getDescrition(), Constans.APP_INSTALL,Constans.DIALOG_CANCEL_BUTTON).setOkButtonClickListener(new OnDialogButtonClickListener<MessageDialog>() {
-                                    @Override
-                                    public boolean onClick(MessageDialog baseDialog, View v) {
+                                MessageDialog.show("发现新版本 v"+bean.getData().getNumber(), bean.getData().getDescrition(), Constans.APP_INSTALL,Constans.DIALOG_CANCEL_BUTTON).setOkButtonClickListener((baseDialog, v) -> {
+                                    File dir = new File(Constans.DOWNLOAD_FILE_PATH);
+                                    if(!dir.exists()){
+                                        dir.mkdir();
+                                    }else{
                                         File appFile = new File(Constans.DOWNLOAD_APP_PATH);
                                         if(appFile.exists()){
                                             appFile.delete();
                                         }
-                                       dowmloadAndInstall(bean.getData().getDownloadUrl());
-                                        return false;
                                     }
+
+                                   dowmloadAndInstall(bean.getData().getDownloadUrl());
+                                    return false;
                                 });
 
                             }else if(versionCode == bean.getData().getCode()) {
@@ -160,9 +161,9 @@ public class SettingActivity extends BaseActivity {
     private void dowmloadAndInstall(String url){
         XXPermissions.with(this)
                 // 申请权限
+                .permission(Permission.REQUEST_INSTALL_PACKAGES)
                 .permission(Permission.WRITE_EXTERNAL_STORAGE)
                 .permission(Permission.READ_EXTERNAL_STORAGE)
-                .permission(Permission.REQUEST_INSTALL_PACKAGES)
                 .request(new OnPermissionCallback() {
                     @Override
                     public void onGranted(List<String> permissions, boolean all) {
@@ -187,8 +188,22 @@ public class SettingActivity extends BaseActivity {
                     }
                 });
     }
+    @Download.onPre void onPre(DownloadTask task) {
+        WaitDialog.show(Constans.DOWNLOADING).setOnBackPressedListener(() -> {
+            WaitDialog.dismiss();
+            return false;
+        });
+    }
+    @Download.onTaskCancel void taskCancel(DownloadTask task) {
+        WaitDialog.dismiss();
+    }
+
+    @Download.onTaskFail void taskFail(DownloadTask task) {
+        WaitDialog.dismiss();
+    }
     @Download.onTaskComplete void taskComplete(DownloadTask task) {
         //下载完成进行安装
+        WaitDialog.dismiss();
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(Intent.ACTION_VIEW);
@@ -197,7 +212,7 @@ public class SettingActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            uri = FileProvider.getUriForFile(this, this.getPackageName()+".fileprovider", apkFile);
+            uri = FileProvider.getUriForFile(this, this.getPackageName()+".fileProvider", apkFile);
         } else {
             uri = Uri.fromFile(apkFile);
         }
