@@ -56,7 +56,6 @@ public class SettingActivity extends BaseActivity {
         binding.titleBar.goPlay.setVisibility(View.GONE);
         binding.titleBar.goBacK.setVisibility(View.VISIBLE);
         binding.titleBar.title.setText("设置");
-
     }
 
     @Override
@@ -109,7 +108,7 @@ public class SettingActivity extends BaseActivity {
 //        Log.i("TAG：",  "checkVersion");
         WaitDialog.show(Constans.CHECKING_UPDATE);
         int versionCode = VersionUtil.getVersonCode(this);
-        Observable<Version> observable  = RequestService.getInstance().getApi().getVersion(versionCode);
+        Observable<Version> observable  = RequestService.getInstance().getApi().checkVersion();
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
                 .subscribe(new BaseObsever<Version>() { // 订阅
@@ -140,7 +139,7 @@ public class SettingActivity extends BaseActivity {
                                     return false;
                                 });
 
-                            }else if(versionCode == bean.getData().getCode()) {
+                            }else if(versionCode >= bean.getData().getCode()) {
 //                                Toast.makeText(getApplicationContext(), Constans.LATEST_VERSION, Toast.LENGTH_SHORT).show();
                                 PopTip.show(R.mipmap.succes_tip,Constans.LATEST_VERSION).showShort().setAutoTintIconInLightOrDarkMode(false);
                             }

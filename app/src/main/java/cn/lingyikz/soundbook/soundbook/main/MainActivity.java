@@ -31,6 +31,7 @@ import androidx.fragment.app.FragmentTransaction;
 import java.io.File;
 import java.util.List;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.lingyikz.soundbook.soundbook.R;
 import cn.lingyikz.soundbook.soundbook.api.RequestService;
 import cn.lingyikz.soundbook.soundbook.base.BaseObsever;
@@ -131,7 +132,7 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
     public void checkVersion(){
 //        Log.i("TAG：",  "checkVersion");
         int versionCode = VersionUtil.getVersonCode(this);
-        Observable<Version> observable  = RequestService.getInstance().getApi().getVersion(versionCode);
+        Observable<Version> observable  = RequestService.getInstance().getApi().checkVersion();
         observable.subscribeOn(Schedulers.io()) // 在子线程中进行Http访问
                 .observeOn(AndroidSchedulers.mainThread()) // UI线程处理返回接口
                 .subscribe(new BaseObsever<Version>() { // 订阅
@@ -139,7 +140,7 @@ public class MainActivity extends BaseFragmentActivity implements BottomNavigati
                     @Override
                     public void onNext(Version bean) {
 //                        Log.i("TAG：", bean.toString() + "");
-                        if(bean.getCode() == 200 && bean.getData() != null){
+                        if(bean.getCode() == 200 && ObjectUtil.isNotNull(bean.getData())){
                             if(versionCode < bean.getData().getCode()){
                                 MessageDialog.show("发现新版本 v"+bean.getData().getNumber(), bean.getData().getDescrition(), Constans.APP_INSTALL,Constans.DIALOG_CANCEL_BUTTON).setOkButtonClickListener((baseDialog, v) -> {
                                     File dir = new File(Constans.DOWNLOAD_FILE_PATH);

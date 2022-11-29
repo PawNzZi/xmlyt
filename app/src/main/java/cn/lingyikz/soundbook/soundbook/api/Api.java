@@ -38,7 +38,7 @@ public interface Api {
 
       //检查版本
       @GET("/zmlmVersion/app/checkVersion")
-      Observable<Version> getVersion(@Query("versonCode") int versonCode);
+      Observable<Version> checkVersion();
 
       //查询分类
       @GET("/zmlmCategory/app/getList")
