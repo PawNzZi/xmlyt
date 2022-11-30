@@ -1,6 +1,7 @@
 package cn.lingyikz.soundbook.soundbook.user.fragment;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,7 +108,7 @@ public class PlayHistoryFragment extends BaseFragment implements PlayHistoryAdap
                     @Override
                     public void onNext(PlayHistories baseModel) {
                         if(baseModel.getCode() == 200 && baseModel.getData().getRows().size() > 0){
-//                            Log.i("TAG",baseModel.toString());
+                            Log.i("TAG",baseModel.toString());
                             if(ObjectUtil.isNull(mList)){
                                 mList = new ArrayList<>();
                             }
