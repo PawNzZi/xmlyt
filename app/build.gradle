@@ -6,8 +6,8 @@ android {
         applicationId "cn.lingyikz.soundbook"
         minSdkVersion 26
         targetSdkVersion 32
-        versionCode 72
-        versionName "0.7.2"
+        versionCode 73
+        versionName "0.7.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary= true
 //添加如下配置 开启annotation processor

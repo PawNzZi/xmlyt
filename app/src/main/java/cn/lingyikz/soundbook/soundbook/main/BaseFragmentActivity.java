@@ -26,7 +26,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         DialogX.globalStyle = new KongzueStyle();
         setContentView(setLayout());
         Constans.user = SharedPreferences.getUser(getApplicationContext());
-        Log.i("TAG",Constans.user+"");
+//        Log.i("TAG",Constans.user+"");
         setView();
         setData();
 

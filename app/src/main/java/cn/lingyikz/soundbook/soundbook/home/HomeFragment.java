@@ -200,8 +200,9 @@ public class HomeFragment extends BaseFragment implements HomeAdapter.ItemOperaC
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         binding = null;
+        super.onDestroyView();
+
     }
 
     @Override
