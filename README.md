@@ -33,13 +33,21 @@
 
 # 鸣谢
 [ Gson](https://github.com/google/gson " Gson")
+
 [ okhttp](https://github.com/square/okhttp " okhttp")
+
 [ RxJava](https://github.com/ReactiveX/RxJava " RxJava")
+
 [ glide](https://github.com/bumptech/glide " glide")
+
 [ LOnClickMe](https://github.com/liys666666/LOnClickMe " LOnClickMe")
+
 [ SearchDialog](https://github.com/wenwenwen888/SearchDialog " SearchDialog")
+
 [ DialogX](https://github.com/kongzue/DialogX " DialogX")
+
 [ XXPermissions](https://github.com/getActivity/XXPermissions " XXPermissions")
+
 [ okdownload](https://github.com/lingochamp/okdownload " okdownload")
 
 # 写在最后
